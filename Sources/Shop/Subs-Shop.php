@@ -2,7 +2,7 @@
 
 /**
  * @package ST Shop
- * @version 2.0
+ * @version 3.0
  * @author Diego Andrés <diegoandres_cortes@outlook.com>
  * @copyright Copyright (c) 2014, Diego Andrés
  * @license http://www.mozilla.org/MPL/MPL-1.1.html
@@ -28,13 +28,20 @@ class Shop
 		self::dataHooks();
 	}
 
+	/**
+	 * Shop::setDefaults()
+	 *
+	 * Sets almost every setting to a default value
+	 * @return void
+	 * @author Peter Spicer (Arantor)
+	 */
 	public static function setDefaults()
 	{
 		global $modSettings;
 
 		$defaults = array(
 			'Shop_enable_shop' => 0,
-			'Shop_stats_refresh' => 300,
+			'Shop_stats_refresh' => 900,
 			'Shop_credits_register' => 200,
 			'Shop_credits_topic' => 25,
 			'Shop_credits_post' => 10,
@@ -168,7 +175,7 @@ class Shop
 	/**
 	 * Shop::dataHooks()
 	 *
-	 * Load member and custom fields hooks quietly
+	 * Load member and custom fields hooks
 	 * @return void
 	 * @author Peter Spicer (Arantor)
 	 */
@@ -176,6 +183,7 @@ class Shop
 	{
 		global $sourcedir;
 
+		// Load our Profile file
 		require_once($sourcedir . '/Shop/ProfileShop.php');
 		$hooks = array(
 			'load_member_data' => 'Shop_profileData',
@@ -204,6 +212,7 @@ class Shop
 		// The main action
 		$actions['shop'] = array('Shop/Shop.php', 'Shop');
 
+		// Add some hooks by action
 		switch ($_REQUEST['action']) {
 			case 'admin':
 				require_once($sourcedir . '/Shop/AdminShop.php');
@@ -266,7 +275,8 @@ class Shop
 	 * Shop::ShopLayer()
 	 *
 	 * Used for adding the shop tabs quickly
-	 * 
+	 * @return void
+	 * @author Diego Andrés
 	 */
 	public static function ShopLayer()
 	{
@@ -290,7 +300,7 @@ class Shop
 	 *
 	 * Used in the credits action.
 	 * @param boolean $return decide between returning a string or append it to a known context var.
-	 * @return string a link for copyright notice
+	 * @return string A link for copyright notice
 	 */
 	public static function shopCredits($return = false)
 	{
@@ -330,8 +340,8 @@ class Shop
 	 * Shop::whoData()
 	 *
 	 * Used in the who's online action.
-	 * @param $action it gets the request parameters 
-	 * @return string of text for the current action
+	 * @param $action It gets the request parameters 
+	 * @return string A text for the current action
 	 */
 	public static function whoData($actions)
 	{
@@ -379,6 +389,20 @@ class Shop
 				// Trade list
 				elseif ($actions['sa'] == 'tradelist' && allowedTo('shop_canTrade'))
 					$who = $txt['whoallow_shop_tradelist'];
+				// Personal trade list
+				elseif ($actions['sa'] == 'mytrades' && allowedTo('shop_canTrade'))
+				{
+					$who = $txt['whoallow_shop_owntrades'];
+					if (!empty($actions['u']))
+					{
+						$temp = loadMemberData($actions['u'], false, 'profile');
+						loadMemberContext($actions['u']);
+						$membername = $memberContext[$actions['u']]['name'];
+						$who = sprintf($txt['whoallow_shop_othertrades'], $membername, $actions['u']);
+					}
+				}
+				elseif ($actions['sa'] == 'tradelist' && allowedTo('shop_canTrade'))
+					$who = $txt['whoallow_shop_tradelist'];
 				// Stats
 				elseif ($actions['sa'] == 'stats' && allowedTo('shop_viewStats'))
 					$who = $txt['whoallow_shop_stats'];
@@ -415,6 +439,17 @@ class Shop
 			return $who;
 	}
 
+	/**
+	 * Shop::afterPost()
+	 *
+	 * Used in the who's online action.
+	 * @param array $msgOptions An array of information/options for the post
+	 * @param array $topicOptions An array of information/options for the topic
+	 * @param array $posterOptions An array of information/options for the poster
+	 * @param array $message_columns An array containing the columns of topics table
+	 * @param array $message_parameters An array containing the values for every column
+	 * @return void
+	 */
 	public static function afterPost($msgOptions, $topicOptions, $posterOptions, $message_columns, $message_parameters)
 	{
 		global $smcFunc, $modSettings;
@@ -476,6 +511,12 @@ class Shop
 		}
 	}
 
+	/**
+	 * Shop::scheduled_shopBank()
+	 *
+	 * Creates a scheduled task for making money in the bank of every user
+	 * @return void
+	 */
 	public static function scheduled_shopBank()
 	{
 		global $smcFunc, $modSettings;
@@ -527,15 +568,29 @@ class Shop
 		}
 	}
 
-	public static function formatCash($cash)
+	/**
+	 * Shop::formatCash()
+	 *
+	 * It gives the money a format, adding the suffix and prefix set in the admin
+	 * @param $money An amount of Shop money 
+	 * @return string A text containing the specified money with format
+	 */
+	public static function formatCash($money)
 	{
 		global $modSettings;
 
-		$cash = (int) $cash;
+		// Make 100% sure it's an int
+		$money = (int) $money;
 
-		return $modSettings['Shop_credits_prefix'] . $cash . ' ' . $modSettings['Shop_credits_suffix'];
+		return $modSettings['Shop_credits_prefix'] . $money . ' ' . $modSettings['Shop_credits_suffix'];
 	}
 
+	/**
+	 * Shop::getImageList()
+	 *
+	 * It provides the list of images that can be used for items and categories
+	 * @return array The list of images
+	 */
 	public static function getImageList()
 	{
 		global $boarddir;
@@ -560,6 +615,12 @@ class Shop
 			fatal_error(self::text('cannot_open_images'));
 	}
 
+	/**
+	 * Shop::getCatList()
+	 *
+	 * It provides the list of categories added into the shop
+	 * @return array The list of current categories
+	 */
 	public static function getCatList()
 	{
 		global $smcFunc;
@@ -588,6 +649,13 @@ class Shop
 		return $cats;
 	}
 
+	/**
+	 * Shop::getShopItemsList()
+	 *
+	 * It provides a FULL list of enabled items
+	 * @param $stock A simple flag to indicate if you want to rule out items without stock
+	 * @return array The list of items in the shop
+	 */
 	public static function getShopItemsList($stock = 0)
 	{
 		global $smcFunc;
@@ -615,6 +683,13 @@ class Shop
 		return $shopitems;
 	}
 
+	/**
+	 * Shop::getUserItemsList()
+	 *
+	 * A FULL list of items from a specific member (Inventory)
+	 * @param $id The id of the desired user
+	 * @return array The inventory of a certain user
+	 */
 	public static function getUserItemsList($id)
 	{
 		global $smcFunc;
@@ -646,7 +721,15 @@ class Shop
 		return $useritems;
 	}
 
-	public static function Shop_imageFormat($image, $description = '')
+	/**
+	 * Shop::ShopImageFormat()
+	 *
+	 * Gives the provided item format with his image
+	 * @param $image The image of an item
+	 * @param $description Optional parameter for including the description in the title/alt
+	 * @return string A formatted image
+	 */
+	public static function ShopImageFormat($image, $description = '')
 	{
 		global $scripturl, $modSettings, $context, $boardurl;
 
@@ -693,7 +776,7 @@ class Shop
 	 * Shop::credits()
 	 *
 	 * Includes a list of contributors, developers and third party scripts that helped to build this MOD
-	 * @return array
+	 * @return array The list of credits
 	 */
 	public static function credits()
 	{
