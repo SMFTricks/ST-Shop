@@ -118,7 +118,7 @@ function Shop_statsRichest($type = 'pocket')
 {
 	global $smcFunc, $context, $scripturl, $modSettings;
 
-	if (($context['shop_stats']['richest'.($type == 'bank' ? '_bank' : '_pocket')] = cache_get_data('shopStats'.($type == 'bank' ? '_bank' : '_pocket'), $modSettings['Shop_stats_refresh'])) == null)
+	if (($context['shop_stats']['richest_'.($type == 'bank' ? 'bank' : 'pocket')] = cache_get_data('shopStats_'.($type == 'bank' ? 'bank' : 'pocket'), $modSettings['Shop_stats_refresh'])) == null)
 	{
 		// Richest top 5.
 		$members_result = $smcFunc['db_query']('', '
@@ -178,7 +178,7 @@ function Shop_statsLastItems()
 			$context['shop_stats']['last_added'][] = array(
 				'id' => $row_items['itemid'],
 				'name' => $row_items['name'],
-				'image' => Shop::Shop_imageFormat($row_items['image'])
+				'image' => Shop::ShopImageFormat($row_items['image'])
 			);
 		}
 		$smcFunc['db_free_result']($items_result);
@@ -190,7 +190,7 @@ function Shop_statsLastBought()
 {
 	global $smcFunc, $context, $modSettings;
 
-	if (($context['shop_stats'] = cache_get_data('shopStats_bought', $modSettings['Shop_stats_refresh'])) == null)
+	if (($context['shop_stats']['last_bought'] = cache_get_data('shopStats_lastbought', $modSettings['Shop_stats_refresh'])) == null)
 	{
 		// Last bought.
 		$items_result = $smcFunc['db_query']('', '
@@ -209,12 +209,12 @@ function Shop_statsLastBought()
 			$context['shop_stats']['last_bought'][] = array(
 				'name' => $row_items['name'],
 				'id' => $row_items['itemid'],
-				'image' => Shop::Shop_imageFormat($row_items['image'])
+				'image' => Shop::ShopImageFormat($row_items['image'])
 			);
 		}
 		$smcFunc['db_free_result']($items_result);
 
-		cache_put_data('shopStats_bought', $context['shop_stats'], $modSettings['Shop_stats_refresh']);
+		cache_put_data('shopStats_lastbought', $context['shop_stats']['last_bought'], $modSettings['Shop_stats_refresh']);
 	}
 
 	return $context['shop_stats']['last_bought'];
@@ -222,9 +222,11 @@ function Shop_statsLastBought()
 
 function Shop_statsMostBought()
 {
-	global $smcFunc, $context, $scripturl;
+	global $smcFunc, $context, $scripturl, $modSettings;
 
-		// Last bought.
+	if (($context['shop_stats']['most_bought'] = cache_get_data('shopStats_mostbought', $modSettings['Shop_stats_refresh'])) == null)
+	{
+		// Most bought.
 		$items_result = $smcFunc['db_query']('', '
 			SELECT l.itemid, count(*) AS count, s.name, s.image, s.status
 			FROM {db_prefix}shop_log_buy AS l
@@ -244,7 +246,7 @@ function Shop_statsMostBought()
 			$context['shop_stats']['most_bought'][] = array(
 				'id' => $row_items['itemid'],
 				'name' => $row_items['name'],
-				'image' => Shop::Shop_imageFormat($row_items['image']),
+				'image' => Shop::ShopImageFormat($row_items['image']),
 				'num' => $row_items['count']
 			);
 
@@ -259,14 +261,19 @@ function Shop_statsMostBought()
 			$context['shop_stats']['most_bought'][$i]['num'] = comma_format($context['shop_stats']['most_bought'][$i]['num']);
 		}
 
+		cache_put_data('shopStats_mostbought', $context['shop_stats']['most_bought'], $modSettings['Shop_stats_refresh']);
+	}
+
 	return $context['shop_stats']['most_bought'];
 }
 
 function Shop_statsTopCats()
 {
-	global $smcFunc, $context;
+	global $smcFunc, $context, $modSettings;
 
-		// Last bought.
+	if (($context['shop_stats']['top_cats'] = cache_get_data('shopStats_topcats', $modSettings['Shop_stats_refresh'])) == null)
+	{
+		// Top categories
 		$items_result = $smcFunc['db_query']('', '
 			SELECT s.catid, s.status, count(*) AS count, c.name, c.image
 			FROM {db_prefix}shop_items AS s
@@ -286,7 +293,7 @@ function Shop_statsTopCats()
 			$context['shop_stats']['top_cats'][] = array(
 				'id' => $row_items['catid'],
 				'name' => $row_items['name'],
-				'image' => Shop::Shop_imageFormat($row_items['image']),
+				'image' => Shop::ShopImageFormat($row_items['image']),
 				'num' => $row_items['count']
 			);
 
@@ -301,14 +308,19 @@ function Shop_statsTopCats()
 			$context['shop_stats']['top_cats'][$i]['num'] = comma_format($context['shop_stats']['top_cats'][$i]['num']);
 		}
 
+		cache_put_data('shopStats_topcats', $context['shop_stats']['top_cats'], $modSettings['Shop_stats_refresh']);
+	}
+
 	return $context['shop_stats']['top_cats'];
 }
 
 function Shop_statsTopBuyers()
 {
-	global $smcFunc, $context, $scripturl;
+	global $smcFunc, $context, $scripturl, $modSettings;
 
-		// Last bought.
+	if (($context['shop_stats']['top_buyers'] = cache_get_data('shopStats_topbuyers', $modSettings['Shop_stats_refresh'])) == null)
+	{
+		// Top buyers
 		$items_result = $smcFunc['db_query']('', '
 			SELECT l.userid, count(*) AS count, m.real_name, s.status
 			FROM {db_prefix}shop_log_buy AS l
@@ -344,14 +356,19 @@ function Shop_statsTopBuyers()
 			$context['shop_stats']['top_buyers'][$i]['num'] = comma_format($context['shop_stats']['top_buyers'][$i]['num']);
 		}
 
+		cache_put_data('shopStats_topbuyers', $context['shop_stats']['top_buyers'], $modSettings['Shop_stats_refresh']);
+	}
+
 	return $context['shop_stats']['top_buyers'];
 }
 
 function Shop_statsTopInventories()
 {
-	global $smcFunc, $context, $scripturl;
+	global $smcFunc, $context, $scripturl, $modSettings;
 
-		// Last bought.
+	if (($context['shop_stats']['top_inventories'] = cache_get_data('shopStats_topinvs', $modSettings['Shop_stats_refresh'])) == null)
+	{
+		// Top inventories
 		$items_result = $smcFunc['db_query']('', '
 			SELECT inv.userid, inv.trading, count(*) AS count, m.real_name, s.status
 			FROM {db_prefix}shop_inventory AS inv
@@ -387,14 +404,19 @@ function Shop_statsTopInventories()
 			$context['shop_stats']['top_inventories'][$i]['num'] = comma_format($context['shop_stats']['top_inventories'][$i]['num']);
 		}
 
+		cache_put_data('shopStats_topinvs', $context['shop_stats']['top_inventories'], $modSettings['Shop_stats_refresh']);
+	}
+
 	return $context['shop_stats']['top_inventories'];
 }
 
 function Shop_statsTopGifts($type = NULL)
 {
-	global $smcFunc, $context, $scripturl;
+	global $smcFunc, $context, $scripturl, $modSettings;
 
-		// Last bought.
+	if (($context['shop_stats']['gift_'.($type == 'received' ? 'received' : 'sent')] = cache_get_data('shopStats_gift'.($type == 'received' ? 'rec' : 'sent'), $modSettings['Shop_stats_refresh'])) == null)
+	{
+		// Top gifts sent/received
 		$items_result = $smcFunc['db_query']('', '
 			SELECT '.($type == 'received' ? 'l.receiver' : 'l.userid').', l.is_admin, count(*) AS count, m.real_name, s.status
 			FROM {db_prefix}shop_log_gift AS l
@@ -409,10 +431,10 @@ function Shop_statsTopGifts($type = NULL)
 		);
 
 		$max_num = 1;
-		$context['shop_stats']['top_buyers'] = array();
+		$context['shop_stats']['top_gifts'] = array();
 		while ($row_items = $smcFunc['db_fetch_assoc']($items_result))
 		{
-			$context['shop_stats']['top_buyers'][] = array(
+			$context['shop_stats']['top_gifts'][] = array(
 				'id' => $row_items[($type == 'received' ? 'receiver' : 'userid')],
 				'name' => $row_items['real_name'],
 				'num' => $row_items['count'],
@@ -424,20 +446,25 @@ function Shop_statsTopGifts($type = NULL)
 		}
 		$smcFunc['db_free_result']($items_result);
 
-		foreach ($context['shop_stats']['top_buyers'] as $i => $bought)
+		foreach ($context['shop_stats']['top_gifts'] as $i => $bought)
 		{
-			$context['shop_stats']['top_buyers'][$i]['percent'] = round(($bought['num'] * 100) / $max_num);
-			$context['shop_stats']['top_buyers'][$i]['num'] = comma_format($context['shop_stats']['top_buyers'][$i]['num']);
+			$context['shop_stats']['top_gifts'][$i]['percent'] = round(($bought['num'] * 100) / $max_num);
+			$context['shop_stats']['top_gifts'][$i]['num'] = comma_format($context['shop_stats']['top_gifts'][$i]['num']);
 		}
 
-	return $context['shop_stats']['top_buyers'];
+		cache_put_data('shopStats_gift'.($type == 'received' ? 'rec' : 'sent'), $context['shop_stats']['gift_'.($type == 'received' ? 'received' : 'sent')], $modSettings['Shop_stats_refresh']);
+	}
+
+	return $context['shop_stats']['top_gifts'];
 }
 
 function Shop_statsTopMoney($type = NULL)
 {
-	global $smcFunc, $context, $scripturl;
+	global $smcFunc, $context, $scripturl, $modSettings;
 
-		// Last bought.
+	if (($context['shop_stats']['money_'.($type == 'received' ? 'received' : 'sent')] = cache_get_data('shopStats_money'.($type == 'received' ? 'rec' : 'sent'), $modSettings['Shop_stats_refresh'])) == null)
+	{
+		// Top money sent/received
 		$items_result = $smcFunc['db_query']('', '
 			SELECT '.($type == 'received' ? 'l.receiver' : 'l.userid').', l.itemid, l.is_admin, sum(l.amount) AS count, m.real_name
 			FROM {db_prefix}shop_log_gift AS l
@@ -451,10 +478,10 @@ function Shop_statsTopMoney($type = NULL)
 		);
 
 		$max_num = 1;
-		$context['shop_stats']['top_buyers'] = array();
+		$context['shop_stats']['top_money'] = array();
 		while ($row_items = $smcFunc['db_fetch_assoc']($items_result))
 		{
-			$context['shop_stats']['top_buyers'][] = array(
+			$context['shop_stats']['top_money'][] = array(
 				'id' => $row_items[($type == 'received' ? 'receiver' : 'userid')],
 				'name' => $row_items['real_name'],
 				'num' => $row_items['count'],
@@ -466,19 +493,24 @@ function Shop_statsTopMoney($type = NULL)
 		}
 		$smcFunc['db_free_result']($items_result);
 
-		foreach ($context['shop_stats']['top_buyers'] as $i => $bought)
+		foreach ($context['shop_stats']['top_money'] as $i => $bought)
 		{
-			$context['shop_stats']['top_buyers'][$i]['percent'] = round(($bought['num'] * 100) / $max_num);
-			$context['shop_stats']['top_buyers'][$i]['num'] = comma_format($context['shop_stats']['top_buyers'][$i]['num']);
+			$context['shop_stats']['top_money'][$i]['percent'] = round(($bought['num'] * 100) / $max_num);
+			$context['shop_stats']['top_money'][$i]['num'] = comma_format($context['shop_stats']['top_money'][$i]['num']);
 		}
 
-	return $context['shop_stats']['top_buyers'];
+		cache_put_data('shopStats_money'.($type == 'received' ? 'rec' : 'sent'), $context['shop_stats']['money_'.($type == 'received' ? 'received' : 'sent')], $modSettings['Shop_stats_refresh']);
+	}
+
+	return $context['shop_stats']['top_money'];
 }
 
 function Shop_statsTopProfit()
 {
-	global $smcFunc, $context, $scripturl;
+	global $smcFunc, $context, $scripturl, $modSettings;
 
+	if (($context['shop_stats']['top_profit'] = cache_get_data('shopStats_topprofit', $modSettings['Shop_stats_refresh'])) == null)
+	{
 		// Top profit
 		$items_result = $smcFunc['db_query']('', '
 			SELECT l.sellerid, sum(l.amount) AS count, m.real_name, s.status
@@ -515,13 +547,18 @@ function Shop_statsTopProfit()
 			$context['shop_stats']['top_profit'][$i]['num'] = comma_format($context['shop_stats']['top_profit'][$i]['num']);
 		}
 
+		cache_put_data('shopStats_topprofit', $context['shop_stats']['top_profit'], $modSettings['Shop_stats_refresh']);
+	}
+
 	return $context['shop_stats']['top_profit'];
 }
 
 function Shop_statsTopSpent()
 {
-	global $smcFunc, $context, $scripturl;
+	global $smcFunc, $context, $scripturl, $modSettings;
 
+	if (($context['shop_stats']['top_spent'] = cache_get_data('shopStats_topspent', $modSettings['Shop_stats_refresh'])) == null)
+	{
 		// Top spent
 		$items_result = $smcFunc['db_query']('', '
 			SELECT l.userid, l.sellerid, sum(l.amount) AS count, m.real_name, s.status
@@ -558,14 +595,19 @@ function Shop_statsTopSpent()
 			$context['shop_stats']['top_spent'][$i]['num'] = comma_format($context['shop_stats']['top_spent'][$i]['num']);
 		}
 
+		cache_put_data('shopStats_topspent', $context['shop_stats']['top_spent'], $modSettings['Shop_stats_refresh']);
+	}
+
 	return $context['shop_stats']['top_spent'];
 }
 
 function Shop_statsMostTraded()
 {
-	global $smcFunc, $context, $scripturl;
+	global $smcFunc, $context, $scripturl, $modSettings;
 
-		// Last bought.
+	if (($context['shop_stats']['most_traded'] = cache_get_data('shopStats_mosttraded', $modSettings['Shop_stats_refresh'])) == null)
+	{
+		// Most traded
 		$items_result = $smcFunc['db_query']('', '
 			SELECT l.itemid, count(*) AS count, s.name, s.image, s.status
 			FROM {db_prefix}shop_log_buy AS l
@@ -585,7 +627,7 @@ function Shop_statsMostTraded()
 			$context['shop_stats']['most_traded'][] = array(
 				'id' => $row_items['itemid'],
 				'name' => $row_items['name'],
-				'image' => Shop::Shop_imageFormat($row_items['image']),
+				'image' => Shop::ShopImageFormat($row_items['image']),
 				'num' => $row_items['count']
 			);
 
@@ -600,14 +642,19 @@ function Shop_statsMostTraded()
 			$context['shop_stats']['most_traded'][$i]['num'] = comma_format($context['shop_stats']['most_traded'][$i]['num']);
 		}
 
+		cache_put_data('shopStats_mosttraded', $context['shop_stats']['most_traded'], $modSettings['Shop_stats_refresh']);
+	}
+
 	return $context['shop_stats']['most_traded'];
 }
 
 function Shop_statsMostExpensive()
 {
-	global $smcFunc, $context, $scripturl;
+	global $smcFunc, $context, $scripturl, $modSettings;
 
-		// Last bought.
+	if (($context['shop_stats']['most_expensive'] = cache_get_data('shopStats_mostexp', $modSettings['Shop_stats_refresh'])) == null)
+	{
+		// Most expensive items
 		$items_result = $smcFunc['db_query']('', '
 			SELECT l.itemid, l.amount, s.name, s.image, s.status
 			FROM {db_prefix}shop_log_buy AS l
@@ -620,13 +667,13 @@ function Shop_statsMostExpensive()
 		);
 
 		$max_num = 1;
-		$context['shop_stats']['most_traded'] = array();
+		$context['shop_stats']['most_expensive'] = array();
 		while ($row_items = $smcFunc['db_fetch_assoc']($items_result))
 		{
-			$context['shop_stats']['most_traded'][] = array(
+			$context['shop_stats']['most_expensive'][] = array(
 				'id' => $row_items['itemid'],
 				'name' => $row_items['name'],
-				'image' => Shop::Shop_imageFormat($row_items['image']),
+				'image' => Shop::ShopImageFormat($row_items['image']),
 				'num' => $row_items['amount']
 			);
 
@@ -635,11 +682,14 @@ function Shop_statsMostExpensive()
 		}
 		$smcFunc['db_free_result']($items_result);
 
-		foreach ($context['shop_stats']['most_traded'] as $i => $bought)
+		foreach ($context['shop_stats']['most_expensive'] as $i => $bought)
 		{
-			$context['shop_stats']['most_traded'][$i]['percent'] = round(($bought['num'] * 100) / $max_num);
-			$context['shop_stats']['most_traded'][$i]['num'] = comma_format($context['shop_stats']['most_traded'][$i]['num']);
+			$context['shop_stats']['most_expensive'][$i]['percent'] = round(($bought['num'] * 100) / $max_num);
+			$context['shop_stats']['most_expensive'][$i]['num'] = comma_format($context['shop_stats']['most_expensive'][$i]['num']);
 		}
 
-	return $context['shop_stats']['most_traded'];
+		cache_put_data('shopStats_mostexp', $context['shop_stats']['most_expensive'], $modSettings['Shop_stats_refresh']);
+	}
+
+	return $context['shop_stats']['most_expensive'];
 }

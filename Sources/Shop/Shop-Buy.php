@@ -63,7 +63,7 @@ function Shop_mainBuy()
 					'class' => 'centertext',
 				),
 				'data' => array(
-					'function' => function($row){ return Shop::Shop_imageFormat($row['image']);},
+					'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
 					'style' => 'width: 10%',
 					'class' => 'centertext',
 				),
@@ -239,23 +239,6 @@ function Shop_itemsGet($start, $items_per_page, $sort, $cat = null)
 	return $context['shop_items_list'];
 }
 
-function Shop_buyCheckLimit($id)
-{
-	global $smcFunc, $user_info;
-
-	// Count the items
-	$items = $smcFunc['db_query']('', '
-		SELECT itemid, userid
-		FROM {db_prefix}shop_inventory
-		WHERE itemid = {int:id} AND userid = {int:userid}',
-		array(
-			'id' => $id,
-			'userid' => $user_info['id'],
-		)
-	);
-	return $smcFunc['db_num_rows']($items);
-}
-
 function Shop_buyItem()
 {
 	global $smcFunc, $context, $user_info, $modSettings, $scripturl, $txt;
@@ -283,7 +266,7 @@ function Shop_buyItem()
 	$result = $smcFunc['db_query']('', '
 		SELECT s.itemid, s.name, s.price, s.count, s.status, s.itemlimit
 		FROM {db_prefix}shop_items AS s
-		WHERE s.itemid = {int:id}',
+		WHERE s.itemid = {int:id} AND s.status = 1',
 		array(
 			'id' => $id,
 		)
@@ -298,7 +281,7 @@ function Shop_buyItem()
 
 	// Is that id actually valid?
 	// Also, let's check if this "smart" guy is not trying to buy a disabled item
-	if (empty($row) || $row['status'] != 1)
+	if (empty($row))
 		fatal_error($txt['Shop_item_notfound'], false);
 	// Already reached the limit?
 	elseif (($row['itemlimit'] != 0) && ($row['itemlimit'] <= $limit))

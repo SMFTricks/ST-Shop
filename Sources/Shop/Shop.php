@@ -53,6 +53,9 @@ function Shop()
 		'home' => array(
 			'function' => 'Shop_mainHome',
 		),
+		'whohas' => array(
+			'function' => 'Shop_itemWho',
+		),
 		'buy' => array(
 			'function' => 'Shop_mainBuy',
 			'file' => $sourcedir . '/Shop/Shop-Buy.php',
@@ -63,10 +66,6 @@ function Shop()
 		),
 		'buy3' => array(
 			'function' => 'Shop_buyItem2',
-			'file' => $sourcedir . '/Shop/Shop-Buy.php',
-		),
-		'whohas' => array(
-			'function' => 'Shop_buyWho',
 			'file' => $sourcedir . '/Shop/Shop-Buy.php',
 		),
 		'inventory' => array(
@@ -161,6 +160,10 @@ function Shop()
 			'function' => 'Shop_tradeRemove',
 			'file' => $sourcedir . '/Shop/Shop-Trade.php',
 		),
+		'tradesearch' => array(
+			'function' => 'Shop_tradeSearch',
+			'file' => $sourcedir . '/Shop/Shop-Trade.php',
+		),
 		'stats' => array(
 			'function' => 'Shop_mainStats',
 			'file' => $sourcedir . '/Shop/Shop-Stats.php',
@@ -173,7 +176,8 @@ function Shop()
 
 	if (isset($_REQUEST['sa']) && array_key_exists($_REQUEST['sa'], $subactions) && ($_REQUEST['sa'] != 'home')) {
 		$sa = $_REQUEST['sa'];
-		require_once($subactions[$sa]['file']);
+		if (isset($subactions[$sa]['file']))
+			require_once($subactions[$sa]['file']);
 	}
 	else
 		$sa = 'home';
@@ -186,7 +190,7 @@ function Shoptabs()
 
 	$context['shop_links'] = array(
 		'home' => array(
-			'action' => array('home'),
+			'action' => array('home', 'whohas'),
 			'label' => $txt['Shop_shop_home'],
 			'permission' => 'shop_canAccess',
 			'enable' => 'Shop_enable_shop'
@@ -290,6 +294,26 @@ function Shop_mainHome()
 			'enabled' => allowedTo('shop_canBank') && !empty($modSettings['Shop_enable_bank']),
 		),
 	);
+}
+
+function Shop_buyCheckLimit($id)
+{
+	global $smcFunc, $user_info;
+
+	// Count the items
+	$items = $smcFunc['db_query']('', '
+		SELECT itemid, userid
+		FROM {db_prefix}shop_inventory
+		WHERE itemid = {int:id} AND userid = {int:userid}',
+		array(
+			'id' => $id,
+			'userid' => $user_info['id'],
+		)
+	);
+	$count = $smcFunc['db_num_rows']($items);
+	$smcFunc['db_free_result']($items);
+
+	return $count;
 }
 
 function Shop_logBuy($itemid, $buyer, $amount, $seller = 0, $fee = 0, $invid = 0)
@@ -548,4 +572,160 @@ function Shop_logGames($userid, $amount, $game = 'slots')
 		),
 		array()
 	);
+}
+
+function Shop_itemWho()
+{
+	global $smcFunc, $context, $scripturl, $txt, $modSettings, $sourcedir;
+
+	// Check if he is allowed to access this section
+	if (!allowedTo('shop_canManage'))
+		isAllowedTo('shop_viewInventory');
+
+	// We got an item?
+	if (!isset($_REQUEST['id']) || empty($_REQUEST['id']))
+		fatal_error($txt['Shop_item_notfound'], false);
+
+	// Our item ID
+	$itemid = $_REQUEST['id'];
+
+	// Get item name
+	$result = $smcFunc['db_query']('', '
+		SELECT name
+		FROM {db_prefix}shop_items
+		WHERE itemid = {int:id} AND status = 1
+		LIMIT 1',
+		array(
+			'id' => $itemid
+		)
+	);
+	$context['item'] = $smcFunc['db_fetch_assoc']($result);
+	$smcFunc['db_free_result']($result);
+
+	// No matches?
+	if (empty($context['item']))
+		fatal_error($txt['Shop_item_notfound'], false);
+
+	// Set all the page stuff
+	require_once($sourcedir . '/Subs-List.php');
+	$context['page_title'] = $txt['Shop_main_button'] . ' - ' . sprintf($txt['Shop_buy_item_who'], $context['item']['name']);
+	$context['page_description'] = sprintf($txt['Shop_whohas_desc'], $context['item']['name']);
+	$context['template_layers'][] = 'Shop_main';
+	$context['sub_template'] = 'show_list';
+	$context['default_list'] = 'who_list';
+	$context['linktree'][] = array(
+		'url' => $scripturl . '?action=shop;sa=whohas;id='.$itemid,
+		'name' => sprintf($txt['Shop_buy_item_who'], $context['item']['name']),
+	);
+
+	// The entire list
+	$listOptions = array(
+		'id' => 'who_list',
+		'items_per_page' => !empty($modSettings['Shop_items_perpage']) ? $modSettings['Shop_items_perpage'] : 15,
+		'base_href' => $scripturl.'?action=shop;sa=whohas;id='.$itemid,
+		'default_sort_col' => 'item_count',
+		'default_sort_dir' => 'DESC',
+		'get_items' => array(
+			'function' => 'Shop_whoGet',
+			'params' => array($itemid),
+		),
+		'get_count' => array(
+			'function' => 'Shop_whoCount',
+			'params' => array($itemid),
+		),
+		'no_items_label' => $txt['Shop_inventory_no_items'],
+		'no_items_align' => 'center',
+		'columns' => array(
+			'item_owner' => array(
+				'header' => array(
+					'value' => $txt['Shop_item_member'],
+					'class' => 'lefttext',
+				),
+				'data' => array(
+					'sprintf' => array(
+						'format' => '<a href="'. $scripturl . '?action=profile;u=%1$d">%2$s</a>',
+						'params' => array(
+							'userid' => false,
+							'user' => true
+						),
+					),
+					'class' => 'lefttext',
+					'style' => 'width: 50%',
+				),
+				'sort' =>  array(
+					'default' => 'user DESC',
+					'reverse' => 'user',
+				),
+			),
+			'item_count' => array(
+				'header' => array(
+					'value' => $txt['Shop_user_count'],
+					'class' => 'centertext',
+				),
+				'data' => array(
+					'db' => 'count',
+					'class' => 'centertext',
+					'style' => 'width: 50%',
+				),
+				'sort' => array(
+					'default' => 'count DESC',
+					'reverse' => 'count',
+				),
+			),
+		),
+	);
+
+	// Let's finishem
+	createList($listOptions);
+}
+
+function Shop_whoCount($itemid)
+{
+	global $smcFunc;
+
+	// Count the items
+	$items = $smcFunc['db_query']('', '
+		SELECT p.itemid, p.userid, s.status
+		FROM {db_prefix}shop_inventory AS p
+			LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
+		WHERE p.itemid = {int:id} AND s.status = 1
+		GROUP BY p.itemid, p.userid, s.status',
+		array(
+			'id' => $itemid,
+		)
+	);
+	$count = $smcFunc['db_num_rows']($items);
+	$smcFunc['db_free_result']($items);
+
+	return $count;
+}
+
+function Shop_whoGet($start, $items_per_page, $sort, $itemid)
+{
+	global $context, $smcFunc, $user_info;
+
+	// Get a list of all the item
+	$result = $smcFunc['db_query']('', '
+		SELECT p.itemid, p.userid, COUNT(*) AS count, m.real_name AS user
+		FROM {db_prefix}shop_inventory AS p
+			LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
+			LEFT JOIN {db_prefix}members AS m ON (m.id_member = p.userid)
+		WHERE s.status = 1 AND p.itemid = {int:itemid}
+		GROUP BY p.userid, p.itemid, user
+		ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:maxindex}',
+		array(
+			'start' => $start,
+			'maxindex' => $items_per_page,
+			'sort' => $sort,
+			'itemid' => $itemid,
+		)
+	);
+
+	$context['item_who_list'] = array();
+	while ($row = $smcFunc['db_fetch_assoc']($result))
+		$context['item_who_list'][] = $row;
+	$smcFunc['db_free_result']($result);
+
+	return $context['item_who_list'];
 }

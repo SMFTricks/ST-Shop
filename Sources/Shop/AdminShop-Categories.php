@@ -75,7 +75,7 @@ function Shop_categoriesIndex()
 					'class' => 'centertext',
 				),
 				'data' => array(
-					'function' => function($row){ return Shop::Shop_imageFormat($row['image']);},
+					'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
 					'style' => 'width: 4%',
 					'class' => 'centertext',
 				),

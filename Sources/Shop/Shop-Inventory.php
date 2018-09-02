@@ -62,13 +62,6 @@ function Shop_mainInv()
 	$context['shop_categories_list'] = Shop::getCatList();
 	$context['form_url'] = '?action=shop;sa=inventory;u='. $context['id_member']. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ';cat='.$_REQUEST['cat'] : '');
 
-
-	/* TODO */
-
-	// Marking an item as fav?
-	if (isset($_REQUEST['fav']) && isset($_REQUEST['itemid']))
-		Shop_invFav();
-
 	// The entire list
 	$listOptions = array(
 		'id' => 'items_list',
@@ -93,7 +86,7 @@ function Shop_mainInv()
 					'class' => 'centertext',
 				),
 				'data' => array(
-					'function' => function($row){ return Shop::Shop_imageFormat($row['image']);},
+					'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
 					'style' => 'width: 10%',
 					'class' => 'centertext',
 				),
@@ -259,9 +252,10 @@ function Shop_mainInv()
 		$listOptions['additional_rows']['catselect'] = array(
 			'position' => 'top_of_list',
 			'value' => $catSelect,
-			'class' => 'floatright',
-			'style' => 'padding: 7px 0 10px;',
+			'class' => 'floatright clear',
+			'style' => 'padding: 7px 0 5px; margin-top: -44px;',
 		);
+
 	}
 
 	// Let's finishem
@@ -846,30 +840,35 @@ function Shop_profileInventory($profile = array())
 	if (!$memID)
 		fatal_lang_error('not_a_user', false, 404);
 
-	// Get a list of all the item
-	$result = $smcFunc['db_query']('', '
-		SELECT p.userid, p.trading, '. (!empty($modSettings['Shop_inventory_show_same_once']) ? 'SUM(p.fav)' : 'p.fav'). ' AS favo, s.name, s.image, s.description, s.status
-		FROM {db_prefix}shop_inventory AS p
-			LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
-		WHERE p.trading = 0 AND p.userid = {int:memid} AND s.status = 1' . (!empty($modSettings['Shop_inventory_show_same_once']) ? '
-		GROUP BY p.itemid, p.userid, p.trading, s.name, s.status, s.image, s.description' : ''). '
-		ORDER BY favo DESC, p.date DESC'. (isset($profile['id_member']) ? '
-		LIMIT {int:max}' : ''),
-		array(
-			'memid' => $memID,
-			'max' => isset($profile['id_member']) ? (empty($modSettings['Shop_inventory_items_num']) ? 5 : $modSettings['Shop_inventory_items_num']) : '',
-		)
-	);
-
-	$context['shop_items_list'] = array();
-	while ($row = $smcFunc['db_fetch_assoc']($result))
-		$context['shop_items_list'][] = array(
-			'image' => Shop::Shop_imageFormat($row['image'], un_htmlspecialchars($row['description'])),
-			'name' => $row['name'],
+	if (($context['shop_items_list'] = cache_get_data(isset($profile['id_member']) ? 'profile' : 'full'. '_shopInventory_'.$memID, 900)) == null)
+	{
+		// Get a list of all the item
+		$result = $smcFunc['db_query']('', '
+			SELECT p.userid, p.trading, '. (!empty($modSettings['Shop_inventory_show_same_once']) ? 'SUM(p.fav)' : 'p.fav'). ' AS favo, s.name, s.image, s.description, s.status
+			FROM {db_prefix}shop_inventory AS p
+				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
+			WHERE p.trading = 0 AND p.userid = {int:memid} AND s.status = 1' . (!empty($modSettings['Shop_inventory_show_same_once']) ? '
+			GROUP BY p.itemid, p.userid, p.trading, s.name, s.status, s.image, s.description' : ''). '
+			ORDER BY favo DESC, p.date DESC'. (isset($profile['id_member']) ? '
+			LIMIT {int:max}' : ''),
+			array(
+				'memid' => $memID,
+				'max' => isset($profile['id_member']) ? (empty($modSettings['Shop_inventory_items_num']) ? 5 : $modSettings['Shop_inventory_items_num']) : '',
+			)
 		);
-	$smcFunc['db_free_result']($result);
-	$context['shop_items_list']['user'] = $context['member']['name'];
-	$context['shop_items_list']['userid'] = $context['id_member'];
+
+		$context['shop_items_list'] = array();
+		while ($row = $smcFunc['db_fetch_assoc']($result))
+			$context['shop_items_list'][] = array(
+				'image' => Shop::ShopImageFormat($row['image'], un_htmlspecialchars($row['description'])),
+				'name' => $row['name'],
+			);
+		$smcFunc['db_free_result']($result);
+		$context['shop_items_list']['user'] = $context['member']['name'];
+		$context['shop_items_list']['userid'] = $context['id_member'];
+
+		cache_put_data(isset($profile['id_member']) ? 'profile' : 'full'. '_shopInventory_'.$memID, $context['shop_items_list'], 900);
+	}
 
 	if (isset($profile['id_member']))
 		return $context['shop_items_list'];

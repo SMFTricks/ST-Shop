@@ -369,7 +369,7 @@ function Shop_logsItems()
 					'class' => 'centertext',
 				),
 				'data' => array(
-					'function' => function($row){ return Shop::Shop_imageFormat($row['image']);},
+					'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
 					'style' => 'width: 9%',
 					'class' => 'centertext',
 				),
@@ -483,7 +483,7 @@ function Shop_logsBuy()
 					'class' => 'centertext',
 				),
 				'data' => array(
-					'function' => function($row){ return Shop::Shop_imageFormat($row['image']);},
+					'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
 					'style' => 'width: 9%',
 					'class' => 'centertext',
 				),
@@ -591,7 +591,7 @@ function Shop_logsTrade()
 					'class' => 'centertext',
 				),
 				'data' => array(
-					'function' => function($row){ return Shop::Shop_imageFormat($row['image']);},
+					'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
 					'style' => 'width: 9%',
 					'class' => 'centertext',
 				),

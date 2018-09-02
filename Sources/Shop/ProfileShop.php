@@ -34,6 +34,18 @@ function Shop_profileAreas(&$profile_areas)
 					'any' => array('shop_viewInventory', 'shop_canManage'),
 				),
 			);
+			$temp_buttons['mytrades'] = array(
+				'label' => $txt['Shop_view_mytrades'],
+				'custom_url' => $scripturl . '?action=shop;sa=mytrades',
+				'file' => 'Shop/Shop-Trade.php',
+				'function' => 'Shop_tradeProfile',
+				'icon' => 'inbox',
+				'enabled' => !empty($modSettings['Shop_enable_shop']),
+				'permission' => array(
+					'own' => array('shop_viewInventory', 'shop_canTrade', 'shop_canManage'),
+					'any' => array('shop_viewInventory', 'shop_canTrade', 'shop_canManage'),
+				),
+			);
 		}
 		$temp_buttons[$k] = $v;
 	}

@@ -87,7 +87,7 @@ function Shop_tradeTabs()
 		),
 		'mytrades' => array(
 			'action' => array('mytrades'),
-			'label' => $txt['Shop_trade_profile'],
+			'label' => $txt['Shop_trade_myprofile'],
 		),
 		'tradelog' => array(
 			'action' => array('tradelog'),
@@ -113,16 +113,23 @@ function Shop_tradeList()
 	// Set all the page stuff
 	require_once($sourcedir . '/Subs-List.php');
 	$context['page_title'] = $txt['Shop_main_button'] . ' - ' . $txt['Shop_trade_list'];
+	$context['page_description'] = $txt['Shop_trade_list_desc'];
 	$context['template_layers'][] = 'Shop_main';
 	$context['template_layers'][] = 'Shop_mainTrade';
 	$context['sub_template'] = 'show_list';
 	$context['default_list'] = 'items_list';
 	$context['linktree'][] = array(
 		'url' => $scripturl . '?action=shop;sa=tradelist',
-		'name' => $txt['Shop_shop_trade'],
+		'name' => $txt['Shop_trade_list'],
 	);
 	// Sub-menu tabs
 	$context['trade_tabs'] = Shop_tradeTabs();
+
+	// Sub-menu tabs
+	$context['trade_tabs']['search'] = array(
+		'link' => '#searchuser',
+		'label' => $txt['Shop_inventory_search'],
+	);
 
 	// Just a text to inform the user that he doesn't have enough money
 	$context['shop']['notenough'] = sprintf($txt['Shop_item_buy_i_ne'], $modSettings['Shop_credits_suffix']);
@@ -156,7 +163,7 @@ function Shop_tradeList()
 					'class' => 'centertext',
 				),
 				'data' => array(
-					'function' => function($row){ return Shop::Shop_imageFormat($row['image']);},
+					'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
 					'style' => 'width: 10%',
 					'class' => 'centertext',
 				),
@@ -253,7 +260,7 @@ function Shop_tradeList()
 						//Enough money? Buy it!
 						else
 							$message = '<a href="'. $scripturl. '?action=shop;sa=trade2;id='. $row['id']. ';'. $context['session_var'] .'='. $context['session_id'] .'">'. $txt['Shop_item_buy_i']. '</a>';
-						return $message. '<br><a href="'. $scripturl. '?action=shop;sa=whohas;id='. $row['id']. '">'. $txt['Shop_buy_item_who_this']. '</a>';},
+						return $message. '<br><a href="'. $scripturl. '?action=shop;sa=whohas;id='. $row['itemid']. '">'. $txt['Shop_buy_item_who_this']. '</a>';},
 					'class' => 'centertext',
 				),
 				'sort' =>  array(
@@ -273,12 +280,12 @@ function Shop_tradeList()
 		$catSelect = '
 			<form action="'. $scripturl. $context['form_url']. '" method="post">
 				<select name="cat" id="cat">
-						<optgroup label="'. $txt['Shop_categories']. '">
-							<option value="-1"'. (!isset($_REQUEST['cat']) || $_REQUEST['cat'] == -1 ? ' selected="selected"' : ''). '>'. $txt['Shop_categories_all']. '</option>
-							<option value="0"'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] == 0 ? ' selected="selected"' : ''). '>'. $txt['Shop_item_uncategorized']. '</option>';
-						// List the categories if there are
-						foreach ($context['shop_categories_list'] as $category)
-							$catSelect .= '<option value="'. $category['id']. '"'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] == $category['id'] ? ' selected="selected"' : ''). '>'. $category['name']. '</option>';
+					<optgroup label="'. $txt['Shop_categories']. '">
+						<option value="-1"'. (!isset($_REQUEST['cat']) || $_REQUEST['cat'] == -1 ? ' selected="selected"' : ''). '>'. $txt['Shop_categories_all']. '</option>
+						<option value="0"'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] == 0 ? ' selected="selected"' : ''). '>'. $txt['Shop_item_uncategorized']. '</option>';
+					// List the categories if there are
+					foreach ($context['shop_categories_list'] as $category)
+						$catSelect .= '<option value="'. $category['id']. '"'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] == $category['id'] ? ' selected="selected"' : ''). '>'. $category['name']. '</option>';
 					$catSelect .= '</optgroup>
 				</select>&nbsp;
 				<input class="button_submit" type="submit" value="'. $txt['go']. '" />
@@ -287,18 +294,128 @@ function Shop_tradeList()
 		$listOptions['additional_rows']['catselect'] = array(
 			'position' => 'top_of_list',
 			'value' => $catSelect,
-			'class' => 'floatright',
-			'style' => 'padding: 7px 0 10px;',
+			'class' => 'floatright clear',
+			'style' => 'padding: 7px 0 5px; margin-top: -44px;',
 		);
 	}
+
+	// Load suggest.js
+	loadJavaScriptFile('suggest.js', array('default_theme' => true, 'defer' => false, 'minimize' => true), 'smf_suggest');
+
+	// We want to search an user?
+	$searchuser = '
+		<br class="clear" />
+		<a id="searchuser"></a>
+		<div class="title_bar">
+			<h4 class="titlebg">
+				'. $txt['Shop_inventory_search']. '
+			</h4>
+		</div>
+		<div class="windowbg stripe">
+			<form method="post" action="'. $scripturl.'?action=shop;sa=tradesearch">
+				'. $txt['Shop_inventory_member_name']. '
+				&nbsp;<input class="input_text" type="text" name="membername" id="membername" />
+				<div id="membernameItemContainer"></div>
+				<span class="smalltext">'. $txt['Shop_inventory_member_name_desc']. '</span>
+				<br /><br />
+				<input class="button_submit floatleft" type="submit" value="'. $txt['search']. '" />
+				<input type="hidden" name="'. $context['session_var']. '" value="'. $context['session_id']. '">
+			</form>
+		</div>
+		<script>
+			var oAddMemberSuggest = new smc_AutoSuggest({
+				sSelf: \'oAddMemberSuggest\',
+				sSessionId: \''. $context['session_id']. '\',
+				sSessionVar: \''. $context['session_var']. '\',
+				sSuggestId: \'to_suggest\',
+				sControlId: \'membername\',
+				sSearchType: \'member\',
+				sPostName: \'memberid\',
+				sURLMask: \'action=profile;u=%item_id%\',
+				sTextDeleteItem: \''. $txt['autosuggest_delete_item']. '\',
+				sItemListContainerId: \'membernameItemContainer\'
+			});
+		</script>';
+
+	// Add the search box
+	$listOptions['additional_rows']['search'] = array(
+		'position' => 'below_table_data',
+		'value' => $searchuser,
+	);
 
 	// Let's finishem
 	createList($listOptions);
 }
 
+function Shop_tradeSearch()
+{
+	global $smcFunc, $user_info, $txt;
+
+	// Check if he is allowed to access this section
+	if (!allowedTo('shop_canManage'))
+		isAllowedTo('shop_canTrade');
+
+	checkSession();
+
+	if (empty($_REQUEST['membername']) && !isset($_REQUEST['u']))
+		fatal_error($txt['Shop_user_empty'], false);
+
+	elseif (empty($_REQUEST['membername']) && isset($_REQUEST['u']))
+			$id['id_member'] = (int) $_REQUEST['u'];
+
+	elseif (!empty($_REQUEST['membername']) && !isset($_REQUEST['u']))
+	{
+		$member_query = array();
+		$member_parameters = array();
+
+		// Get the member name...
+		$_REQUEST['membername'] = strtr($smcFunc['htmlspecialchars']($_REQUEST['membername'], ENT_QUOTES), array('&quot;' => '"'));
+		preg_match_all('~"([^"]+)"~', $_REQUEST['membername'], $matches);
+		$member_name = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_REQUEST['membername']))));
+
+		foreach ($member_name as $index => $name)
+		{
+			$member_name[$index] = trim($smcFunc['strtolower']($member_name[$index]));
+
+			if (strlen($member_name[$index]) == 0)
+				unset($member_name[$index]);
+		}
+
+		// Construct the query
+		if (!empty($member_name))
+		{
+			$member_query[] = 'LOWER(member_name) IN ({array_string:member_name})';
+			$member_query[] = 'LOWER(real_name) IN ({array_string:member_name})';
+			$member_parameters['member_name'] = $member_name;
+		}
+
+		if (!empty($member_query))
+		{
+			$request = $smcFunc['db_query']('', '
+				SELECT id_member
+				FROM {db_prefix}members
+				WHERE (' . implode(' OR ', $member_query) . ')
+				LIMIT 1',
+				$member_parameters
+			);
+			$id = $smcFunc['db_fetch_assoc']($request);
+			$smcFunc['db_free_result']($request);
+		}
+	}
+
+	if (empty($id))
+		fatal_error($txt['Shop_user_unable_tofind'], false);
+
+	// Why are you looking for your OWN user?
+	if ($id['id_member'] == $user_info['id'])
+		redirectexit('action=shop;sa=mytrades');	
+	else
+		redirectexit('action=shop;sa=mytrades;u='. $id['id_member']);
+}
+
 function Shop_tradeProfile()
 {
-	global $context, $smcFunc, $sourcedir, $scripturl, $modSettings, $txt;
+	global $context, $smcFunc, $sourcedir, $user_info, $memberContext, $scripturl, $modSettings, $txt;
 
 	// What if the Inventories are disabled?
 	if (empty($modSettings['Shop_enable_trade']))
@@ -308,16 +425,41 @@ function Shop_tradeProfile()
 	if (!allowedTo('shop_canManage'))
 		isAllowedTo('shop_canTrade');
 
+	// Did we get the user by name...
+	if (isset($_REQUEST['user']))
+		$memberResult = loadMemberData($_REQUEST['user'], true, 'profile');
+	// ... or by id_member?
+	elseif (!empty($_REQUEST['u']))
+		$memberResult = loadMemberData((int) $_REQUEST['u'], false, 'profile');
+	// If it was just ?sa=mytrades, view your own trade list.
+	else
+		$memberResult = loadMemberData($user_info['id'], false, 'profile');
+	// Check if loadMemberData() has returned a valid result.
+	if (!$memberResult)
+		fatal_lang_error('not_a_user', false, 404);
+
+	// If all went well, we have a valid member ID!
+	list ($memID) = $memberResult;
+	$context['id_member'] = $memID;
+	// Let's have some information about this member ready, too.
+	loadMemberContext($memID);
+	$context['member'] = $memberContext[$memID];
+	$context['user']['is_owner'] = $memID == $user_info['id'];
+
+	// Viewing X inventory
+	$context['trades']['whos'] = ((!empty($context['user']['is_owner'])) ? $txt['Shop_trade_myprofile'] : sprintf($txt['Shop_trade_profile'], $context['member']['name']));
+
 	// Set all the page stuff
 	require_once($sourcedir . '/Subs-List.php');
-	$context['page_title'] = $txt['Shop_main_button'] . ' - ' . $txt['Shop_trade_list'];
+	$context['page_title'] = $txt['Shop_main_button'] . ' - ' . $context['trades']['whos'];
+	$context['page_description'] = ((!empty($context['user']['is_owner'])) ? $txt['Shop_trade_myprofile_desc'] : sprintf($txt['Shop_trade_profile_desc'], $context['member']['name']));
 	$context['template_layers'][] = 'Shop_main';
 	$context['template_layers'][] = 'Shop_mainTrade';
 	$context['sub_template'] = 'show_list';
 	$context['default_list'] = 'items_list';
 	$context['linktree'][] = array(
-		'url' => $scripturl . '?action=shop;sa=mytrades',
-		'name' => $txt['Shop_shop_trade'],
+		'url' => $scripturl . '?action=shop;sa=mytrades;u='.$context['id_member'],
+		'name' => ((!empty($context['user']['is_owner'])) ? $txt['Shop_trade_myprofile'] : $context['trades']['whos']),
 	);
 	// Sub-menu tabs
 	$context['trade_tabs'] = Shop_tradeTabs();
@@ -339,11 +481,11 @@ function Shop_tradeProfile()
 		'default_sort_dir' => 'DESC',
 		'get_items' => array(
 			'function' => 'Shop_tradeGet',
-			'params' => array(isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null, false),
+			'params' => array(isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null, false, $context['member']['id']),
 		),
 		'get_count' => array(
 			'function' => 'Shop_tradeCount',
-			'params' => array(isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null, false),
+			'params' => array(isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null, false, $context['member']['id']),
 		),
 		'no_items_label' => $txt['Shop_no_items'],
 		'no_items_align' => 'center',
@@ -354,7 +496,7 @@ function Shop_tradeProfile()
 					'class' => 'centertext',
 				),
 				'data' => array(
-					'function' => function($row){ return Shop::Shop_imageFormat($row['image']);},
+					'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
 					'style' => 'width: 10%',
 					'class' => 'centertext',
 				),
@@ -379,6 +521,7 @@ function Shop_tradeProfile()
 				),
 				'data' => array(
 					'db' => 'description',
+					'style' => 'width: 25%',
 				),
 				'sort' =>  array(
 					'default' => 'description DESC',
@@ -388,11 +531,11 @@ function Shop_tradeProfile()
 			'item_category' => array(
 				'header' => array(
 					'value' => $txt['Shop_item_category'],
-					'class' => 'centertext',
+					'class' => 'lefttext',
 				),
 				'data' => array(
 					'function' => function($row){ global $txt; return $row['catid'] != 0 ? $row['category'] : $txt['Shop_item_uncategorized'];},
-					'class' => 'centertext',
+					'class' => 'lefttext',
 				),
 				'sort' =>  array(
 					'default' => 'category DESC',
@@ -412,6 +555,7 @@ function Shop_tradeProfile()
 							'user' => true
 						),
 					),
+					'style' => 'width: 15%',
 					'class' => 'centertext',
 				),
 				'sort' =>  array(
@@ -438,16 +582,27 @@ function Shop_tradeProfile()
 					'reverse' => 'tradecost',
 				),
 			),
-			'item_buy' => array(
+			'item_actions' => array(
 				'header' => array(
-					'value' => $txt['Shop_item_buy'],
+					'value' => !empty($context['user']['is_owner']) ? $txt['Shop_trade_mytrades_actions'] : $txt['Shop_item_buy'],
 					'class' => 'centertext',
 				),
 				'data' => array(
-					'function' => function($row){ global $txt, $context, $scripturl; 
-						// Remove item from trade
-						$message = '<a href="'. $scripturl. '?action=shop;sa=traderemove;id='. $row['id']. ';'. $context['session_var'] .'='. $context['session_id'] .'">'. $txt['Shop_item_remove_ftrade']. '</a>';
-						return $message. '<br><a href="'. $scripturl. '?action=shop;sa=whohas;id='. $row['id']. '">'. $txt['Shop_buy_item_who_this']. '</a>';},
+					'function' => function($row){ global $txt, $context, $user_info, $scripturl;
+						//Viewing his own profile?
+						if (!empty($context['user']['is_owner']))
+							$message = '<a href="'. $scripturl. '?action=shop;sa=traderemove;id='. $row['id']. ';'. $context['session_var'] .'='. $context['session_id'] .'">'. $txt['Shop_item_remove_ftrade']. '</a>';
+						// Show buying links
+						else
+						{
+							// How much need the user to buy this item?
+							if ($user_info['shopMoney'] < $row['tradecost']) 
+								$message = $context['shop']['notenough'];
+							//Enough money? Buy it!
+							else
+								$message = '<a href="'. $scripturl. '?action=shop;sa=trade2;id='. $row['id']. ';'. $context['session_var'] .'='. $context['session_id'] .'">'. $txt['Shop_item_buy_i']. '</a>';
+						}
+						return $message. '<br><a href="'. $scripturl. '?action=shop;sa=whohas;id='. $row['itemid']. '">'. $txt['Shop_buy_item_who_this']. '</a>';},
 					'class' => 'centertext',
 				),
 				'sort' =>  array(
@@ -463,6 +618,10 @@ function Shop_tradeProfile()
 			),
 		),
 	);
+
+	// Remove owner if he's viewing his own items
+	if (!empty($context['user']['is_owner']))
+		unset($listOptions['columns']['item_owner']);
 
 	// Check first for categories
 	if (!empty($context['shop_categories_list']))
@@ -485,8 +644,8 @@ function Shop_tradeProfile()
 		$listOptions['additional_rows']['catselect'] = array(
 			'position' => 'top_of_list',
 			'value' => $catSelect,
-			'class' => 'floatright',
-			'style' => 'padding: 7px 0 10px;',
+			'class' => 'floatright clear',
+			'style' => 'padding: 7px 0 5px; margin-top: -44px;',
 		);
 	}
 
@@ -494,9 +653,13 @@ function Shop_tradeProfile()
 	createList($listOptions);
 }
 
-function Shop_tradeCount($cat = null, $members = true)
+function Shop_tradeCount($cat = null, $members = true, $memID = 0)
 {
 	global $smcFunc, $user_info;
+
+	// By default we want his own profile
+	if ($memID == 0)
+		$memID = $user_info['id'];
 
 	$items = $smcFunc['db_query']('', '
 		SELECT p.id, p.itemid, p.userid, p.trading, s.status, s.catid
@@ -508,24 +671,27 @@ function Shop_tradeCount($cat = null, $members = true)
 		AND p.userid = {int:userid}'),
 		array(
 			'cat' => $cat,
-			'userid' => $user_info['id'],
+			'userid' => $memID,
 		)
 	);
 	return $smcFunc['db_num_rows']($items);
 }
 
-function Shop_tradeGet($start, $items_per_page, $sort, $cat = null, $members = true)
+function Shop_tradeGet($start, $items_per_page, $sort, $cat = null, $members = true, $memID = 0)
 {
 	global $context, $smcFunc, $user_info;
 
+	// By default we want his own profile
+	if ($memID == 0)
+		$memID = $user_info['id'];
+
 	// Get a list of all the item
 	$result = $smcFunc['db_query']('', '
-		SELECT p.id, p.itemid, p.userid, p.trading, p.tradecost, s.name, s.itemid, s.description, s.image, s.count, s.price, s.status, s.catid, c.name AS category, m.real_name AS user, m.id_group, g.online_color
+		SELECT p.id, p.itemid, p.userid, p.trading, p.tradecost, s.name, s.itemid, s.description, s.image, s.count, s.price, s.status, s.catid, c.name AS category, m.real_name AS user
 		FROM {db_prefix}shop_inventory AS p
 			LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
 			LEFT JOIN {db_prefix}shop_categories AS c ON (c.catid = s.catid)
 			LEFT JOIN {db_prefix}members AS m ON (m.id_member = p.userid)
-			LEFT JOIN {db_prefix}membergroups AS g ON (g.id_group = m.id_group)
 		WHERE s.status = 1 AND p.trading = 1' . ($cat != null ? '
 		AND s.catid = {int:cat}' : ''). ($members == true ? '
 		AND p.userid <> {int:userid}' : '
@@ -537,7 +703,7 @@ function Shop_tradeGet($start, $items_per_page, $sort, $cat = null, $members = t
 			'maxindex' => $items_per_page,
 			'sort' => $sort,
 			'cat' => $cat,
-			'userid' => $user_info['id'],
+			'userid' => $memID,
 		)
 	);
 
@@ -580,10 +746,10 @@ function Shop_tradeTransaction()
 
 	// Get the item's information
 	$result = $smcFunc['db_query']('', '
-		SELECT p.id, p.itemid, p.trading, p.tradecost, p.userid, s.status, s.name
+		SELECT p.id, p.itemid, p.trading, p.tradecost, p.userid, s.status, s.name, s.itemlimit
 		FROM {db_prefix}shop_inventory AS p
 			LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
-		WHERE p.id = {int:id} AND p.trading = 1',
+		WHERE p.id = {int:id} AND p.trading = 1 AND s.status = 1',
 		array(
 			'id' => $id,
 		)
@@ -591,15 +757,22 @@ function Shop_tradeTransaction()
 	$row = $smcFunc['db_fetch_assoc']($result);
 	$smcFunc['db_free_result']($result);
 
+	// How many of this item does the user own?
+	$limit = Shop_buyCheckLimit($row['itemid']);
+
 	// Is that id actually valid?
 	// Also, let's check if this "smart" guy is not trying to buy a disabled item or an item that is not set for trading
-	if (empty($row) || ($row['status'] == 0) || ($row['trading'] == 0))
+	if (empty($row))
 		fatal_error($txt['Shop_item_notfound'], false);
+	// Already reached the limit?
+	elseif (($row['itemlimit'] != 0) && ($row['itemlimit'] <= $limit))
+		fatal_error($txt['Shop_item_limit_reached'], false);
 	// Are you really so stupid to buy your own item?
 	elseif ($row['userid'] == $user_info['id'])
 		fatal_error($txt['Shop_item_notbuy_own'], false);
 	// Fine... Do the user has enough money to buy this? This is just to avoid those "smart" guys
-	elseif ($user_info['shopMoney'] < $row['tradecost']) {
+	elseif ($user_info['shopMoney'] < $row['tradecost'])
+	{
 		// We need to find out the difference
 		$notenough = ($row['tradecost'] - $user_info['shopMoney']);
 		fatal_lang_error('Shop_buy_item_notenough', false, array($modSettings['Shop_credits_suffix'], $row['name'], $notenough, $modSettings['Shop_credits_prefix']));
@@ -762,29 +935,226 @@ function Shop_tradePM($seller, $itemname, $amount, $fee)
 	sendpm($pmto, $subject, $message, false, $pmfrom);
 }
 
-class ShopTrade
+function Shop_logCount()
 {
-	public static function itemWhat($id)
-	{
-		global $smcFunc;
+	global $smcFunc, $user_info;
 
-		// Get the item's information
-		$result = $smcFunc['db_query']('', '
-			SELECT itemid, name, status
-			FROM {db_prefix}shop_items
-			WHERE itemid = {int:id}',
-			array(
-				'id' => $id,
-			)
-		);
-		$row = $smcFunc['db_fetch_assoc']($result);
-		$smcFunc['db_free_result']($result);
+	// Count the log entries
+	$logs = $smcFunc['db_query']('', '
+		SELECT l.id, l.sellerid, l.userid, s.status
+		FROM {db_prefix}shop_log_buy AS l
+		LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = l.itemid)
+		WHERE l.sellerid <> 0 AND  (l.sellerid = {int:user} OR l.userid = {int:user}) AND s.status = 1',
+		array(
+			'user' => $user_info['id'],
+		)
+	);
 
-		if (isset($_REQUEST['removed']) && isset($_REQUEST['id']) && !empty($row))
-			$context['shop']['trade']['what'] = sprintf($txt['Shop_item_trade_removed'], $row['name']);
+	return $smcFunc['db_num_rows']($logs);
+}
 
-		// Return the result
-		return $context['shop']['trade']['what'];
+function Shop_logGet($start, $items_per_page, $sort)
+{
+	global $context, $smcFunc, $user_info;
 
-	}
+	
+	// Get a list of all the item
+	$result = $smcFunc['db_query']('', '
+		SELECT l.itemid, l.userid, l.sellerid, l.amount, l.fee, l.date, m1.real_name AS name_buyer, m2.real_name AS name_seller,
+		       s.name, s.image, s.status, s.catid, c.name AS category
+		FROM {db_prefix}shop_log_buy AS l
+		LEFT JOIN {db_prefix}members AS m1 ON (m1.id_member = l.userid)
+		LEFT JOIN {db_prefix}members AS m2 ON (m2.id_member = l.sellerid)
+		LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = l.itemid)
+		LEFT JOIN {db_prefix}shop_categories AS c ON (s.catid = c.catid)
+		WHERE l.sellerid <> 0 AND  (l.sellerid = {int:user} OR l.userid = {int:user}) AND s.status = 1
+		ORDER by {raw:sort}
+		LIMIT {int:start}, {int:maxindex}',
+		array(
+			'start' => $start,
+			'maxindex' => $items_per_page,
+			'sort' => $sort,
+			'user' => $user_info['id'],
+		)
+	);
+
+	// Return the data
+	$context['shop_logs_list'] = array();
+	while ($row = $smcFunc['db_fetch_assoc']($result))
+		$context['shop_logs_list'][] = $row;
+	$smcFunc['db_free_result']($result);
+
+	return $context['shop_logs_list'];
+}
+
+function Shop_tradeLog()
+{
+	global $context, $scripturl, $sourcedir, $modSettings, $txt;
+
+	require_once($sourcedir . '/Subs-List.php');
+	$context['page_title'] = $txt['Shop_main_button']. ' - ' . $txt['Shop_trade_log'];
+	$context['page_description'] = $txt['Shop_trade_log_desc'];
+	$context['template_layers'][] = 'Shop_main';
+	$context['template_layers'][] = 'Shop_mainTrade';
+	$context['sub_template'] = 'show_list';
+	$context['default_list'] = 'trade_log';
+	$context['linktree'][] = array(
+		'url' => $scripturl . '?action=shop;sa=tradelog',
+		'name' => $txt['Shop_trade_log'],
+	);
+	// Sub-menu tabs
+	$context['trade_tabs'] = Shop_tradeTabs();
+
+	// The entire list
+	$listOptions = array(
+		'id' => 'trade_log',
+		'items_per_page' => !empty($modSettings['Shop_items_perpage']) ? $modSettings['Shop_items_perpage'] : 15,
+		'base_href' => '?action=shop;sa=tradelog',
+		'default_sort_col' => 'date',
+		'get_items' => array(
+			'function' => 'Shop_logGet',
+		),
+		'get_count' => array(
+			'function' => 'Shop_logCount',
+		),
+		'no_items_label' => $txt['Shop_logs_empty'],
+		'no_items_align' => 'center',
+		'columns' => array(
+			'item_image' => array(
+				'header' => array(
+					'value' => $txt['Shop_item_image'],
+					'class' => 'centertext',
+				),
+				'data' => array(
+					'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
+					'style' => 'width: 10%',
+					'class' => 'centertext',
+				),
+			),
+			'item_name' => array(
+				'header' => array(
+					'value' => $txt['Shop_item_name'],
+					'class' => 'lefttext',
+				),
+				'data' => array(
+					'db' => 'name',
+					'style' => 'width: 18%'
+				),
+				'sort' =>  array(
+					'default' => 'name DESC',
+					'reverse' => 'name',
+				),
+			),
+			'item_category' => array(
+				'header' => array(
+					'value' => $txt['Shop_item_category'],
+					'class' => 'lefttext',
+				),
+				'data' => array(
+					'function' => function($row){ global $txt; return $row['catid'] != 0 ? $row['category'] : $txt['Shop_item_uncategorized'];},
+					'class' => 'lefttext',
+					'style' => 'width: 15%',
+				),
+				'sort' =>  array(
+					'default' => 'category DESC',
+					'reverse' => 'category',
+				),
+			),
+			'item_user' => array(
+				'header' => array(
+					'value' => $txt['Shop_logs_user'],
+					'class' => 'lefttext',
+				),
+				'data' => array(
+					'function' => function($row) { global $user_info, $scripturl;
+						// You bought it. From who?
+						if ($row['userid'] == $user_info['id'])
+						{
+							$name = $row['name_seller'];
+							$id = $row['sellerid'];
+						}
+						// You sold it. To who?
+						elseif ($row['sellerid'] == $user_info['id'])
+						{
+							$name = $row['name_buyer'];
+							$id = $row['userid'];
+						}
+
+						// Format a link to his inventory
+						$user = '<a href="'. $scripturl . '?action=shop;sa=inventory;u='.$id.'">'.$name.'</a>';
+						return $user;
+					},
+					'style' => 'width: 12%',
+				),
+			),
+			'amount' => array(
+				'header' => array(
+					'value' => $txt['Shop_logs_amount'],
+					'class' => 'lefttext',
+				),
+				'data' => array(
+					'function' => function($row){ global $user_info;
+						// Show a "-" if you bought it and a "+" if you sold it
+						if ($row['userid'] == $user_info['id'])
+						{
+							$sign = '-';
+							$color = 'red';
+						}
+						elseif ($row['sellerid'] == $user_info['id'])
+						{
+							$sign = '+';
+							$color = 'green';
+						}
+	
+						return '<span style="color: '.$color.'">'.$sign.Shop::formatCash($row['amount']).'</span>';
+					},
+					'style' => 'width: 15%'
+				),
+				'sort' =>  array(
+					'default' => 'amount DESC',
+					'reverse' => 'amount',
+				),
+			),
+			'fee' => array(
+				'header' => array(
+					'value' => $txt['Shop_logs_fee'],
+					'class' => 'lefttext',
+				),
+				'data' => array(
+					'function' => function($row){ global $user_info;
+						// Only show fee if you sold it
+						if ($row['sellerid'] == $user_info['id'])
+							$fee = $row['fee'];
+						else
+							$fee = 0;
+
+						return Shop::formatCash($fee);
+					},
+					'style' => 'width: 12%'
+				),
+				'sort' =>  array(
+					'default' => 'fee DESC',
+					'reverse' => 'fee',
+				),
+			),
+			'date' => array(
+				'header' => array(
+					'value' => $txt['Shop_logs_date'],
+					'class' => ' lefttext',
+				),
+				'data' => array(
+					'function' => function($row) {return timeformat($row['date']);},
+					'style' => 'width: 25%',
+				),
+				'sort' =>  array(
+					'default' => 'date DESC',
+					'reverse' => 'date',
+				),
+			),
+		),
+		'additional_rows' => array(
+		),
+	);
+	// Let's finishem
+	createList($listOptions);
 }

@@ -236,7 +236,7 @@ function Shop_invUser()
 					'class' => 'centertext',
 				),
 				'data' => array(
-					'function' => function($row){ return Shop::Shop_imageFormat($row['image']);},
+					'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
 					'style' => 'width: 9%',
 					'class' => 'centertext',
 				),
@@ -413,7 +413,7 @@ function Shop_invRestock()
 		$context['shop_select_items'][] = array(
 			'id' => $row['itemid'],
 			'name' => $row['name'],
-			'image' => Shop::Shop_imageFormat($row['image']),
+			'image' => Shop::ShopImageFormat($row['image']),
 		);
 	$smcFunc['db_free_result']($result);
 }
