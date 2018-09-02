@@ -37,7 +37,7 @@ $txt['Shop_enable_gift'] = 'Enable Send Gifts and Credits?';
 $txt['Shop_enable_trade'] = 'Enable Trade?';
 $txt['Shop_enable_stats'] = 'Enable Stats?';
 $txt['Shop_stats_refresh'] = 'Time for refreshing stats';
-$txt['Shop_stats_refresh_desc'] = 'The time in seconds that the forum will take to refresh your shop stats. This helps you to prevent overloads of data and help to load information faster. <br/>By default is set to <i>300</i> (5 mis).';
+$txt['Shop_stats_refresh_desc'] = 'The time in seconds that the forum will take to refresh your shop stats stored in cache. This helps you to prevent overloads of data and help to load information faster. <br/>By default is set to <i>900</i> (5 mis).';
 $txt['Shop_enable_maintenance'] = 'Enable Maintenance?';
 $txt['Shop_enable_maintenance_desc'] = 'This will put the Shop in maintenance, only users who are allowed to manage the Shop have access.';
 
@@ -459,6 +459,7 @@ $txt['Shop_buy_item_bought_error'] = 'You probably came here for a mistake, beca
 $txt['Shop_buy_item_who'] = 'Who owns %s';
 $txt['Shop_buy_item_who_nobody'] = 'Nobody owns the item \'%s\' at the moment.';
 $txt['Shop_buy_item_who_this'] = 'Who owns this';
+$txt['Shop_whohas_desc'] = 'On this page you can see a list of every user that own the item <i>%s</i> and how many they have.';
 
 // Posting
 $txt['Shop_posting_credits_pocket'] = $modSettings['Shop_credits_suffix'];
@@ -501,7 +502,7 @@ $txt['Shop_categories_all'] = 'All categories';
 $txt['Shop_category_image'] = 'Category Image';
 
 // Inventory
-$txt['Shop_view_inventory'] = 'View Shop inventory';
+$txt['Shop_view_inventory'] = 'View inventory';
 $txt['Shop_inventory_use_item'] = 'Use the %s item';
 $txt['Shop_inventory_use_confirm'] = 'You are about to use this item. If there\'s anything else to fill, do it below, and then click the use button.';
 $txt['Shop_item_fav'] = 'Fav';
@@ -540,6 +541,7 @@ $txt['scheduled_task_desc_bank_interest'] = 'The magic task that will get money 
 // Trade center
 $txt['Shop_trade_main'] = 'Trade center';
 $txt['Shop_trade_list'] = 'Trade list';
+$txt['Shop_trade_list_desc'] = 'Here you will find every item that users have put for sale in the Trade Center.<br>If you want to find items from a specific user you can use the search tool located below.';
 $txt['Shop_trade_desc'] = '<strong>Welcome %1$s to the Trade Center.</strong><br /> Here, you can trade and buy items from other users, check on your current items listed and find out more about the more active users in terms of sales, profit and purchases.';
 $txt['Shop_item_remove_ftrade'] = 'Remove item from Trade';
 $txt['Shop_item_trade_removed'] = 'Your item was succesfully removed from the trade center.<br> You can now find it back in your inventory.';
@@ -547,10 +549,17 @@ $txt['Shop_trade_notification_sold_from'] = 'Forum Shop';
 $txt['Shop_trade_notification_sold_subject'] = 'Your item on trade was sold successfully.';
 $txt['Shop_trade_notification_sold_message1'] = 'Congratulations!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has purchased your item \'%3$s\' for %4$s. All the %5$s from the purchase have been added to your pocket.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
 $txt['Shop_trade_notification_sold_message2'] = 'Congratulations!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has purchased your item \'%3$s\' for %4$s, but has been taken away a fee of %5$s. The other %6$s from the purchase have been added to your pocket.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
-$txt['Shop_trade_profile'] = 'My items';
+$txt['Shop_trade_myprofile'] = 'My items';
+$txt['Shop_trade_myprofile_desc'] = 'This is the list of items <strong>you</strong> currently have in the Trade Center. You can remove them also if you want.';
+$txt['Shop_trade_profile'] = 'Items from %s';
+$txt['Shop_trade_profile_desc'] = 'You are currently viewing the list of <strong>%s\'s</strong> for the items he has in the Trade Center. You can specifically buy items from him.';
+$txt['Shop_trade_mytrades_actions'] = 'Actions';
 $txt['Shop_trade_log'] = 'Trade log';
+$txt['Shop_trade_log_desc'] = 'Find out about the items that you have bought and those that you have sold.';
 $txt['Shop_trade_cost'] = 'Trade cost:';
 $txt['Shop_trade_cost_desc'] = 'Set the price for your item.';
+$txt['Shop_view_mytrades'] = 'View trade list';
+
 
 // Gift
 $txt['Shop_gift_member_find'] = 'Type the name of the user you want to send a gift.';
@@ -573,7 +582,7 @@ $txt['Shop_gift_notification_message1'] = '[url=' . $scripturl . '?action=profil
 $txt['Shop_gift_notification_message2'] = '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has sent you %3$s! He has gifted you %4$s.' . "\n" . 'You now have %5$s' . "\n" . 'If they left an additional message, will be shown below.' . "\n\n" . '%6$s' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
 
 // Stats
-$txt['Shop_stats_desc'] = 'Welcome to the Stats site, here you can keep track of most relevant information about the Shop';
+$txt['Shop_stats_desc'] = 'Welcome to the Stats site, here you can keep track of the most relevant information about the Shop';
 $txt['Shop_stats_most_bought'] = 'Most bought';
 $txt['Shop_stats_most_traded'] = 'Top traded';
 $txt['Shop_stats_top_cats'] = 'Best categories';
@@ -642,11 +651,14 @@ $txt['whoallow_shop_buy'] = 'Buying items in the <a href="' . $scripturl . '?act
 $txt['whoallow_shop_gift'] = 'Sending a <a href="' . $scripturl . '?action=shop;sa=gift">Gift</a> through the <a href="' . $scripturl . '?action=shop">Forum Shop</a>';
 $txt['whoallow_shop_sendmoney'] = 'Sending <a href="' . $scripturl . '?action=shop;sa=sendmoney">%s</a> through the <a href="' . $scripturl . '?action=shop">Forum Shop</a>';
 $txt['whoallow_shop_owninventory'] = 'Viewing his own Shop Inventory';
-$txt['whoallow_shop_inventory'] = 'Viewing %1$s <a href="' . $scripturl . '?action=shop;sa=viewinventory;id=%2$d">Inventory</a>';
+$txt['whoallow_shop_inventory'] = 'Viewing %1$s <a href="' . $scripturl . '?action=shop;sa=viewinventory;u=%2$d">Inventory</a>';
 $txt['whoallow_shop_search'] = 'Searching for someone\'s <a href="' . $scripturl . '?action=shop;sa=search">Inventory</a>';
 $txt['whoallow_shop_bank'] = 'Managing his money in the <a href="' . $scripturl . '?action=shop;sa=bank">Shop Bank</a>';
 $txt['whoallow_shop_trade'] = 'Viewing the <a href="' . $scripturl . '?action=shop;sa=trade">Trade Center</a>';
 $txt['whoallow_shop_tradelist'] = 'Viewing the items available for sale in the <a href="' . $scripturl . '?action=shop;sa=tradelist">Trade Center</a>';
+$txt['whoallow_shop_owntrades'] = 'Viewing his own trade list <a href="' . $scripturl . '?action=shop;sa=trade">Trade Center</a>';
+$txt['whoallow_shop_othertrades'] = 'Viewing %1$s\'s <a href="' . $scripturl . '?action=shop;sa=mytrades;u=%2$d">trade list</a> in the <a href="' . $scripturl . '?action=shop;sa=tradelist">Trade Center</a>';
+$txt['whoallow_shop_tradelog'] = 'Viewing his trade log in the <a href="' . $scripturl . '?action=shop;sa=trade">Trade Center</a>';
 $txt['whoallow_shop_stats'] = 'Viewing the <a href="' . $scripturl . '?action=shop;sa=stats">Shop Stats</a>';
 $txt['whoallow_shop_games'] = 'Playing in the <a href="' . $scripturl . '?action=shop;sa=games">Games Room</a>';
 $txt['whoallow_shop_games_slots'] = 'Playing <a href="'. $scripturl. '?action=shop;sa=games;play=slots">Slots</a> in the <a href="' . $scripturl . '?action=shop;sa=games">Games Room</a>';
