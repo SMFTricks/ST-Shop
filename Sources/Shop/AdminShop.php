@@ -85,7 +85,7 @@ function Shop_adminAreas(&$admin_areas)
 			),
 			'shopgames' => array(
 				'label' => $txt['Shop_tab_games'],
-				'icon' => 'server',
+				'icon' => 'paid',
 				'file' => 'Shop/AdminShop-Games.php',
 				'function' => 'Shop_adminGames',
 				'permission' => array('shop_canManage'),
@@ -293,7 +293,7 @@ function Shop_boardModify($id, $boardOptions, &$boardUpdates, &$boardUpdateParam
 
 function Shop_adminInfo()
 {
-	global $sourcedir, $modSettings, $scripturl, $context, $txt;
+	global $sourcedir, $modSettings, $scripturl, $context, $user_info, $txt;
 
 	loadTemplate('ShopAdmin');
 
@@ -302,15 +302,45 @@ function Shop_adminInfo()
 	$context['sub_template'] = 'Shop_adminInfo';
 	$context[$context['admin_menu_name']]['tab_data'] = array(
 		'title' => $context['page_title'],
-		'description' => $txt['Shop_tab_info_desc'],
+		'description' => sprintf($txt['Shop_tab_info_desc'], $user_info['name']),
 	);
 
 	$context['Shop']['version'] = Shop::$version;
 	$context['Shop']['support'] = Shop::$supportSite;
 	$context['Shop']['credits'] = Shop::credits();
 
-	// Admin bits
-	
+	// Feed news
+	addInlineJavascript('
+		$(function(){
+			var shoplive = $("#smfAnnouncements");
+			$.ajax({
+				type: "GET",
+				url: '. JavaScriptEscape($scripturl . '?action=shopfeed') .',
+				cache: false,
+				dataType: "xml",
+				success: function(xml){
+					var dl = $("<dl />");
+					$(xml).find("item").each(function () {
+						var item = $(this),
+						title = $("<a />", {
+							text: item.find("title").text(),
+							href: item.find("link").attr("href")
+						}),
+						parsedTime = new Date(item.find("pubDate").text().replace("T", " ").split("+")[0]),
+						updated = $("<span />").text( parsedTime.toDateString()),
+						content = $("<div/>").html(item.find("description")).text(),
+						dt = $("<dt />").html(title),
+						dd = $("<dd />").html(content);
+						updated.appendTo(dt);
+						dt.appendTo(dl);
+						dd.appendTo(dl);
+					});
+					shoplive.html(dl);
+				},
+				error: function (html){}
+			});
+		});
+	', true);
 }
 
 function Shop_itemsCount()
@@ -323,7 +353,10 @@ function Shop_itemsCount()
 		FROM {db_prefix}shop_items',
 		array()
 	);
-	return $smcFunc['db_num_rows']($items);
+	$count = $smcFunc['db_num_rows']($items);
+	$smcFunc['db_free_result']($items);
+
+	return $count;
 }
 
 function Shop_itemsGet($start, $items_per_page, $sort)
@@ -332,7 +365,7 @@ function Shop_itemsGet($start, $items_per_page, $sort)
 
 	// Get a list of all the item
 	$result = $smcFunc['db_query']('', '
-		SELECT s.name, s.itemid, s.description, s.image, s.module, s.function, s.count, s.status, s.price, s.catid, c.name AS category, m.file AS module
+		SELECT s.name, s.itemid, s.description, s.image, s.module, s.function, s.count, s.status, s.price, s.catid, c.name AS category, m.file
 		FROM {db_prefix}shop_items AS s
 			LEFT JOIN {db_prefix}shop_categories AS c ON (c.catid = s.catid)
 			LEFT JOIN {db_prefix}shop_modules AS m ON (m.id = s.module)
@@ -364,7 +397,10 @@ function Shop_categoriesCount()
 		FROM {db_prefix}Shop_categories',
 		array()
 	);
-	return $smcFunc['db_num_rows']($items);
+	$count = $smcFunc['db_num_rows']($items);
+	$smcFunc['db_free_result']($items);
+
+	return $count;
 }
 
 function Shop_categoriesGet($start, $items_per_page, $sort)
@@ -397,7 +433,7 @@ function Shop_categoriesItemsCount($cat)
 {
 	global $smcFunc;
 
-	$counit = $smcFunc['db_query']('', '
+	$items = $smcFunc['db_query']('', '
 		SELECT catid, status
 		FROM {db_prefix}shop_items
 		WHERE catid = {int:cat}',
@@ -405,7 +441,10 @@ function Shop_categoriesItemsCount($cat)
 			'cat' => $cat,
 		)
 	);
-	return $smcFunc['db_num_rows']($counit);
+	$count = $smcFunc['db_num_rows']($items);
+	$smcFunc['db_free_result']($items);
+
+	return $count;
 }
 
 function Shop_logsDelete($items, $redirect = NULL)
