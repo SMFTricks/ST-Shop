@@ -45,21 +45,41 @@ class item_ChangeUsername extends itemTemplate
 
 	function getUseInput()
 	{
-		return Shop::text('cu_new_username') .'&nbsp;<input class="input_text" type="text" id="newusername" name="newusername" size="50" /><br />
-				<span class="smalltext">'.Shop::text('cu_new_username_desc').'</span><br />';
+		global $txt;
+
+		$input =
+			$txt['Shop_cu_new_username'].'&nbsp;<input class="input_text" type="text" id="newusername" name="newusername" size="60" /><br />
+				<span class="smalltext">'.$txt['Shop_cu_new_username_desc'].'</span><br />';
+
+		return $input;
 	}
 
 	function onUse()
 	{
-		global $user_info;
+		global $user_info, $smcFunc, $context, $sourcedir, $item_info, $txt;
 
-		if (!isset($_REQUEST['newusername']) || $_REQUEST['newusername'] == ' ' || empty($_REQUEST['newusername']))
-			fatal_error(Shop::text('cu_error'));
+		$value = trim(preg_replace('~[\t\n\r \x0B\0' . ($context['utf8'] ? '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}' : '\x00-\x08\x0B\x0C\x0E-\x19\xA0') . ']+~' . ($context['utf8'] ? 'u' : ''), ' ', $_REQUEST['newusername']));
 
-		updateMemberData($user_info['id'], array('member_name' => $_REQUEST['newusername']));
-		return '<div class="infobox">' . sprintf(Shop::text('cu_success'), $_REQUEST['newusername']) . '</div>';
+		// Name can't be empty!
+		if (trim($value) == '')
+			fatal_error($txt['Shop_cu_error_empty'], false);
+		// It's too long! :o
+		elseif ($smcFunc['strlen']($value) > 25)
+			fatal_error($txt['Shop_cdn_error_long'], false);
+		// Why you want the same name?
+		elseif ($user_info['username'] == $value)
+			fatal_error($txt['Shop_cdn_error_same'], false);
+		// Alright everything fine. But, is it a reserved name?
+		elseif ($user_info['username'] != $value)
+		{
+			require_once($sourcedir . '/Subs-Members.php');
+			if (isReservedName($value, $user_info['id']))
+				fatal_error($txt['Shop_cdn_error_taken'], false);
+		}
+
+		// Update the information
+		updateMemberData($user_info['id'], array('member_name' => $value));
+
+		return '<div class="infobox">' . sprintf($txt['Shop_cu_success'], $value) . '</div>';
 	}
-
 }
-
-?>

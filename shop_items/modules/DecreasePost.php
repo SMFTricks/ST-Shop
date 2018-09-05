@@ -49,66 +49,116 @@ class item_DecreasePost extends itemTemplate
 	
 	function getAddInput()
 	{
-		global $item_info;
-		
-		if ($item_info[1] == 0) $item_info[1] = 100;
-		return '
+		global $item_info, $txt;
+
+		// If it's empty, decrease 100 by default
+		if (empty($item_info[1]))
+			$item_info[1] = 100;
+
+		$info = '
 			<dl class="settings">
 				<dt>
-					'.Shop::text('dp_setting1').'
+					'. $txt['Shop_dp_setting1']. '
 				</dt>
 				<dd>
 					<input class="input_text" type="number" min="1" id="info1" name="info1" value="' . $item_info[1] . '" />
 				</dd>
 			</dl>';
+
+		return $info;
 	}
 
 	function getUseInput()
 	{
-		global $context, $scripturl;
-		return Shop::text('inventory_member_name') . '&nbsp;<input class="input_text" type="text" id="username" name="username" size="50" />
-				<a href="'.$scripturl.'?action=findmember;input=username;sesc='.$context['session_id'].'" onclick="return reqWin(this.href, 350, 400);">
-					<span class="generic_icons assist"></span> '.Shop::text('inventory_member_find'). '
-				</a><br />';
+		global $context, $txt;
+
+		$search =
+			$txt['Shop_inventory_member_name']. '
+			&nbsp;<input type="text" name="username" id="username" />
+			<div id="membernameItemContainer"></div>
+			<span class="smalltext">'. $txt['Shop_dp_find_desc']. '</span>
+			<br /><br />
+			<script>
+				var oAddMemberSuggest = new smc_AutoSuggest({
+					sSelf: \'oAddMemberSuggest\',
+					sSessionId: \''. $context['session_id']. '\',
+					sSessionVar: \''. $context['session_var']. '\',
+					sSuggestId: \'to_suggest\',
+					sControlId: \'username\',
+					sSearchType: \'member\',
+					sPostName: \'memberid\',
+					sURLMask: \'action=profile;u=%item_id%\',
+					sTextDeleteItem: \''. $txt['autosuggest_delete_item']. '\',
+					sItemListContainerId: \'membernameItemContainer\'
+				});
+			</script>';
+
+		return $search;
 	}
 
 	function onUse()
 	{
-		global $smcFunc, $item_info;
-		
-		if ($item_info[1] == 0) $item_info[1] = 100;
+		global $smcFunc, $txt, $user_info, $item_info;
 
-		$result = $smcFunc['db_query']('', '
-			SELECT id_member, posts, real_name
-				FROM {db_prefix}members
-				WHERE real_name = {string:user}',
-			array(
-				'user' => $_REQUEST['username'],
-			)
-		);
+		// Set it to 100 by default
+		if (empty($item_info[1]) || !isset($item_info[1]))
+			$item_info[1] = 100;
 
-		// If user doesn't exist
-		if ($smcFunc['db_num_rows']($result) == 0)
-			fatal_error(Shop::text('user_unable_tofind'));
+		// Make sure we got an user
+		if (!isset($_REQUEST['username']) || empty($_REQUEST['username']))
+			fatal_error($txt['Shop_user_unable_tofind'], false);
 
-		$row = $smcFunc['db_fetch_assoc']($result);
-			
-		// This code from PersonalMessage.php. It trims the " characters off the membername posted, 
-		// and then puts all names into an array
-		$_REQUEST['username'] = strtr($_REQUEST['username'], array('\\"' => '"'));
+		$member_query = array();
+		$member_parameters = array();
+
+		// Get the member name...
+		$_REQUEST['username'] = strtr($smcFunc['htmlspecialchars']($_REQUEST['username'], ENT_QUOTES), array('&quot;' => '"'));
 		preg_match_all('~"([^"]+)"~', $_REQUEST['username'], $matches);
-		$userArray = array_unique(array_merge($matches[1], explode(',', preg_replace('~"([^"]+)"~', '', $_REQUEST['username']))));
-		
-		// We only want the first memberName found
-		$user = $userArray[0];
-		
-		$final_value = $row['posts'] - $item_info[1];
-        updateMemberData($row['id_member'], array('posts' => $final_value));
+		$member_name = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_REQUEST['username']))));
 
-        return '<div class="infobox">' . sprintf(Shop::text('dp_success'), $user, $item_info[1]) . '</div>';
-	
+		foreach ($member_name as $index => $name)
+		{
+			$member_name[$index] = trim($smcFunc['strtolower']($member_name[$index]));
+
+			if (strlen($member_name[$index]) == 0)
+				unset($member_name[$index]);
+		}
+		// Construct the query
+		if (!empty($member_name))
+		{
+			$member_query[] = 'LOWER(member_name) IN ({array_string:member_name})';
+			$member_query[] = 'LOWER(real_name) IN ({array_string:member_name})';
+			$member_parameters['member_name'] = $member_name;
+		}
+		if (!empty($member_query))
+		{
+			$request = $smcFunc['db_query']('', '
+				SELECT id_member, posts
+				FROM {db_prefix}members
+				WHERE (' . implode(' OR ', $member_query) . ')
+				LIMIT 1',
+				$member_parameters
+			);
+			$row = $smcFunc['db_fetch_assoc']($request);
+				$memID = $row['id_member'];
+				$pcount = $row['posts'];
+			$smcFunc['db_free_result']($request);
+		}
+
+		// Empty? Something went wrong
+		if (empty($row))
+			fatal_lang_error('not_a_user', false, 404);
+		// Did we find an user?
+		elseif (empty($memID))
+			fatal_error($txt['Shop_user_unable_tofind'], false);
+		// You cannot affect yourself
+		elseif ($memID == $user_info['id'])
+			fatal_error($txt['Shop_dp_yourself'], false);
+
+		// Update the information
+		$final_value = $pcount - $item_info[1];
+		updateMemberData($memID, array('posts' => $final_value));
+
+		return '<div class="infobox">' . sprintf($txt['Shop_dp_success'], $_REQUEST['username'], $item_info[1]) . '</div>';
 	}
-
 }
-
-?>

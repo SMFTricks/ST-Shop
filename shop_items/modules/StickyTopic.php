@@ -32,8 +32,7 @@ if (!defined('SMF'))
 
 class item_StickyTopic extends itemTemplate
 {
- 
-    function getItemDetails()
+	function getItemDetails()
 	{
 		$this->authorName = 'Diego Andr&eacute;s';
 		$this->authorWeb = 'http://www.smftricks.com/';
@@ -45,14 +44,11 @@ class item_StickyTopic extends itemTemplate
 
 		$this->require_input = true;
 		$this->can_use_item = true;
-    }
+	}
 
-    function getUseInput()
+	function getUseInput()
 	{
-		global $smcFunc, $user_info;
-		
-		$returnStr = Shop::text('st_choose_topic') . '<br />
-			<select name="stickyTopic">';
+		global $smcFunc, $user_info, $txt;
 
 		$result = $smcFunc['db_query']('', '
 			SELECT t.id_member_started, t.id_topic, t.is_sticky, t.id_first_msg, m.id_msg, m.subject
@@ -64,28 +60,29 @@ class item_StickyTopic extends itemTemplate
 			)
 		);
 
-		while ($row = $smcFunc['db_fetch_assoc']($result))
-		{
-			$returnStr .= '<option value="' . $row['id_topic'] . '">' . $row['subject'] . '</option>';
-		}
-			
-		$returnStr .= '</select><br />';
-		
 		// What if the user has 0 topics?
-		if ($smcFunc['db_num_rows']($result) == 0)
-		{
-			return '<div class="errorbox">' .Shop::text('st_notopics') . '</div>';
-		}
+		if (empty($smcFunc['db_num_rows']($result)))
+			$returnStr = '<div class="errorbox">'. $txt['Shop_st_notopics'] . '</div>';
 		else
-			return $returnStr;
-    }
+		{
+			$returnStr = $txt['Shop_st_choose_topic'] . '<br />
+			<select name="stickyTopic">';
+			while ($row = $smcFunc['db_fetch_assoc']($result))
+				$returnStr .= '<option value="' . $row['id_topic'] . '">' . $row['subject'] . '</option>';
+			$returnStr .= '</select><br />';
+		}
+		$smcFunc['db_free_result']($result);
 
-    function onUse()
+		// Return the list of topics or an error
+		return $returnStr;
+	}
+
+	function onUse()
 	{
-		global $user_info, $smcFunc, $scripturl;
+		global $user_info, $smcFunc, $txt;
 		
-		if (!isset($_REQUEST['stickyTopic'])) 
-			fatal_error(Shop::text('st_error'));
+		if (!isset($_REQUEST['stickyTopic']) || empty($_REQUEST['stickyTopic'])) 
+			fatal_error($txt['Shop_st_error']);
 
 		$_REQUEST['stickyTopic'] = (int) $_REQUEST['stickyTopic'];
 		
@@ -98,30 +95,28 @@ class item_StickyTopic extends itemTemplate
 				'id_topic' => $_REQUEST['stickyTopic'],
 			)
 		);
+		$row = $smcFunc['db_fetch_assoc']($result);
+		$smcFunc['db_free_result']($result);
 
-		$row = $smcFunc['db_fetch_assoc']($result);		
-		
-		if ($smcFunc['db_num_rows']($result) == 0)
-			fatal_error(Shop::text('st_topic_notexists'));
+		$topic_subject = $row['subject'];
+		$topic_id = $_REQUEST['stickyTopic'];
 
-		if ($row['id_member_started'] != $user_info['id'])
-			fatal_error(Shop::text('st_topic_notown'));
+		// That topic wasn't on the list...
+		if (empty($row))
+			fatal_error($txt['Shop_st_topic_notexists'], false);
+		// That topic is not yours although it was...
+		elseif ($row['id_member_started'] != $user_info['id'])
+			fatal_error($txt['Shop_st_topic_notown'], false);
 		
 		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}topics			 
+			UPDATE {db_prefix}topics
 			SET is_sticky = 1
-			WHERE id_topic = {int:id_topic}
-			LIMIT 1',
+			WHERE id_topic = {int:id_topic}',
 			array(
 				'id_topic' => $_REQUEST['stickyTopic'],
 			)
 		);
-
-		$topic_subject = $row['subject'];
-		$topic_id = $_REQUEST['stickyTopic'];
 							 
-        return '<div class="infobox">' . sprintf(Shop::text('st_success'), $topic_id, $topic_subject) .'</div>';
-    }
+		return '<div class="infobox">' . sprintf($txt['Shop_st_success'], $topic_id, $topic_subject) .'</div>';
+	}
 }
-
-?>

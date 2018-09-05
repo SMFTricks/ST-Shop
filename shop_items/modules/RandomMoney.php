@@ -32,103 +32,92 @@ if (!defined('SMF'))
 
 class item_RandomMoney extends itemTemplate
 {
-    function getItemDetails()
+	function getItemDetails()
 	{
 		$this->authorName = 'Daniel15';
 		$this->authorWeb = 'http://www.dansoftaustralia.net/';
 		$this->authorEmail = 'dansoft@dansoftaustralia.net';
 
-        $this->name = 'Random Money (between xxx and xxx)';
-        $this->desc = 'Get a random amount of money, between xxx and xxx!';
-        $this->price = 75;
+		$this->name = 'Random Money (between xxx and xxx)';
+		$this->desc = 'Get a random amount of money, between xxx and xxx!';
+		$this->price = 75;
 
-        $this->require_input = false;
-        $this->can_use_item = true;
+		$this->require_input = false;
+		$this->can_use_item = true;
 		$this->addInput_editable = true;
-    }
+	}
 
-    function getAddInput()
+	function getAddInput()
 	{
-		global $item_info;
+		global $item_info, $txt;
 
-		if ($item_info[1] == 0) $item_info[1] = '-190';
-		if ($item_info[2] == 0) $item_info[2] = '190';
+		// By default -190 and 190
+		if (empty($item_info[1]))
+			$item_info[1] = -190;
+		if (empty($item_info[2]))
+			$item_info[2] = 190;
 
-		return '
+		$info = '
 			<dl class="settings">
 				<dt>
-					'.Shop::text('rm_setting1').'
+					'.$txt['Shop_rm_setting1'].'
 				</dt>
 				<dd>
 					<input class="input_text" type="number" id="info1" name="info1" value="' . $item_info[1] . '" />
 				</dd>
 				<dt>
-					'.Shop::text('rm_setting2').'
+					'.$txt['Shop_rm_setting2'].'
 				</dt>
 				<dd>
-					<input class="input_text" type="number" id="info2" name="info2" value="' . $item_info[2] . '" />
+					<input class="input_text" type="number" min="1" id="info2" name="info2" value="' . $item_info[2] . '" />
 				</dd>
 			</dl>';
-    }
 
-    function onUse()
+		return $info;
+	}
+
+	function onUse()
 	{
-        global $smcFunc, $user_info, $item_info;
+		global $user_info, $item_info, $txt;
 
 		// If an amount was not defined by the admin, assume defaults
-        if (!isset($item_info[1]) || empty($item_info[1]))
-            $item_info[1] = -190;
+		if (!isset($item_info[1]) || empty($item_info[1]))
+			$item_info[1] = -190;
 
-        if (!isset($item_info[2]) || empty($item_info[2]))
-            $item_info[2] = 190;
+		if (!isset($item_info[2]) || empty($item_info[2]))
+			$item_info[2] = 190;
 
-        $amount = mt_rand($item_info[1], $item_info[2]);
+		$amount = mt_rand($item_info[1], $item_info[2]);
 
-		// Did we lose money?
+		// By default we are always adding the money to their pocket.
+		$final_value = $user_info['shopMoney'] + $amount;
+
+		// Did he lose money?
 		if ($amount < 0)
 		{
-			$result = $smcFunc['db_query']('', "
-				SELECT shopMoney, shopBank
-				FROM {db_prefix}members
-				WHERE id_member = {int:id}",
-				array(
-					'id' => $user_info['id'],
-				)
-			);
-
-			$row = $smcFunc['db_fetch_assoc']($result);
-
-			$money = $row['shopMoney'] + $amount;
-
-			// If the user has enough money to pay for it out of his/her pocket
-			if ($money >= 0)
+			// If the user has enough money to pay for it out of their pocket
+			if ($user_info['shopMoney'] >= ($amount*(-1)))
 			{
-				updateMemberData($user_info['id'], array('shopMoney' => $money));
-				return '<div class="errorbox">' . sprintf(Shop::text('rm_lost_pocket'), ShopMainData::formatCash(abs($amount))) . '</div>';
+				updateMemberData($user_info['id'], array('shopMoney' => $final_value));
+				$info_result = '<div class="errorbox">' . sprintf($txt['Shop_rm_lost_pocket'], Shop::formatCash(abs($amount))) . '</div>';
 			}
-
-			// Do we need to get the bank money instead?
+			// Remove it from the bank then!
 			else
 			{
-				$bank = $row['shopBank'] + $amount;
-				updateMemberData($user_info['id'], array('shopBank' => $bank));
-				return '<div class="errorbox">' . sprintf(Shop::text('rm_lost_bank'), ShopMainData::formatCash(abs($amount))) . '</div>';
+				$final_value = $user_info['shopBank'] + $amount;
+				updateMemberData($user_info['id'], array('shopBank' => $final_value));
+				$info_result = '<div class="errorbox">' . sprintf($txt['Shop_rm_lost_bank'], Shop::formatCash(abs($amount))) . '</div>';
 			}
 
 		}
-
 		// Congratulations! You won some money! :D
 		else
 		{
-			$money = $user_info['shopMoney'] + $amount;
-			updateMemberData($user_info['id'], array('shopMoney' => $money));
-			return '<div class="infobox">' . sprintf(Shop::text('rm_success'), ShopMainData::formatCash($amount)) . '</div>';
+			updateMemberData($user_info['id'], array('shopMoney' => $final_value));
+			$info_result = '<div class="infobox">' . sprintf($txt['Shop_rm_success'], Shop::formatCash($amount)) . '</div>';
 
 		}
-
-    }
-
+		// Return the final message
+		return $info_result;
+	}
 }
-
-?>
-

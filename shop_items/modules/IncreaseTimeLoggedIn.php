@@ -49,32 +49,39 @@ class item_IncreaseTimeLoggedIn extends itemTemplate
 	
 	function getAddInput()
 	{
-		global $item_info;
+		global $item_info, $txt;
 
-		if ($item_info[1] == 0) $item_info[1] = '12';
+		// By default 12 hours
+		if (empty($item_info[1]))
+			$item_info[1] = 12;
 
-		return '
+		$info = '
 			<dl class="settings">
 				<dt>
-					'.Shop::text('itli_setting1').'
+					'.$txt['Shop_itli_setting1'].'
 				</dt>
 				<dd>
-					<input class="input_text" type="number" min="1" id="info1" name="info1" value="' . $item_info[1] . '" /> ' . Shop::text('itli_hours') . '
+					<input class="input_text" type="number" min="1" id="info1" name="info1" value="' . $item_info[1] . '" /> '.$txt['Shop_itli_hours'].'
 				</dd>
 			</dl>';
+
+		return $info;
 	}
 
 	function onUse()
 	{
-		global $user_info, $item_info;
+		global $user_info, $item_info, $txt;
 
+		// By default 12 hours
+		if (empty($item_info[1]))
+			$item_info[1] = 12;
+
+		// Add the time to his current total
 		$time = (int) ($user_info['total_time_logged_in'] + ($item_info[1] * 3600));
 
+		// Update info
 		updateMemberData($user_info['id'], array('total_time_logged_in' => (int) $time));
 		
-		return '<div class="infobox">' . sprintf(Shop::text('itli_success'), $item_info[1]) . '</div>';
+		return '<div class="infobox">' . sprintf($txt['Shop_itli_success'], $item_info[1]) . '</div>';
 	}
-
 }
-
-?>

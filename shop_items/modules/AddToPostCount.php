@@ -47,37 +47,35 @@ class item_AddToPostCount extends itemTemplate
 		$this->addInput_editable = true;
 	}
 
-	// This is the best bit of this item. When you add the item into the admin panel, you
-	// can set additional variables (up to 4). Make sure to call them info1, info2, info3
-	// and info4.
 	function getAddInput()
 	{
-		global $item_info;
-		if ($item_info[1] == 0) $item_info[1] = 200;
-		return '
+		global $item_info, $txt;
+
+		// If it's empty, add 100 by default
+		if (empty($item_info[1]))
+			$item_info[1] = 100;
+
+		$info = '
 			<dl class="settings">
 				<dt>
-					'.Shop::text('atpc_setting1').'
+					'. $txt['Shop_atpc_setting1']. '
 				</dt>
 				<dd>
 					<input class="input_text" type="number" min="1" id="info1" name="info1" value="' . $item_info[1] . '" />
 				</dd>
 			</dl>';
+
+		return $info;
 	}
 
-	// The additional parameters (see 'getAddInput' above) are in the $item_info array.
-	// Make sure to make it global (like shown here) otherwise you won't be able to access
-	// its contents. THE ARRAY IS 1-BASED (1 IS THE FIRST ITEM) NOT 0-BASED!
 	function onUse()
 	{
-		global $user_info, $item_info;
+		global $user_info, $item_info, $txt;
 
+		// Update info
 		$final_value =  $item_info[1] + $user_info['posts'];
-        updateMemberData($user_info['id'], array('posts' => $final_value));
+		updateMemberData($user_info['id'], array('posts' => $final_value));
 		
-		return '<div class="infobox">' . sprintf(Shop::text('atpc_success'), $item_info[1]) . '</div>';
+		return '<div class="infobox">' . sprintf($txt['Shop_atpc_success'], $item_info[1]) . '</div>';
 	}
-
 }
-
-?>

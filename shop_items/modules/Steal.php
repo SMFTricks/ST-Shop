@@ -49,88 +49,127 @@ class item_Steal extends itemTemplate
 
 	function getAddInput()
 	{
-		global $item_info;
+		global $item_info, $txt;
 
-		if ($item_info[1] == 0) $item_info[1] = 40;
+		// By default 40
+		if (empty($item_info[1]))
+			$item_info[1] = 40;
 
-		return '
+		$info = '
 			<dl class="settings">
 				<dt>
-					'.Shop::text('steal_setting1').'<br />
-					<span class="smalltext">'.Shop::text('steal_setting1_desc').'</span>
+					'. $txt['Shop_steal_setting1']. '
+					<span class="smalltext">'.$txt['Shop_steal_setting1_desc'].'</span>
 				</dt>
 				<dd>
-					<input class="input_text" type="number" min="1" max="100" id="info1" name="info1" value="' . $item_info[1] . '" /> %
+					<input class="input_text" type="number" min="1" max="100" id="info1" name="info1" value="' . $item_info[1] . '" />
 				</dd>
 			</dl>';
+
+		return $info;
 	}
 
 	function getUseInput()
 	{
-		global $context, $scripturl;
+		global $context, $txt;
 
-		return Shop::text('steal_from') . '&nbsp;<input class="input_text" type="text" id="stealfrom" name="stealfrom" size="50" />
-				<a href="'.$scripturl.'?action=findmember;input=stealfrom;sesc='.$context['session_id'].'" onclick="return reqWin(this.href, 350, 400);">
-					<span class="generic_icons assist"></span> '.Shop::text('inventory_member_find'). '
-				</a><br />';
+		$search =
+			$txt['Shop_steal_from']. '
+			&nbsp;<input type="text" name="stealfrom" id="stealfrom" />
+			<div id="membernameItemContainer"></div>
+			<span class="smalltext">'. $txt['Shop_inventory_member_find']. '</span>
+			<br /><br />
+			<script>
+				var oAddMemberSuggest = new smc_AutoSuggest({
+					sSelf: \'oAddMemberSuggest\',
+					sSessionId: \''. $context['session_id']. '\',
+					sSessionVar: \''. $context['session_var']. '\',
+					sSuggestId: \'to_suggest\',
+					sControlId: \'stealfrom\',
+					sSearchType: \'member\',
+					sPostName: \'memberid\',
+					sURLMask: \'action=profile;u=%item_id%\',
+					sTextDeleteItem: \''. $txt['autosuggest_delete_item']. '\',
+					sItemListContainerId: \'membernameItemContainer\'
+				});
+			</script>';
+
+		return $search;
 	}
+
 
 	function onUse()
 	{
-		global $user_info, $item_info, $smcFunc;
+		global $user_info, $item_info, $smcFunc, $txt;
 
 		// Check some inputs
 		if (!isset($_REQUEST['stealfrom']) || empty($_REQUEST['stealfrom'])) 
-			fatal_error(Shop::text('user_unable_tofind'));
-
-		// This code from PersonalMessage.php5. It trims the " characters off the membername posted, 
-		// and then puts all names into an array
-		$_REQUEST['stealfrom'] = strtr($_REQUEST['stealfrom'], array('\\"' => '"'));
-		preg_match_all('~"([^"]+)"~', $_REQUEST['stealfrom'], $matches);
-		$userArray = array_unique(array_merge($matches[1], explode(',', preg_replace('~"([^"]+)"~', '', $_REQUEST['stealfrom']))));
-
-		// We only want the first memberName found
-		$user = $userArray[0];
+			fatal_error($txt['Shop_user_unable_tofind'], false);
 
 		// Get a random number between 0 and 100
-		$try = mt_rand(0, 100);
+		$prob = mt_rand(0, 100);
 
 		// If successful
-		if ($try <= $item_info[1])
+		if ($prob <= $item_info[1])
 		{
-			// Get stealee's (person we're stealing from) money count
-			$result = $smcFunc['db_query']('', '
-				SELECT shopMoney, real_name, id_member
-				FROM {db_prefix}members 
-				WHERE real_name = {string:name}', 
-				array( 
-					'name' => $user, 
-				) 
-			);
+			$member_query = array();
+			$member_parameters = array();
 
-			// If user doesn't exist
-			if ($smcFunc['db_num_rows']($result) == 0)
-				fatal_error(Shop::text('user_unable_tofind'));
+			// Get the member name...
+			$_REQUEST['stealfrom'] = strtr($smcFunc['htmlspecialchars']($_REQUEST['stealfrom'], ENT_QUOTES), array('&quot;' => '"'));
+			preg_match_all('~"([^"]+)"~', $_REQUEST['stealfrom'], $matches);
+			$member_name = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_REQUEST['stealfrom']))));
 
-			// Wait, are you going to steal yourself? WTF
-			if ($user_info['id'] == $row['id_member']) 
-				fatal_error(Shop::text('steal_error_yourself'));
+			foreach ($member_name as $index => $name)
+			{
+				$member_name[$index] = trim($smcFunc['strtolower']($member_name[$index]));
 
-			$row = $smcFunc['db_fetch_assoc']($result);
+				if (strlen($member_name[$index]) == 0)
+					unset($member_name[$index]);
+			}
+			// Construct the query
+			if (!empty($member_name))
+			{
+				$member_query[] = 'LOWER(member_name) IN ({array_string:member_name})';
+				$member_query[] = 'LOWER(real_name) IN ({array_string:member_name})';
+				$member_parameters['member_name'] = $member_name;
+			}
+			if (!empty($member_query))
+			{
+				$request = $smcFunc['db_query']('', '
+					SELECT id_member, posts, shopMoney, shopBank, real_name
+					FROM {db_prefix}members
+					WHERE (' . implode(' OR ', $member_query) . ')
+					LIMIT 1',
+					$member_parameters
+				);
+				$row = $smcFunc['db_fetch_assoc']($request);
+					$memID = $row['id_member'];
+					$pcount = $row['posts'];
+					$memCash = $row['shopMoney'];
+					$memName = $row['real_name'];
+				$smcFunc['db_free_result']($request);
+			}
+
+			// Empty? Something went wrong
+			if (empty($row))
+				fatal_lang_error('not_a_user', false, 404);
+			// Did we find an user?
+			elseif (empty($memID))
+				fatal_error($txt['Shop_user_unable_tofind'], false);
+			// You cannot affect yourself
+			elseif ($memID == $user_info['id'])
+				fatal_error($txt['Shop_steal_error_yourself'], false);
+			// That user's pocket is empty!
+			elseif (empty($memCash))
+				fatal_error($txt['Shop_steal_error_zero'], false);
 
 			// Get random amount between 0 and amount of money stealee has
-			$steal_amount = mt_rand(0, $row['shopMoney']);
+			$steal_amount = mt_rand(1, $memCash);
 
-			// We shouldn't get less than 0
-			if ($steal_amount < 0)
-				$steal_amount = 0;
-
-			
-			$stealee = $row['id_member'];
-			$cash = $row['shopMoney'];
-
-			$final_value1 = $cash - $steal_amount;
-			updateMemberData($stealee, array('shopMoney' => $final_value1));
+			// Steal from him!
+			$final_value1 = $memCash - $steal_amount;
+			updateMemberData($memID, array('shopMoney' => $final_value1));
 
 			//...and give to stealer (robber)
 			$final_value2 = $user_info['shopMoney'] + $steal_amount;
@@ -138,16 +177,15 @@ class item_Steal extends itemTemplate
 
 			// Now we are going to tell the user how much he got
 			if ($steal_amount < 200)
-				return '<div class="infobox">' . sprintf(Shop::text('steal_success1'), ShopMainData::formatCash($steal_amount)) . '</div>';
+				$info_result = '<div class="infobox">' . sprintf($txt['Shop_steal_success1'], Shop::formatCash($steal_amount), $memName) . '</div>';
 			// If it was less than 200, the user was not very lucky
 			else
-				return '<div class="infobox">' . sprintf(Shop::text('steal_success2'), ShopMainData::formatCash($steal_amount), $user) . '</div>';
+				$info_result = '<div class="infobox">' . sprintf($txt['Shop_steal_success2'], Shop::formatCash($steal_amount), $memName) . '</div>';
 		}
 		else
-		{
-			return '<div class="errorbox">' . Shop::text('steal_error') . '</div>';
-		}
+			$info_result = '<div class="errorbox">' . $txt['Shop_steal_error'] . '</div>';
+
+		// Return the message
+		return $info_result;
 	}
 }
-
-?>

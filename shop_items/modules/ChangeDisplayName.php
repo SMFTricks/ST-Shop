@@ -50,44 +50,72 @@ class item_ChangeDisplayName extends itemTemplate
 	function getAddInput()
 	{
 		global $item_info, $txt;
-		loadLanguage('Shop');
-		if ($item_info[1] == 0) $item_info[1] = 5;
-		return '
+
+		// Set the length to 5 by default
+		if (empty($item_info[1]))
+			$item_info[1] = 5;
+
+		$info = '
 			<dl class="settings">
 				<dt>
 					'. $txt['Shop_cdn_setting1'].'
 				</dt>
 				<dd>
-					<input class="input_text" type="text" id="info1" name="info1" value="' . $item_info[1] . '" />
+					<input class="input_text" type="number" min="1" id="info1" name="info1" value="' . $item_info[1] . '" />
 				</dd>
 			</dl>';
+
+		return $info;
 	}
 
 	function getUseInput()
 	{
-		global $item_info;
+		global $item_info, $txt;
 
 		// Use length of 5 as default
-		if (!isset($item_info[1]) || $item_info[1] == 0) $item_info[1] = 5;
+		if (!isset($item_info[1]) || empty($item_info[1]))
+			$item_info[1] = 5;
+
+		$input =
+			$txt['Shop_cdn_new_display_name'].'&nbsp;<input class="input_text" type="text" id="newDisplayName" name="newDisplayName" size="60" /><br />
+				<span class="smalltext">' . sprintf($txt['Shop_cdn_new_display_name_desc'], $item_info[1]) . '</span><br />';
 		
-		return Shop::text('cdn_new_display_name').'&nbsp;<input class="input_text" type="text" id="newDisplayName" name="newDisplayName" size="50" /><br />
-				<span class="smalltext">' . sprintf(Shop::text('cdn_new_display_name_desc'), $item_info[1]) . '</span><br />';
+		return $input;
 	}
 
 	function onUse()
 	{
-		global $user_info, $item_info;
+		global $user_info, $smcFunc, $context, $sourcedir, $item_info, $txt;
 		
-		// Use a length of 5 as default
-		if (!isset($item_info[1]) || $item_info[1] == 0) $item_info[1] = 5;
+		// Use length of 5 as default
+		if (!isset($item_info[1]) || empty($item_info[1]))
+			$item_info[1] = 5;
 
-		if (strlen($_REQUEST['newDisplayName']) < $item_info[1]) 
-			fatal_error(sprintf(Shop::text('cdn_error'), $item_info[1]));
+		$value = trim(preg_replace('~[\t\n\r \x0B\0' . ($context['utf8'] ? '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}' : '\x00-\x08\x0B\x0C\x0E-\x19\xA0') . ']+~' . ($context['utf8'] ? 'u' : ''), ' ', $_REQUEST['newDisplayName']));
 
-		updateMemberData($user_info['id'], array('real_name' => $_REQUEST['newDisplayName']));
-		return '<div class="infobox">' . sprintf(Shop::text('cdn_success'), $_REQUEST['newDisplayName']) . '</div>';
+		// Name can't be empty!
+		if (trim($value) == '')
+			fatal_error($txt['Shop_cdn_error_empty'], false);
+		// Is it long enough then? ;)
+		elseif ($smcFunc['strlen']($value) < $item_info[1])
+			fatal_error(sprintf($txt['Shop_cdn_error_short'], $item_info[1]), false);
+		// It's too long! :o
+		elseif ($smcFunc['strlen']($value) > 60)
+			fatal_error($txt['Shop_cdn_error_long'], false);
+		// Why you want the same name?
+		elseif ($user_info['name'] == $value)
+			fatal_error($txt['Shop_cdn_error_same'], false);
+		// Alright everything fine. But, is it a reserved name?
+		elseif ($user_info['name'] != $value)
+		{
+			require_once($sourcedir . '/Subs-Members.php');
+			if (isReservedName($value, $user_info['id']))
+				fatal_error($txt['Shop_cdn_error_taken'], false);
+		}
+
+		// Update the information
+		updateMemberData($user_info['id'], array('real_name' => $value));
+
+		return '<div class="infobox">' . sprintf($txt['Shop_cdn_success'], $value) . '</div>';
 	}
-
 }
-
-?>

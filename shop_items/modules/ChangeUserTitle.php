@@ -45,20 +45,27 @@ class item_ChangeUserTitle extends itemTemplate
 
 	function getUseInput()
 	{
-		return Shop::text('cot_title').' <input class="input_text" type="text" id="newtitle" name="newtitle" size="50" /><br />';
+		global $txt;
+
+		$search =
+			$txt['Shop_cot_title']. '
+			&nbsp;<input class="input_text" type="text" name="newtitle" size="50" />
+			<br /><br/>';
+
+		return $search;
 	}
 
 	function onUse()
 	{
-		global $user_info;
+		global $txt, $user_info;
 
-		if (!isset($_REQUEST['newtitle']) || empty($_REQUEST['newtitle']))
-			fatal_error(Shop::text('cot_empty_title'));
+		// Somehow we missed the title?
+		if (!isset($_REQUEST['newtitle']))
+			fatal_error($txt['Shop_cot_empty_title'], false);
 
+		// Update the information
 		updateMemberData($user_info['id'], array('usertitle' => $_REQUEST['newtitle']));
-		return '<div class="infobox">' . sprintf(Shop::text('cot_success2'), $_REQUEST['newtitle']) . '</div>';
+
+		return '<div class="infobox">' . sprintf($txt['Shop_cot_own_success'], $_REQUEST['newtitle']) . '</div>';
 	}
-
 }
-
-?>
