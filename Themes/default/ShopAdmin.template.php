@@ -29,10 +29,8 @@ function template_Shop_adminInfo()
 						<span class="ie6_header floatleft">', $txt['Shop_live_news'] , '</span>
 					</h3>
 				</div>
-				<div class="windowbg">
-					<div class="content padding">
-						News are supposed to go here....
-					</div>
+				<div class="windowbg nopadding">
+					<div id="smfAnnouncements">', $txt['lfyi'], '</div>
 				</div>
 			</div>';
 
@@ -68,7 +66,7 @@ function template_Shop_adminInfo()
 					</form>
 				</div>
 			</div>
-			<br class="clear" />
+			<br class="clear" /><br>
 			<div class="cat_bar">
 				<h3 class="catbg">
 					<span class="ie6_header floatleft">', $txt['Shop_main_credits'], '</span>
@@ -98,6 +96,39 @@ function template_Shop_adminInfo()
 	echo '
 			</div></div>
 		</div>
+		<br class="clear" />';
+
+	foreach ($context[$context['admin_menu_name']]['sections'] as $area_id => $area)
+	{
+		// Only shop info...
+			if ($area_id != 'shop')
+				continue;
+
+		echo '
+		<fieldset id="group_', $area_id, '" class="windowbg admin_group">
+			<legend>', $area['title'], '</legend>';
+
+		foreach ($area['areas'] as $item_id => $item)
+		{
+			// Don't show home
+			if ($item_id == 'shopinfo')
+				continue;
+
+			$url = isset($item['url']) ? $item['url'] : $scripturl . '?action=admin;area=' . $item_id . (!empty($context[$context['admin_menu_name']]['extra_parameters']) ? $context[$context['admin_menu_name']]['extra_parameters'] : '');
+
+			if (!empty($item['icon_file']))
+				echo '
+			<a href="', $url, '" class="admin_group', !empty($item['inactive']) ? ' inactive' : '', '"><img class="large_admin_menu_icon_file" src="', $item['icon_file'], '" alt="">', $item['label'], '</a>';
+			else
+				echo '
+			<a href="', $url, '"><span class="large_', $item['icon_class'], !empty($item['inactive']) ? ' inactive' : '', '"></span>', $item['label'], '</a>';
+		}
+
+		echo '
+		</fieldset>';
+	}
+
+	echo '
 	</div>';
 }
 
