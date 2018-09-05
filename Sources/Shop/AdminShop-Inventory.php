@@ -142,7 +142,10 @@ function Shop_invCount($memid)
 			'id' => $memid,
 		)
 	);
-	return $smcFunc['db_num_rows']($items);
+	$count = $smcFunc['db_num_rows']($items);
+	$smcFunc['db_free_result']($items);
+
+	return $count;
 }
 
 function Shop_invGet($start, $items_per_page, $sort, $memid)
@@ -536,13 +539,11 @@ function Shop_invGroup2()
 		$member_query = 'id_member IN ({array_int:member_ids})';
 
 		// Handle  everything and save it in the log
-		Shop_logInventory($user_info['id'], $member_parameters, $member_query, '', $amount, 0, 0);
+		Shop_logInventory($user_info['id'], $member_parameters['member_ids'], $member_query, '', $amount, 0, 0);
 
 		// Redirect to a nice message of successful
 		redirectexit('action=admin;area=shopinventory;sa=groupcredits;success');
 	}
-	
-	
 }
 
 function Shop_invCredits()

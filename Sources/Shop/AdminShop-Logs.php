@@ -131,8 +131,11 @@ function Shop_logsCount($type, $is_admin = false)
 			array()
 		);
 	}
+	
+	$count = $smcFunc['db_num_rows']($logs);
+	$smcFunc['db_free_result']($logs);
 
-	return $smcFunc['db_num_rows']($logs);
+	return $count;
 }
 
 function Shop_logsGet($start, $items_per_page, $sort, $type, $is_admin = false)

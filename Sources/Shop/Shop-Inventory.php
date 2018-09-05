@@ -278,7 +278,10 @@ function Shop_invCount($memid, $cat = null)
 			'id' => $memid,
 		)
 	);
-	return $smcFunc['db_num_rows']($items);
+	$count = $smcFunc['db_num_rows']($items);
+	$smcFunc['db_free_result']($items);
+
+	return $count;
 }
 
 function Shop_invGet($start, $items_per_page, $sort, $memid, $cat = null)
@@ -640,7 +643,9 @@ function Shop_invUse()
 	$context['shop']['use']['name'] = $item['name'];
 	eval('$temp = new item_' . $item['file'] . ';');
 	$context['shop']['use']['input'] = $temp->getUseInput();
-	
+
+	// Load suggest.js
+	loadJavaScriptFile('suggest.js', array('default_theme' => true, 'defer' => false, 'minimize' => true), 'smf_suggest');
 }
 
 function Shop_invUsed()

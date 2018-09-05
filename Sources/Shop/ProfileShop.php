@@ -40,7 +40,7 @@ function Shop_profileAreas(&$profile_areas)
 				'file' => 'Shop/Shop-Trade.php',
 				'function' => 'Shop_tradeProfile',
 				'icon' => 'inbox',
-				'enabled' => !empty($modSettings['Shop_enable_shop']),
+				'enabled' => !empty($modSettings['Shop_enable_shop']) && !empty($modSettings['Shop_enable_trade']),
 				'permission' => array(
 					'own' => array('shop_viewInventory', 'shop_canTrade', 'shop_canManage'),
 					'any' => array('shop_viewInventory', 'shop_canTrade', 'shop_canManage'),

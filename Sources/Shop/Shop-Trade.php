@@ -674,7 +674,10 @@ function Shop_tradeCount($cat = null, $members = true, $memID = 0)
 			'userid' => $memID,
 		)
 	);
-	return $smcFunc['db_num_rows']($items);
+	$count = $smcFunc['db_num_rows']($items);
+	$smcFunc['db_free_result']($items);
+
+	return $count;
 }
 
 function Shop_tradeGet($start, $items_per_page, $sort, $cat = null, $members = true, $memID = 0)
@@ -949,8 +952,10 @@ function Shop_logCount()
 			'user' => $user_info['id'],
 		)
 	);
+	$count = $smcFunc['db_num_rows']($logs);
+	$smcFunc['db_free_result']($logs);
 
-	return $smcFunc['db_num_rows']($logs);
+	return $count;
 }
 
 function Shop_logGet($start, $items_per_page, $sort)

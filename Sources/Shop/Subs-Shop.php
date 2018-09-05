@@ -19,7 +19,7 @@ class Shop
 	public static $itemsdir = '/shop_items/items';
 	public static $modulesdir = '/shop_items/modules';
 	public static $gamesdir = '/shop_items/games';
-	public static $supportSite = 'http://smftricks.com/index.php?action=.xml;sa=news;board=51;limit=10;type=rss2';
+	public static $supportSite = 'https://smftricks.com/index.php?action=.xml;sa=news;board=51;limit=10;type=rss2';
 
 	public static function initialize()
 	{
@@ -211,6 +211,8 @@ class Shop
 
 		// The main action
 		$actions['shop'] = array('Shop/Shop.php', 'Shop');
+		// Feed
+		$actions['shopfeed'] = array(false, 'Shop::getFeed#');
 
 		// Add some hooks by action
 		switch ($_REQUEST['action']) {
@@ -401,8 +403,6 @@ class Shop
 						$who = sprintf($txt['whoallow_shop_othertrades'], $membername, $actions['u']);
 					}
 				}
-				elseif ($actions['sa'] == 'tradelist' && allowedTo('shop_canTrade'))
-					$who = $txt['whoallow_shop_tradelist'];
 				// Stats
 				elseif ($actions['sa'] == 'stats' && allowedTo('shop_viewStats'))
 					$who = $txt['whoallow_shop_stats'];
@@ -791,15 +791,6 @@ class Shop
 					),
 				),
 			),
-			'scripts' => array(
-				'name' => 'Third Party Scripts',
-				'users' => array(
-					'feed' => array(
-						'name' => 'zRSSFeeds',
-						'site' => 'http://www.zazar.net/developers/jquery/zrssfeed',
-					),
-				),
-			),
 			'icons' => array(
 				'name' => 'Icons',
 				'users' => array(
@@ -812,30 +803,40 @@ class Shop
 			'thanksto' => array(
 				'name' => 'Special Thanks',
 				'users' => array(
-					'daniel15' => array(
-						'name' => 'Daniel15',
-						'site' => 'http://www.simplemachines.org/community/index.php?action=profile;u=9547',
-						'desc' => 'Original Shop mod',
-					),
-					'sa' => array(
-						'name' => 'SA',
-						'site' => 'http://www.simplemachines.org/community/index.php?action=profile;u=84438',
-						'desc' => 'Original Developer',
-					),
 					'suki' => array(
 						'name' => 'Suki',
 						'site' => 'http:://www.missallsunday.com',
 						'desc' => 'Consultant',
 					),
+					'daniel15' => array(
+						'name' => 'Daniel15',
+						'site' => 'https://www.simplemachines.org/community/index.php?action=profile;u=9547',
+						'desc' => 'Original Shop mod',
+					),
+					'sa' => array(
+						'name' => 'SA',
+						'site' => 'https://www.simplemachines.org/community/index.php?action=profile;u=84438',
+						'desc' => 'Original Developer',
+					),
+					'vbgamer45' => array(
+						'name' => 'vbgamer45',
+						'site' => 'https://www.smfhacks.com/',
+						'desc' => 'SMF Shop Developer, for keeping his lovely mods always updated',
+					),
 					'hcfwesker' => array(
 						'name' => 'hcfwesker',
-						'site' => 'http://www.simplemachines.org/community/index.php?action=profile;u=244295',
-						'desc' => 'Nice ideas and for making SA Shop feel loved',
+						'site' => 'https://www.simplemachines.org/community/index.php?action=profile;u=244295',
+						'desc' => 'Nice ideas and for making SA/ST Shop feel loved',
 					),
 					'gerard' => array(
 						'name' => 'Zerk',
-						'site' => 'http://www.simplemachines.org/community/index.php?action=profile;u=130323',
+						'site' => 'https://www.simplemachines.org/community/index.php?action=profile;u=130323',
 						'desc' => 'Suggestions, code and cool ideas',
+					),
+					'ospina' => array(
+						'name' => 'Cristian Ospina',
+						'site' => 'https://www.simplemachines.org/community/index.php?action=profile;u=215234',
+						'desc' => 'Feedback and ideas for Shop Modules',
 					),
 				),
 			),
@@ -845,6 +846,26 @@ class Shop
 		call_integration_hook('integrate_shop_credits', array(&$credits));
 
 		return $credits;
+	}
+
+		/**
+	 * \Breeze\Breeze::getFeed()
+	 *
+	 * Proxy function to avoid Cross-origin errors.
+	 * @return string
+	 * @author Jessica González <suki@missallsunday.com>
+	 */
+	public function getFeed()
+	{
+		global $sourcedir;
+		require_once($sourcedir . '/Class-CurlFetchWeb.php');
+		$fetch = new \curl_fetch_web_data();
+		$fetch->get_url_data(Shop::$supportSite);
+		if ($fetch->result('code') == 200 && !$fetch->result('error'))
+			$data = $fetch->result('body');
+		else
+			return '';
+		smf_serverResponse($data, 'Content-type: text/xml');
 	}
 }
 

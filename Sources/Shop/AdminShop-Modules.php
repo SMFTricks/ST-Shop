@@ -52,7 +52,10 @@ function Shop_modulesCount()
 		FROM {db_prefix}shop_modules',
 		array()
 	);
-	return $smcFunc['db_num_rows']($modules);
+	$count = $smcFunc['db_num_rows']($modules);
+	$smcFunc['db_free_result']($modules);
+
+	return $count;
 }
 
 function Shop_modulesGet($start, $items_per_page, $sort)

@@ -158,12 +158,11 @@ function Shop_giftSend()
 	// Empty? Something went wrong
 	if (empty($row))
 		fatal_lang_error('not_a_user', false, 404);
-
 	// Did we find an user?
 	if (empty($memID))
 		fatal_error($txt['Shop_user_unable_tofind'], false);
 	// You cannot gift yourself DUH!
-	elseif ($context['id_member'] == $user_info['id'])
+	elseif ($memID == $user_info['id'])
 		fatal_error($txt['Shop_gift_not_yourself'], false);
 
 	// Did the user leave a message? Nice :)

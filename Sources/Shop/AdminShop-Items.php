@@ -148,12 +148,12 @@ function Shop_itemsIndex()
 					'class' => 'lefttext',
 				),
 				'data' => array(
-					'function' => function($row){ global $txt; return (!empty($row['module']) ? $row['module'] : $txt['Shop_items_na']);},
+					'function' => function($row){ global $txt; return (!empty($row['file']) ? $row['file'] : $txt['Shop_items_na']);},
 					'style' => 'width: 5%',
 				),
 				'sort' =>  array(
-					'default' => 'module DESC',
-					'reverse' => 'module',
+					'default' => 'file DESC',
+					'reverse' => 'file',
 				),
 			),
 			'status' => array(
@@ -314,11 +314,8 @@ function Shop_itemsAdd()
 	$request = $smcFunc['db_query']('', '
 		SELECT id, name, author, email, file
 		FROM {db_prefix}shop_modules
-		WHERE file != {string:defitem}
 		ORDER BY name ASC',
-		array(
-			'defitem' => 'Default'
-		)
+		array()
 	);
 
 	$context['shop_modules'] = array();
@@ -357,7 +354,6 @@ function Shop_itemsAdd2()
 			'module' => $module
 		)
 	);
-	// TODO : Check for 0 matches in dB
 
 	// Put all the details into an array
 	$row = $smcFunc['db_fetch_assoc']($request);
@@ -379,7 +375,7 @@ function Shop_itemsAdd2()
 	);
 	$smcFunc['db_free_result']($request);
 
-	if(!empty($module)) {
+	if(!empty($module) && !empty($row)) {
 		// Open tha file
 		require_once($boarddir . Shop::$modulesdir . '/' . $context['shop_item_info']['name'] . '.php');
 		// Create an instance of the item
@@ -446,6 +442,22 @@ function Shop_itemsAdd3()
 	$status = isset($_REQUEST['itemstatus']) ? 1 : 0;
 	$_REQUEST['cat'] = (int) $_REQUEST['cat'];
 	$_REQUEST['module'] = (int) $_REQUEST['module'];
+
+	// Just in case something random happened
+	$getmodule = $smcFunc['db_query']('', '
+		SELECT id
+		FROM {db_prefix}shop_modules
+		WHERE id = {int:module}',
+		array(
+			'module' => $_REQUEST['module']
+		)
+	);
+	$findmodule = $smcFunc['db_num_rows']($getmodule);
+	$smcFunc['db_free_result']($getmodule);
+
+	// Is that module valid?
+	if (empty($findmodule))
+		$_REQUEST['module'] = 0;
 
 	// Insert the actual item
 	$smcFunc['db_insert']('',
@@ -545,7 +557,6 @@ function Shop_itemsEdit()
 		'delete_after_use' => $row['delete_after_use'],
 		'catid' => $row['catid'],
 		'module' => $row['module'],
-		'function' => $row['function'],
 		'status' => $row['status'],
 		'file' => $row['file'],
 	);
