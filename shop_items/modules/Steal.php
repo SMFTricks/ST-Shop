@@ -52,17 +52,28 @@ class item_Steal extends itemTemplate
 		global $item_info, $txt;
 
 		// By default 40
-		if (empty($item_info[1]))
+		if (empty($item_info[1]) || !isset($item_info[1]))
 			$item_info[1] = 40;
+
+		// By default enabled
+		if (empty($item_info[2]) || !isset($item_info[2]))
+			$item_info[2] = 0;
 
 		$info = '
 			<dl class="settings">
 				<dt>
-					'. $txt['Shop_steal_setting1']. '
+					'. $txt['Shop_steal_setting1']. '<br/>
 					<span class="smalltext">'.$txt['Shop_steal_setting1_desc'].'</span>
 				</dt>
 				<dd>
 					<input class="input_text" type="number" min="1" max="100" id="info1" name="info1" value="' . $item_info[1] . '" />
+				</dd>
+				<dt>
+					'. $txt['Shop_steal_setting2']. '<br/>
+					<span class="smalltext">'.$txt['Shop_steal_setting2_desc'].'</span>
+				</dt>
+				<dd>
+					<input class="input_check" type="checkbox" id="info2" name="info2" value="1"'. ($item_info[2] == 1 ? ' checked' : ''). ' />
 				</dd>
 			</dl>';
 
@@ -97,10 +108,17 @@ class item_Steal extends itemTemplate
 		return $search;
 	}
 
-
 	function onUse()
 	{
 		global $user_info, $item_info, $smcFunc, $txt;
+
+		// By default 40
+		if (empty($item_info[1]) || !isset($item_info[1]))
+			$item_info[1] = 40;
+
+		// By default enabled
+		if (empty($item_info[2]) || !isset($item_info[2]))
+			$item_info[2] = 0;
 
 		// Check some inputs
 		if (!isset($_REQUEST['stealfrom']) || empty($_REQUEST['stealfrom'])) 
@@ -181,11 +199,43 @@ class item_Steal extends itemTemplate
 			// If it was less than 200, the user was not very lucky
 			else
 				$info_result = '<div class="infobox">' . sprintf($txt['Shop_steal_success2'], Shop::formatCash($steal_amount), $memName) . '</div>';
+
+			// Notify the user
+			if ($item_info[2] == 1)
+				self::stealPM($memID, $steal_amount, $final_value1);
 		}
 		else
 			$info_result = '<div class="errorbox">' . $txt['Shop_steal_error'] . '</div>';
 
 		// Return the message
 		return $info_result;
+	}
+
+	function stealPM($memID, $steal_amount, $current_money)
+	{
+		global $user_info, $sourcedir, $modSettings, $txt;
+
+		// Who is sending the PM
+		$pmfrom = array(
+			'id' => 0,
+			'name' => $txt['Shop_trade_notification_sold_from'],
+			'username' => $txt['Shop_trade_notification_sold_from'],
+		);
+
+		// Who is receiving the PM		
+		$pmto = array(
+			'to' => array($memID),
+			'bcc' => array()
+		);
+		// The message subject
+		$subject = $txt['Shop_steal_notification_robbed'];
+
+		// The actual message
+		$message = sprintf($txt['Shop_steal_notification_message'], $user_info['id'], $user_info['name'], Shop::formatCash($steal_amount), Shop::formatCash($current_money));
+
+		// We need this file
+		require_once($sourcedir . '/Subs-Post.php');
+		// Send the PM
+		sendpm($pmto, $subject, $message, false, $pmfrom);
 	}
 }

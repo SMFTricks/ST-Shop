@@ -52,7 +52,7 @@ class item_IncreaseTimeLoggedIn extends itemTemplate
 		global $item_info, $txt;
 
 		// By default 12 hours
-		if (empty($item_info[1]))
+		if (empty($item_info[1]) || !isset($item_info[1]))
 			$item_info[1] = 12;
 
 		$info = '
@@ -73,7 +73,7 @@ class item_IncreaseTimeLoggedIn extends itemTemplate
 		global $user_info, $item_info, $txt;
 
 		// By default 12 hours
-		if (empty($item_info[1]))
+		if (empty($item_info[1]) || !isset($item_info[1]))
 			$item_info[1] = 12;
 
 		// Add the time to his current total

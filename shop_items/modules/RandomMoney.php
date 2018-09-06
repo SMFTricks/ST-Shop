@@ -52,9 +52,9 @@ class item_RandomMoney extends itemTemplate
 		global $item_info, $txt;
 
 		// By default -190 and 190
-		if (empty($item_info[1]))
+		if (empty($item_info[1]) || !isset($item_info[1]))
 			$item_info[1] = -190;
-		if (empty($item_info[2]))
+		if (empty($item_info[2]) || !isset($item_info[2]))
 			$item_info[2] = 190;
 
 		$info = '

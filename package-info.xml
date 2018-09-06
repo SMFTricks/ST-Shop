@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+<package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
+	<id>smftricks:shop</id>
+	<name>ST Shop</name>
+	<version>3.0</version>
+	<type>modification</type>
+	<install for="2.1 - 2.1.99, 2.1 Beta 1 - 3">
+
+		<!-- Mod Readme -->
+		<readme lang="english" parsebbc="true" type="file">readme/readme.english.txt</readme>
+
+		<!-- Templates and Languages -->
+		<require-dir name="Themes" destination="$boarddir">Theme files</require-dir>
+
+		<!-- Item Modules and Images -->
+		<require-dir name="shop_items" destination="$boarddir">Shop items and modules</require-dir>		
+
+		<!-- Shop Files -->
+		<require-dir name="Sources" destination="$boarddir">Source files</require-dir>
+
+		<!-- Database and Hooks -->
+		<database>install.php</database>
+
+		<!-- Redirect -->
+		<redirect url="?action=admin;area=shopinfo">redirect.txt</redirect>
+	</install>
+	
+	<uninstall for="2.1 - 2.1.99, 2.1 Beta 1 - 3">
+
+		<!-- Source Files -->
+		<remove-dir name="$sourcedir/Shop">Source files</remove-dir>
+
+		<!-- Languages -->
+		<remove-file name="$languagedir/Shop.english.php">Language file</remove-file>
+
+		<!-- Images -->
+		<remove-file name="$imagesdir/icons/shop.png">Shop icon</remove-file>
+		<remove-dir name="$imagesdir/icons/shop">Shop Stats icons</remove-dir>
+
+		<!-- Templates -->
+		<remove-file name="$themedir/Shop.template.php">Main template</remove-file>
+		<remove-file name="$themedir/ShopAdmin.template.php">Admin template</remove-file>
+
+		<!-- Item Modules and Images -->
+		<remove-dir name="$boarddir/shop_items">Shop items and modules</remove-dir>
+
+		<!-- Hooks Remove -->
+		<code>remove-hooks.php</code>
+
+		<!-- Database -->
+		<database>install.php</database>
+	</uninstall>
+</package-info>

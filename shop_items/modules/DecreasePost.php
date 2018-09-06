@@ -52,7 +52,7 @@ class item_DecreasePost extends itemTemplate
 		global $item_info, $txt;
 
 		// If it's empty, decrease 100 by default
-		if (empty($item_info[1]))
+		if (empty($item_info[1]) || !isset($item_info[1]))
 			$item_info[1] = 100;
 
 		$info = '

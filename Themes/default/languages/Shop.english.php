@@ -549,8 +549,8 @@ $txt['Shop_item_remove_ftrade'] = 'Remove item from Trade';
 $txt['Shop_item_trade_removed'] = 'Your item was succesfully removed from the trade center.<br> You can now find it back in your inventory.';
 $txt['Shop_trade_notification_sold_from'] = 'Forum Shop';
 $txt['Shop_trade_notification_sold_subject'] = 'Your item on trade was sold successfully.';
-$txt['Shop_trade_notification_sold_message1'] = 'Congratulations!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has purchased your item \'%3$s\' for %4$s. All the %5$s from the purchase have been added to your pocket.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
-$txt['Shop_trade_notification_sold_message2'] = 'Congratulations!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has purchased your item \'%3$s\' for %4$s, but has been taken away a fee of %5$s. The other %6$s from the purchase have been added to your pocket.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
+$txt['Shop_trade_notification_sold_message1'] = 'Congratulations!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has purchased your item \'%3$s\' for [i]%4$s[/i]. All the %5$s from the purchase have been added to your pocket.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
+$txt['Shop_trade_notification_sold_message2'] = 'Congratulations!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has purchased your item \'%3$s\' for [i]%4$s[/i], but has been taken away a fee of [i]%5$s[/i]. The other [i]%6$s[/i] from the purchase have been added to your pocket.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
 $txt['Shop_trade_myprofile'] = 'My items';
 $txt['Shop_trade_myprofile_desc'] = 'This is the list of items <strong>you</strong> currently have in the Trade Center. You can remove them also if you want.';
 $txt['Shop_trade_profile'] = 'Items from %s';
@@ -581,7 +581,7 @@ $txt['Shop_gift_not_negative_or_zero'] = 'The amount to send cannot be negative 
 $txt['Shop_gift_message'] = 'Message to send to the member';
 $txt['Shop_gift_notification_subject'] = 'You have received a gift.';
 $txt['Shop_gift_notification_message1'] = '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has sent you an item! He has gifted you the item \'%3$s\'.' . "\n" . 'If they left an additional message, will be shown below.' . "\n\n" . '%4$s' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
-$txt['Shop_gift_notification_message2'] = '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has sent you %3$s! He has gifted you %4$s.' . "\n" . 'You now have %5$s' . "\n" . 'If they left an additional message, will be shown below.' . "\n\n" . '%6$s' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
+$txt['Shop_gift_notification_message2'] = '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has sent you %3$s! He has gifted you [i]%4$s[/i].' . "\n" . 'You now have %5$s' . "\n" . 'If they left an additional message, will be shown below.' . "\n\n" . '%6$s' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
 
 // Stats
 $txt['Shop_stats_desc'] = 'Welcome to the Stats site, here you can keep track of the most relevant information about the Shop';
@@ -723,10 +723,14 @@ $txt['Shop_st_notopics'] = 'You don\'t have any topic created! (Or any non-stick
 $txt['Shop_st_success'] = 'The topic <a href="'. $scripturl . '?topic=%1$d.0">%2$s</a> was successfully stickied!';
 // Steal
 $txt['Shop_steal_setting1'] = 'Probability of successful steal:';
-$txt['Shop_steal_from'] = 'Steal from:';
 $txt['Shop_steal_setting1_desc'] = 'For steal, user does NOT need to, and shouldn\'t know the probability! It\'s more fun this way :-)';
+$txt['Shop_steal_setting2'] = 'Send notifications:';
+$txt['Shop_steal_setting2_desc'] = 'When a user gets robbed he will receive a notification informing him who robbed him and how much they stole from him.';
+$txt['Shop_steal_from'] = 'Steal from:';
 $txt['Shop_steal_success1'] = 'You successfully stole from %2$s, although you only got %1$s!';
 $txt['Shop_steal_success2'] = 'You successfully stole %1$s from %2$s! It\'s their fault for not having the money in the bank!';
 $txt['Shop_steal_error'] = 'Steal unsuccessful! Sorry, better luck next time.';
 $txt['Shop_steal_error_zero'] = 'That user is not carrying money on their pocket.';
 $txt['Shop_steal_error_yourself'] = 'What are you doing? You cannot steal from yourself.';
+$txt['Shop_steal_notification_robbed'] = 'You just got robbed!';
+$txt['Shop_steal_notification_message'] = 'We are sorry to inform you that you just have been robbed!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has stripped you of [i]%3$s[/i] from your pocket. You now have [i]%4$s[/i] remaining in your pocket.' . "\n\n" . ' Next time put your money safe in the Shop Bank.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';

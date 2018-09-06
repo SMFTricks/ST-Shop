@@ -420,13 +420,13 @@ function Shop_itemsAdd3()
 
 	// To avoid errors, check for non-existant values and set them to blank
 	if (!isset($_REQUEST['info1']))
-		$_REQUEST['info1'] = '';
+		$_REQUEST['info1'] = 0;
 	if (!isset($_REQUEST['info2']))
-		$_REQUEST['info2'] = '';
+		$_REQUEST['info2'] = 0;
 	if (!isset($_REQUEST['info3']))
-		$_REQUEST['info3'] = '';
+		$_REQUEST['info3'] = 0;
 	if (!isset($_REQUEST['info4']))
-		$_REQUEST['info4'] = '';
+		$_REQUEST['info4'] = 0;
 
 	// If no image selected, default to 'blank.gif'
 	if (!isset($_REQUEST['icon']) || $_REQUEST['icon'] == '[NONE]' || $_REQUEST['icon'] == '')
@@ -473,10 +473,10 @@ function Shop_itemsAdd3()
 			'input_needed' => 'int',
 			'can_use_item' => 'int',
 			'delete_after_use' => 'int',
-			'info1' => 'string',
-			'info2' => 'string',
-			'info3' => 'string',
-			'info4' => 'string',
+			'info1' => 'int',
+			'info2' => 'int',
+			'info3' => 'int',
+			'info4' => 'int',
 			'image' => 'string',
 			'catid' => 'int',
 			'status' => 'int',
@@ -632,14 +632,14 @@ function Shop_itemsEdit2()
 	// Additional fields to update
 	$additional = '';
 
-	if (isset($_REQUEST['info1']))
-		$additional .= ', info1 = "' . intval($_REQUEST['info1']) . '"';
-	if (isset($_REQUEST['info2']))
-		$additional .= ', info2 = "' . intval($_REQUEST['info2']) . '"';
-	if (isset($_REQUEST['info3']))
-		$additional .= ', info3 = "' . intval($_REQUEST['info3']) . '"';
-	if (isset($_REQUEST['info4']))
-		$additional .= ', info4 = "' . intval($_REQUEST['info4']) . '"';
+	if (!isset($_REQUEST['info1']))
+		$_REQUEST['info1'] = 0;
+	if (!isset($_REQUEST['info2']))
+		$_REQUEST['info2'] = 0;
+	if (!isset($_REQUEST['info3']))
+		$_REQUEST['info3'] = 0;
+	if (!isset($_REQUEST['info4']))
+		$_REQUEST['info4'] = 0;
 
 	// Update the item information
 	$smcFunc['db_query']('', '
@@ -653,8 +653,11 @@ function Shop_itemsEdit2()
 			image = {string:image},
 			delete_after_use = {int:delete},
 			catid = {int:cat},
-			status = {int:status}
-			{raw:additional}
+			status = {int:status},
+			info1 = {int:info1},
+			info2 = {int:info2},
+			info3 = {int:info3},
+			info4 = {int:info4}
 		WHERE itemid = {int:id}
 		LIMIT 1',
 		array(
@@ -669,6 +672,10 @@ function Shop_itemsEdit2()
 			'additional' => $additional,
 			'id' => $_REQUEST['id'],
 			'status' => $status,
+			'info1' => $_REQUEST['info1'],
+			'info2' => $_REQUEST['info2'],
+			'info3' => $_REQUEST['info3'],
+			'info4' => $_REQUEST['info4'],
 		)
 	);
 

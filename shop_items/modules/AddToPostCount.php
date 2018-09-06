@@ -52,7 +52,7 @@ class item_AddToPostCount extends itemTemplate
 		global $item_info, $txt;
 
 		// If it's empty, add 100 by default
-		if (empty($item_info[1]))
+		if (empty($item_info[1]) || !isset($item_info[1]))
 			$item_info[1] = 100;
 
 		$info = '
@@ -71,6 +71,10 @@ class item_AddToPostCount extends itemTemplate
 	function onUse()
 	{
 		global $user_info, $item_info, $txt;
+
+		// If it's empty, add 100 by default
+		if (empty($item_info[1]) || !isset($item_info[1]))
+			$item_info[1] = 100;
 
 		// Update info
 		$final_value =  $item_info[1] + $user_info['posts'];

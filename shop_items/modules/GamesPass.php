@@ -51,7 +51,7 @@ class item_GamesPass extends itemTemplate
 		global $item_info, $txt;
 
 		// By default 30 days
-		if (empty($item_info[1]))
+		if (empty($item_info[1]) || !isset($item_info[1]))
 			$item_info[1] = 30;
 
 		$info = '
@@ -70,6 +70,10 @@ class item_GamesPass extends itemTemplate
 	function onUse()
 	{
 		global $user_info, $item_info, $txt, $context;
+
+		// By default 30 days
+		if (empty($item_info[1]) || !isset($item_info[1]))
+			$item_info[1] = 30;
 
 		// Get the time in seconds
 		$days = 86400 * $item_info[1];
