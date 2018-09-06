@@ -617,7 +617,7 @@
 					'description' => 'string',
 				),
 				// Values
-				array()
+				array(
 					// Default category
 					array(
 						'Default',
