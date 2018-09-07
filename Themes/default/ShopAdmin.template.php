@@ -195,6 +195,7 @@ function template_Shop_itemsAdd()
 		}
 
 		echo '
+			<br/>
 			<input class="button floatleft" type="submit" value="', $txt['Shop_item_add'], '" />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 		</form>
