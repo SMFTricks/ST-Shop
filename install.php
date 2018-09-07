@@ -83,6 +83,7 @@
 					'name' => 'count',
 					'type' => 'smallint',
 					'null' => false,
+					'default' => 0,
 				),
 				array(
 					'name' => 'module',
