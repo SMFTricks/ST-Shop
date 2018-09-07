@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @package SA Shop
+ * @package ST Shop
  * @version 2.0
  * @author Diego Andrés <diegoandres_cortes@outlook.com>
- * @copyright Copyright (c) 2014, Diego Andrés
+ * @copyright Copyright (c) 2018, Diego Andrés
  * @license http://www.mozilla.org/MPL/MPL-1.1.html
  */
 
@@ -54,11 +54,13 @@
 					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
+					'null' => false,
 				),
 				array(
 					'name' => 'name',
 					'type' => 'varchar',
 					'size' => 50,
+					'null' => false,
 				),	
 				array(
 					'name' => 'image',
@@ -68,20 +70,24 @@
 				array(
 					'name' => 'description',
 					'type' => 'varchar',
+					'size' => 255,
+					'null' => false,
 				),
 				array(
 					'name' => 'price',
 					'type' => 'int',
+					'null' => false,
 					'default' => 0,
 				),
 				array(
 					'name' => 'count',
 					'type' => 'smallint',
-					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'module',
 					'type' => 'tinyint',
+					'null' => false,
 					'size' => 10,
 					'default' => 0,
 				),
@@ -115,33 +121,39 @@
 					'type' => 'tinyint',
 					'size' => 1,
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'can_use_item',
 					'type' => 'tinyint',
 					'size' => 1,
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'delete_after_use',
 					'type' => 'tinyint',
 					'size' => 1,
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'catid',
 					'type' => 'int',
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'status',
 					'type' => 'smallint',
 					'default' => 1,
+					'null' => false,
 				),
 				array(
 					'name' => 'itemlimit',
 					'type' => 'int',
 					'default' => 0,
+					'null' => false,
 				),
 			),
 			'indexes' => array(
@@ -163,54 +175,66 @@
 					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
+					'null' => false,
 				),
 				array(
 					'name' => 'name',
 					'type' => 'varchar',
 					'size' => 50,
+					'null' => false,
 				),	
 				array(
 					'name' => 'description',
 					'type' => 'varchar',
+					'size' => 255,
+					'null' => false,
 				),
 				array(
 					'name' => 'price',
 					'type' => 'int',
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'author',
 					'type' => 'varchar',
 					'size' => 80,
+					'null' => false,
 				),
 				array(
 					'name' => 'email',
 					'type' => 'varchar',
 					'size' => 255,
+					'null' => false,
 				),
 				array(
 					'name' => 'require_input',
 					'type' => 'tinyint',
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'can_use',
 					'type' => 'tinyint',
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'editable_input',
 					'type' => 'tinyint',
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'web',
 					'type' => 'varchar',
 					'size' => 255,
+					'null' => false,
 				),
 				array(
 					'name' => 'file',
 					'type' => 'tinytext',
+					'null' => false,
 				),
 			),
 			'indexes' => array(
@@ -232,11 +256,13 @@
 					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
+					'null' => false,
 				),
 				array(
 					'name' => 'userid',
 					'type' => 'int',
 					'size' => 10,
+					'null' => false,
 				),	
 				array(
 					'name' => 'itemid',
@@ -248,25 +274,30 @@
 					'type' => 'tinyint',
 					'size' => 1,
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'tradecost',
 					'type' => 'int',
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'date',
 					'type' => 'int',
+					'null' => false,
 				),
 				array(
 					'name' => 'tradedate',
 					'type' => 'int',
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'fav',
 					'type' => 'int',
 					'default' => 0,
+					'null' => false,
 				),
 			),
 			'indexes' => array(
@@ -288,25 +319,31 @@
 					'type' => 'smallint',
 					'size' => 5,
 					'auto' => true,
+					'null' => false,
 				),
 				array(
 					'name' => 'name',
 					'type' => 'varchar',
 					'size' => 50,
+					'null' => false,
 				),	
 				array(
 					'name' => 'image',
 					'type' => 'tinytext',
 					'null' => true,
+					'null' => false,
 				),
 				array(
 					'name' => 'description',
 					'type' => 'varchar',
+					'size' => 255,
+					'null' => false,
 				),
 				array(
 					'name' => 'status',
 					'type' => 'smallint',
 					'default' => 1,
+					'null' => false,
 				),
 			),
 			'indexes' => array(
@@ -328,42 +365,50 @@
 					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
+					'null' => false,
 				),
 				array(
 					'name' => 'itemid',
 					'type' => 'int',
 					'size' => 10,
+					'null' => false,
 				),
 				array(
 					'name' => 'invid',
 					'type' => 'int',
 					'size' => 10,
+					'null' => false,
 				),
 				array(
 					'name' => 'userid',
 					'type' => 'int',
 					'size' => 10,
+					'null' => false,
 				),
 				array(
 					'name' => 'sellerid',
 					'type' => 'int',
 					'size' => 10,
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'amount',
 					'type' => 'int',
 					'size' => 10,
+					'null' => false,
 				),
 				array(
 					'name' => 'fee',
 					'type' => 'int',
 					'size' => 10,
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'date',
 					'type' => 'int',
+					'null' => false,
 				),
 			),
 			'indexes' => array(
@@ -384,46 +429,55 @@
 					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
+					'null' => false,
 				),
 				array(
 					'name' => 'userid',
 					'type' => 'int',
 					'size' => 10,
+					'null' => false,
 				),
 				array(
 					'name' => 'receiver',
 					'type' => 'int',
 					'size' => 10,
+					'null' => false,
 				),
 				array(
 					'name' => 'amount',
 					'type' => 'int',
 					'size' => 10,
+					'null' => false,
 				),
 				array(
 					'name' => 'itemid',
 					'type' => 'int',
 					'size' => 10,
+					'null' => false,
 				),
 				array(
 					'name' => 'invid',
 					'type' => 'int',
 					'size' => 10,
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'message',
 					'type' => 'varchar',
 					'size' => 255,
+					'null' => false,
 				),
 				array(
 					'name' => 'is_admin',
 					'type' => 'tinyint',
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'date',
 					'type' => 'int',
+					'null' => false,
 				),
 			),
 			'indexes' => array(
@@ -444,31 +498,37 @@
 					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
+					'null' => false,
 				),
 				array(
 					'name' => 'userid',
 					'type' => 'int',
 					'size' => 10,
+					'null' => false,
 				),
 				array(
 					'name' => 'amount',
 					'type' => 'int',
 					'size' => 10,
+					'null' => false,
 				),
 				array(
 					'name' => 'fee',
 					'type' => 'int',
 					'size' => 10,
 					'default' => 0,
+					'null' => false,
 				),
 				array(
 					'name' => 'type',
 					'type' => 'smallint',
 					'size' => 10,
+					'null' => false,
 				),
 				array(
 					'name' => 'date',
 					'type' => 'int',
+					'null' => false,
 				),
 			),
 			'indexes' => array(
@@ -489,24 +549,29 @@
 					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
+					'null' => false,
 				),
 				array(
 					'name' => 'userid',
 					'type' => 'int',
 					'size' => 10,
+					'null' => false,
 				),
 				array(
 					'name' => 'amount',
 					'type' => 'int',
 					'size' => 10,
+					'null' => false,
 				),
 				array(
 					'name' => 'game',
 					'type' => 'tinytext',
+					'null' => false,
 				),
 				array(
 					'name' => 'date',
 					'type' => 'int',
+					'null' => false,
 				),
 			),
 			'indexes' => array(
@@ -522,7 +587,7 @@
 
 		// Installing
 		foreach ($tables as $table)
-		$smcFunc['db_create_table']($table['table_name'], $table['columns'], $table['indexes'], $table['parameters'], $table['if_exists'], $table['error']);
+			$smcFunc['db_create_table']($table['table_name'], $table['columns'], $table['indexes'], $table['parameters'], $table['if_exists'], $table['error']);
 
 
 		// Add some columns for board options
@@ -648,7 +713,7 @@
 					'name' => 'string',
 					'image' => 'string',
 					'description' => 'string',
-					'price' => 'float',
+					'price' => 'int',
 					'count' => 'int',
 					'function' => 'string',
 					'catid' => 'int',
@@ -674,7 +739,7 @@
 
 		// Let's add some modules shall we
 		$modules = $smcFunc['db_query']('', '
-			SELECT itemid
+			SELECT id
 			FROM {db_prefix}shop_modules',
 			array()
 		);
@@ -685,7 +750,7 @@
 		{
 			$smcFunc['db_insert'](
 				'ignore',
-				'{db_prefix}modules',
+				'{db_prefix}shop_modules',
 				// Fields
 				array(
 					'name' => 'string',
