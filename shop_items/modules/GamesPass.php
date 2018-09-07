@@ -4,7 +4,7 @@
 ***********************************************************************************
 * SMFShop: Shop MOD for Simple Machines Forum                                     *
 * =============================================================================== *
-* Software Version:           SA Shop 0.7                                         *
+* Software Version:           ST Shop 0.7                                         *
 * Software by:                SA Development (http://sleepy-arcade.ath.cx/)       *
 * Copyright 2005-2018 by:     wdm2005 (https://github.com/SAMods)                 *
 * Support, News, Updates at:  https://github.com/SAMods                           *

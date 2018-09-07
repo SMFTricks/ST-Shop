@@ -4,7 +4,7 @@
  * @package ST Shop
  * @version 3.0
  * @author Diego Andrés <diegoandres_cortes@outlook.com>
- * @copyright Copyright (c) 2014, Diego Andrés
+ * @copyright Copyright (c) 2018, Diego Andrés
  * @license http://www.mozilla.org/MPL/MPL-1.1.html
  */
 

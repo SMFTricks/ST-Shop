@@ -1,14 +1,14 @@
  <?php
 /**********************************************************************************
-* SA Shop item                                                                    *
+* ST Shop item                                                                    *
 ***********************************************************************************
-* SA Shop: Shop MOD for Simple Machines Forum                                     *
+* ST Shop: Shop MOD for Simple Machines Forum                                     *
 * =============================================================================== *
-* Software Version:           SA Shop 3.0                                         *
-* $Date:: 2014-12-28 10:39:52 +0200 (za, 28 dic 2014)                             *
-* $Id:: ChangeOtherTitle.php  2014-12-28 08:39:52Z		                          *
+* Software Version:           ST Shop 3.0                                         *
+* $Date:: 2018-12-28 10:39:52 +0200 (za, 28 dic 2018)                             *
+* $Id:: ChangeOtherTitle.php  2018-12-28 08:39:52Z		                          *
 * Software by:                Diego Andrés (https://www.smftricks.com/)           *
-* Copyright 2014 by:          Diego Andrés (https://www.smftricks.com/)           *
+* Copyright 2018 by:          Diego Andrés (https://www.smftricks.com/)           *
 * Support, News, Updates at:  http://www.smftricks.com/                           *
 *                                                                                 *
 * Forum software by:          Simple Machines (http://www.simplemachines.org)     *
