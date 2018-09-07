@@ -2,7 +2,7 @@
 
 /**
  * @package ST Shop
- * @version 2.0
+ * @version 3.0
  * @author Diego Andrés <diegoandres_cortes@outlook.com>
  * @copyright Copyright (c) 2018, Diego Andrés
  * @license http://www.mozilla.org/MPL/MPL-1.1.html
@@ -195,7 +195,7 @@ function template_Shop_itemsAdd()
 		}
 
 		echo '
-			<br/>
+			<br />
 			<input class="button floatleft" type="submit" value="', $txt['Shop_item_add'], '" />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 		</form>
