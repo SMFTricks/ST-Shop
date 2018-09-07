@@ -20,8 +20,8 @@ function Shop_adminInventory()
 	$context['items_url'] = Shop::$itemsdir . '/';
 
 	$subactions = array(
-		'search' => 'Shop_invSearch',
-		'search2' => 'Shop_invSearch2',
+		'search' => 'Shop_adminSearch',
+		'search2' => 'Shop_adminSearch2',
 		'userinv' => 'Shop_invUser',
 		'delete' => 'Shop_invDelete',
 		'restock' => 'Shop_invRestock',
@@ -50,7 +50,7 @@ function Shop_adminInventory()
 	$subactions[$sa]();
 }
 
-function Shop_invSearch()
+function Shop_adminSearch()
 {
 	global $context, $txt;
 
@@ -66,7 +66,7 @@ function Shop_invSearch()
 	loadJavaScriptFile('suggest.js', array('default_theme' => true, 'defer' => false, 'minimize' => true), 'smf_suggest');
 }
 
-function Shop_invSearch2()
+function Shop_adminSearch2()
 {
 	global $context, $txt, $smcFunc;
 
@@ -128,7 +128,7 @@ function Shop_invSearch2()
 	redirectexit('action=admin;area=shopinventory;sa=userinv;u='. $memID);
 }
 
-function Shop_invCount($memid)
+function Shop_invadminCount($memid)
 {
 	global $smcFunc;
 
@@ -148,7 +148,7 @@ function Shop_invCount($memid)
 	return $count;
 }
 
-function Shop_invGet($start, $items_per_page, $sort, $memid)
+function Shop_invadminGet($start, $items_per_page, $sort, $memid)
 {
 	global $context, $smcFunc;
 
@@ -223,11 +223,11 @@ function Shop_invUser()
 		'default_sort_col' => 'item_date',
 		'default_sort_dir' => 'DESC',
 		'get_items' => array(
-			'function' => 'Shop_invGet',
+			'function' => 'Shop_invadminGet',
 			'params' => array($context['id_member']),
 		),
 		'get_count' => array(
-			'function' => 'Shop_invCount',
+			'function' => 'Shop_invadminCount',
 			'params' => array($context['id_member']),
 		),
 		'no_items_label' => $txt['Shop_inventory_no_items'],
