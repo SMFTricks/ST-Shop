@@ -212,7 +212,7 @@ class Shop
 		// The main action
 		$actions['shop'] = array('Shop/Shop.php', 'Shop');
 		// Feed
-		$actions['shopfeed'] = array(false, 'Shop::getFeed#');
+		$actions['shopfeed'] = array(false, 'Shop::getFeed');
 
 		// Add some hooks by action
 		switch ($_REQUEST['action']) {
