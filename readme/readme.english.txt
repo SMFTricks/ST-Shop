@@ -1,2 +1,2 @@
 # ST-Shop
-A kinda beautiful shop mod for SMF 2.1
+A shop mod for SMF 2.1
