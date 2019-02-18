@@ -25,6 +25,7 @@ $txt['Shop_donate_title'] = 'Donate to the author';
 $txt['Shop_tab_info'] = 'Shop Information';
 $txt['Shop_tab_info_desc'] = 'Hello %s, welcome to your ST Shop Admin panel. From here you can edit the shop settings, add items, modules, categories and set the reward in the games room.<br> Additionally you can check the shop logs adn use the maintenance tools to restock items or send items/money to specific users, or remove items from their inventory.';
 $txt['Shop_main_credits'] = 'Credits';
+$txt['Shop_news_connect'] = 'Attempting to get ST News...';
 
 // Shop settings
 $txt['Shop_settings_general'] = 'General';
