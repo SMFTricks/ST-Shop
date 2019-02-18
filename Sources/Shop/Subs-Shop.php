@@ -855,7 +855,7 @@ class Shop
 	 * @return string
 	 * @author Jessica González <suki@missallsunday.com>
 	 */
-	public function getFeed()
+	public static function getFeed()
 	{
 		global $sourcedir;
 		require_once($sourcedir . '/Class-CurlFetchWeb.php');
