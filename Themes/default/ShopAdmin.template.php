@@ -30,13 +30,13 @@ function template_Shop_adminInfo()
 					</h3>
 				</div>
 				<div class="windowbg nopadding">
-					<div id="smfAnnouncements">', $txt['lfyi'], '</div>
+					<div id="smfAnnouncements">', $txt['Shop_news_connect'], '</div>
 				</div>
 			</div>';
 
 	// Show the Breeze version.
 	echo '
-			<div id="supportVersionsTable" class="floatright">
+			<div id="support_info" class="floatright">
 				<div class="cat_bar">
 					<h3 class="catbg">
 						', $txt['support_title'], '
