@@ -34,7 +34,7 @@ function template_Shop_adminInfo()
 				</div>
 			</div>';
 
-	// Show the Breeze version.
+	// Show the ST Shop version.
 	echo '
 			<div id="support_info" class="floatright">
 				<div class="cat_bar">
