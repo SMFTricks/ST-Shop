@@ -36,4 +36,4 @@ Features
     Inventories
         Display inventories in your profile post
         Select your favorite items to display
-    Shop statsA
+    Shop stats
