@@ -740,7 +740,7 @@ function template_Shop_displayInventory($shop_inventory)
 			$inventory .= $item['image'];
 	}
 
-	$inventory .= '<br /><a href="'. $scripturl. '?action=shop;sa=userinv;id='. $shop_inventory['userid']. '" onclick="return reqOverlayDiv(this.href, \''. $shop_inventory['user']. '\', \'shop/bought.png\');">'. $txt['Shop_posting_inventory_all']. '</a>';
+	$inventory .= '<br /><a href="'. $scripturl. '?action=shop;sa=userinv;id='. $shop_inventory['userid']. '" onclick="return reqOverlayDiv(this.href, \''. $shop_inventory['user']. '\', \'icons/shop/top_inventories.png\');">'. $txt['Shop_posting_inventory_all']. '</a>';
 
 	return $inventory;
 
