@@ -203,16 +203,9 @@ function Shop_adminIllegalPerms()
 	$context['non_guest_permissions'] = array_merge($context['non_guest_permissions'],$shop_permissions);
 }
 
-function Shop_preboardTree(&$extraBoardColumns)
+function Shop_preboardTree(&$boardColumns, &$boardParameters, &$boardJoins, &$boardWhere, &$boardOrder)
 {
-	global $context;
-
-	$extraBoardColumns += array(
-		'b.Shop_credits_count',
-		'b.Shop_credits_topic',
-		'b.Shop_credits_post',
-		'b.Shop_credits_bonus',
-	);
+	array_push($boardColumns,'b.Shop_credits_count','b.Shop_credits_topic','b.Shop_credits_post','b.Shop_credits_bonus');
 }
 
 function Shop_boardTree($row)
