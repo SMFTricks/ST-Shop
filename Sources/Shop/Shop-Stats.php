@@ -35,8 +35,8 @@ function Shop_mainStats()
 
 	// Get the stats
 	$context['stats_blocks'] = array(
-		// Stats with an icon
-		'shop_i' => array(
+		// Normal stats
+		'shop' => array(
 			// Most bought
 			'most_bought' => array(
 				'label' => $txt['Shop_stats_most_bought'],
@@ -51,9 +51,6 @@ function Shop_mainStats()
 				'function' => Shop_statsTopCats(),
 				'enabled' => true,
 			),
-		),
-		// Normal stats
-		'shop' => array(
 			// Top inventories
 			'top_inventories' => array(
 				'label' => $txt['Shop_stats_top_inventories'],

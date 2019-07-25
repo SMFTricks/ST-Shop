@@ -108,47 +108,7 @@ function template_shop_stats()
 {
 	global $txt, $context, $settings;
 
-	// Other type of stats for testing purposes
-	foreach ($context['stats_blocks']['shop_i'] as $block)
-	{
-		// Check if he has enough privileges to show him this information
-		if (empty($block['enabled']))
-			continue;
-		echo '
-			<div class="half_content">
-				<div class="title_bar">
-					<h4 class="titlebg">
-						<img class="centericon" src="', $settings['default_images_url'], '/icons/shop/', $block['icon'], '" alt="" /> ', $block['label'], '
-					</h4>
-				</div>
-					<dl class="stats">';
-
-		foreach ($block['function'] as $item)
-		{
-			echo '
-						<dt>
-							', $item['image'], ' &nbsp;', $item['name'], '
-						</dt>
-						<dd class="statsbar generic_bar righttext">';
-
-			if (!empty($item['percent']))
-				echo '
-							<div class="bar" style="width: ', $item['percent'], '%;"></div>';
-			else
-				echo '
-							<div class="bar empty"></div>';
-
-			echo '
-							<span>', $item['num'], '</span>
-						</dd>';
-		}
-
-		echo '
-					</dl>
-			</div>';
-	}
-
-	// Common stats
+	// Store Stats
 	foreach ($context['stats_blocks']['shop'] as $block)
 	{
 		// Check if he has enough privileges to show him this information
@@ -166,9 +126,9 @@ function template_shop_stats()
 
 		foreach ($block['function'] as $item)
 		{
-			echo '
+				echo '
 						<dt>
-							', $item['link'], '
+							', !empty($item['image']) ? $item['image'].' &nbsp;'.$item['name'] : $item['link'], '
 						</dt>
 						<dd class="statsbar generic_bar righttext">';
 
