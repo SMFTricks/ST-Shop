@@ -3,7 +3,7 @@
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
 	<id>wdm2005:shop</id>
 	<name>ST Shop</name>
-	<version>3.0.1</version>
+	<version>3.0.2</version>
 	<type>modification</type>
 	<install for="2.1 - 2.1.99, 2.1 Beta 1 - 3">
 
