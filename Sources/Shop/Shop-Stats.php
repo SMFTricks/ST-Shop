@@ -109,6 +109,9 @@ function Shop_mainStats()
 			),
 		),
 	);
+
+	// Add more stats?
+	call_integration_hook('integrate_shop_stats', array(&$context['stats_blocks']));
 }
 
 function Shop_statsRichest($type = 'pocket')
