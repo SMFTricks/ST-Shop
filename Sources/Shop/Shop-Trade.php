@@ -784,7 +784,7 @@ function Shop_tradeTransaction()
 	// The amount that the user received
 	$totalrec = (int) ($row['tradecost'] - (($row['tradecost'] * $modSettings['Shop_items_trade_fee'])/100));
 	// The actual fee he has to pay:
-	$fee = (($row['tradecost'] * $modSettings['Shop_items_trade_fee'])/100);
+	$fee = (int) (($row['tradecost'] * $modSettings['Shop_items_trade_fee'])/100);
 	// Send the info!
 	Shop_logBuy($row['itemid'], $user_info['id'], $row['tradecost'], $row['userid'], $fee, $row['id']);
 	// Send a PM to the seller saying that his item was successfully bought
