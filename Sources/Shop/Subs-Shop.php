@@ -848,8 +848,8 @@ class Shop
 		return $credits;
 	}
 
-		/**
-	 * \Breeze\Breeze::getFeed()
+	/**
+	 * Shop::getFeed()
 	 *
 	 * Proxy function to avoid Cross-origin errors.
 	 * @return string
@@ -858,13 +858,14 @@ class Shop
 	public static function getFeed()
 	{
 		global $sourcedir;
+
 		require_once($sourcedir . '/Class-CurlFetchWeb.php');
 		$fetch = new \curl_fetch_web_data();
 		$fetch->get_url_data(Shop::$supportSite);
 		if ($fetch->result('code') == 200 && !$fetch->result('error'))
 			$data = $fetch->result('body');
 		else
-			return '';
+			exit;
 		smf_serverResponse($data, 'Content-type: text/xml');
 	}
 }
