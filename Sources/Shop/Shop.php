@@ -260,6 +260,10 @@ function Shop_mainHome()
 	// Welcome message
 	$context['shop']['welcome'] = sprintf($txt['Shop_welcome_text'], $user_info['name'], $modSettings['Shop_credits_suffix']);
 
+	// Profile action??
+	if (isset($_REQUEST['u']) && !empty($_REQUEST['u']))
+		redirectexit('action=shop;sa=gift;u='.$_REQUEST['u']);
+
 	// Display some general stats
 	// Load our stats file first
 	require_once($sourcedir. '/Shop/Shop-Stats.php');
