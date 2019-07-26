@@ -803,11 +803,6 @@ class Shop
 			'thanksto' => array(
 				'name' => 'Special Thanks',
 				'users' => array(
-					'suki' => array(
-						'name' => 'Suki',
-						'site' => 'http:://www.missallsunday.com',
-						'desc' => 'Consultant',
-					),
 					'daniel15' => array(
 						'name' => 'Daniel15',
 						'site' => 'https://www.simplemachines.org/community/index.php?action=profile;u=9547',
@@ -822,6 +817,11 @@ class Shop
 						'name' => 'vbgamer45',
 						'site' => 'https://www.smfhacks.com/',
 						'desc' => 'SMF Shop Developer, for keeping his lovely mods always updated',
+					),
+					'suki' => array(
+						'name' => 'Suki',
+						'site' => 'https://www.simplemachines.org/community/index.php?action=profile;u=245528',
+						'desc' => 'Consultant',
 					),
 					'hcfwesker' => array(
 						'name' => 'hcfwesker',
