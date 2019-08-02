@@ -313,7 +313,7 @@ class Shop
 			$context['copyrights']['mods'][] = '<a href="http://smftricks.com" title="SMF Themes & Mods">ST Shop &copy '.date('Y').', SMF Tricks</a>';
 
 		if (isset($context['current_action']) && $context['current_action'] === 'shop')
-			return '<br /><div style="text-align: center;"><span class="smalltext">Powered by <a href="http://smftricks.com" target="_blank">ST Shop</a></span></div>';
+			return '<br /><div style="text-align: center;"><span class="smalltext">Powered by <a href="http://smftricks.com" target="_blank" rel="noopener">ST Shop</a></span></div>';
 	}
 
 	/**
