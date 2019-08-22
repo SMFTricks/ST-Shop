@@ -812,7 +812,7 @@
 						'require_input' => 1,
 						'editable_input' => 1,
 						'can_use' => 1,
-						'web' => 'http://www.smftricks.com/',
+						'web' => 'https://www.smftricks.com/',
 						'file' => 'Steal',
 					),
 					array(
@@ -860,7 +860,7 @@
 						'require_input' => 1,
 						'editable_input' => 0,
 						'can_use' => 1,
-						'web' => 'http://www.smftricks.com/',
+						'web' => 'https://www.smftricks.com/',
 						'file' => 'StickyTopic',
 					),
 					array(
@@ -896,7 +896,7 @@
 						'require_input' => 1,
 						'editable_input' => 0,
 						'can_use' => 1,
-						'web' => 'http://www.smftricks.com/',
+						'web' => 'https://www.smftricks.com/',
 						'file' => 'ChangeOtherTitle',
 					),
 				),
