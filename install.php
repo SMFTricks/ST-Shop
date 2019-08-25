@@ -905,12 +905,3 @@
 
 		}
 	}
-
-	// So... looking for something new
-	$hooks = array(
-		'integrate_pre_include' => '$sourcedir/Shop/Subs-Shop.php',
-		'integrate_pre_load' => 'Shop::initialize',
-	);
-
-	foreach ($hooks as $hook => $function)
-		add_integration_function($hook, $function, true);
