@@ -11,7 +11,7 @@
 if (!defined('SMF'))
 	die('No direct access...');
 
-class AdminShop_Items extends AdminShop
+class AdminShopItems extends AdminShop
 {
 	public static function Main()
 	{
@@ -22,16 +22,16 @@ class AdminShop_Items extends AdminShop
 		$context['items_url'] = Shop::$itemsdir;
 
 		$subactions = array(
-			'index' => 'self::Index',
-			'add' => 'self::Add',
-			'add2' => 'self::Add2',
-			'add3' => 'self::Add3',
-			'edit' => 'self::Edit',
-			'edit2' => 'self::Edit2',
-			'delete' => 'self::Delete',
-			'delete2' => 'self::Delete2',
-			'uploaditems' => 'self::Upload',
-			'uploaditems2' => 'self::Upload2',
+			'index' => 'AdminShopItems::Index',
+			'add' => 'AdminShopItems::Add',
+			'add2' => 'AdminShopItems::Add2',
+			'add3' => 'AdminShopItems::Add3',
+			'edit' => 'AdminShopItems::Edit',
+			'edit2' => 'AdminShopItems::Edit2',
+			'delete' => 'AdminShopItems::Delete',
+			'delete2' => 'AdminShopItems::Delete2',
+			'uploaditems' => 'AdminShopItems::Upload',
+			'uploaditems2' => 'AdminShopItems::Upload2',
 		);
 
 		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'index';
@@ -67,10 +67,10 @@ class AdminShop_Items extends AdminShop
 			'base_href' => '?action=admin;area=shopitems;sa=index',
 			'default_sort_col' => 'modify',
 			'get_items' => array(
-				'function' => 'parent::itemsGet',
+				'function' => 'AdminShop::itemsGet',
 			),
 			'get_count' => array(
-				'function' => 'parent::itemsCount',
+				'function' => 'AdminShop::itemsCount',
 			),
 			'no_items_label' => $txt['Shop_no_items'],
 			'no_items_align' => 'center',
@@ -164,7 +164,7 @@ class AdminShop_Items extends AdminShop
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($row){ return ($row['status'] == 1 ? '<span class="generic_icons warning_watch"></span>' : '<span class="generic_icons warning_mute"></span>');},
+						'function' => function($row){ return ($row['status'] == 1 ? '<span class="main_icons warning_watch"></span>' : '<span class="main_icons warning_mute"></span>');},
 						'style' => 'width: 1%',
 						'class' => 'centertext',
 					),
@@ -329,7 +329,7 @@ class AdminShop_Items extends AdminShop
 
 	public static function Add2()
 	{
-		global $context, $boarddir, $smcFunc, $modSettings, $txt, $item_info;
+		global $context, $boarddir, $smcFunc, $modSettings, $txt, $item_info, $scripturl;
 
 		// Set all the page stuff
 		$context['page_title'] = $txt['Shop_tab_settings'] . ' - '. $txt['Shop_items_add'];
@@ -359,13 +359,14 @@ class AdminShop_Items extends AdminShop
 
 		// Put all the details into an array
 		$row = $smcFunc['db_fetch_assoc']($request);
-		$context['shop_item_info'] = array(
+		$context['shop_item'] = array(
 			'name' => $row['file'],
 			'friendlyname' => $row['name'],
 			'desc' => $row['description'],
 			'price' => $row['price'],
 			'stock' => 50,
 			'itemlimit' => 0,
+			'addInputEditable' => true,
 			'require_input' => $row['require_input'],
 			'can_use_item' => $row['can_use'],
 			'delete_after_use' => 1,
@@ -379,10 +380,10 @@ class AdminShop_Items extends AdminShop
 
 		if(!empty($module) && !empty($row)) {
 			// Open tha file
-			require_once($boarddir . Shop::$modulesdir . '/' . $context['shop_item_info']['name'] . '.php');
+			require_once($boarddir . Shop::$modulesdir . '/' . $context['shop_item']['name'] . '.php');
 			// Create an instance of the item
 			// TODO: Simplify this somehow?
-			eval('$tempItem = new item_' . $context['shop_item_info']['name'] . ';');
+			eval('$tempItem = new item_' . $context['shop_item']['name'] . ';');
 			// Get the item's details
 			// At this stage, there's no additional information
 			$item_info = array(
@@ -390,19 +391,21 @@ class AdminShop_Items extends AdminShop
 				2 => '',
 				3 => '', 
 				4 => '');
-			$context['shop_item_info']['addInput'] = ($tempItem->getAddInput() == false) ? '' : $tempItem->getAddInput();
+			$context['shop_item']['addInput'] = ($tempItem->getAddInput() == false) ? '' : $tempItem->getAddInput();
 		}
 		
 		// Images...
 		$context['shop_images_list'] = Shop::getImageList();
 		// ... and categories
 		$context['shop_categories_list'] = Shop::getCatList();
+		// Form
+		$context['form_url'] = $scripturl . '?action=admin;area=shopitems;sa=add3';
 
 		// Let's put this below, so we can use the information we have
-		$context['sub_template'] = 'Shop_itemsAdd2';
+		$context['sub_template'] = 'Shop_items';
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $context['page_title'],
-			'description' => sprintf($txt['Shop_items_add_desc2'], $context['shop_item_info']['name'], $context['shop_item_info']['author'], $context['shop_item_info']['email'],  $context['shop_item_info']['web']),
+			'description' => sprintf($txt['Shop_items_add_desc2'], $context['shop_item']['name'], $context['shop_item']['author'], $context['shop_item']['email'],  $context['shop_item']['web']),
 		);
 	}
 
@@ -511,7 +514,7 @@ class AdminShop_Items extends AdminShop
 
 	public static function Edit()
 	{
-		global $context, $smcFunc, $boarddir, $modSettings, $item_info, $txt;
+		global $context, $smcFunc, $boarddir, $modSettings, $item_info, $txt, $scripturl;
 
 		// If item is not set, something is terribly wrong or is trying to access this page without actually editing an item
 		if (!isset($_REQUEST['id']))
@@ -519,7 +522,7 @@ class AdminShop_Items extends AdminShop
 
 		// Set all the page stuff
 		$context['page_title'] = $txt['Shop_tab_settings'] . ' - '. $txt['Shop_items_edit'];
-		$context['sub_template'] = 'Shop_itemsEdit';
+		$context['sub_template'] = 'Shop_items';
 
 		if (!empty($modSettings['Shop_images_resize']))
 			$context['itemOpt'] = 'width: '. $modSettings['Shop_images_width']. '; height: '. $modSettings['Shop_images_height']. ';';
@@ -547,7 +550,7 @@ class AdminShop_Items extends AdminShop
 			fatal_error($txt['Shop_item_notfound'], false);
 
 		// Set all the information (for use in the template)
-		$context['shop_item_edit'] = array(
+		$context['shop_item'] = array(
 			'itemid' => $id,
 			'name' => $row['name'],
 			'desc' => $row['description'],
@@ -567,6 +570,8 @@ class AdminShop_Items extends AdminShop
 		$context['shop_images_list'] = Shop::getImageList();
 		// ... and categories
 		$context['shop_categories_list'] = Shop::getCatList();
+		// Form
+		$context['form_url'] = $scripturl . '?action=admin;area=shopitems;sa=edit2';
 			
 		// We need to grab the extra input required by this item.
 		// The actual information.
@@ -574,34 +579,34 @@ class AdminShop_Items extends AdminShop
 		$item_info[2] = $row['info2'];
 		$item_info[3] = $row['info3'];
 		$item_info[4] = $row['info4'];
-		$context['shop_item_edit']['addInputEditable'] = false;
+		$context['shop_item']['addInputEditable'] = false;
 
-		if(!empty($context['shop_item_edit']['module']))
+		if(!empty($context['shop_item']['module']))
 		{
 			// Is the item still there?
-			if (!file_exists($boarddir . Shop::$modulesdir . '/' . $context['shop_item_edit']['file'] . '.php'))
-				fatal_lang_error('Shop_item_no_module', false, array(Shop::$modulesdir . '/' . $context['shop_item_edit']['file']));
+			if (!file_exists($boarddir . Shop::$modulesdir . '/' . $context['shop_item']['file'] . '.php'))
+				fatal_lang_error('Shop_item_no_module', false, array(Shop::$modulesdir . '/' . $context['shop_item']['file']));
 
-			require_once($boarddir . Shop::$modulesdir . '/' . $context['shop_item_edit']['file'] . '.php');
+			require_once($boarddir . Shop::$modulesdir . '/' . $context['shop_item']['file'] . '.php');
 			// Create an instance of the item (it's used below)
-			eval('$tempItem = new item_' . $context['shop_item_edit']['file'] . ';');
+			eval('$tempItem = new item_' . $context['shop_item']['file'] . ';');
 			// Get the actual info
 			$tempItem->getItemDetails();
 
 			// Can we edit the getAddInput() info?
 			if ($tempItem->addInput_editable == true) {
-				$context['shop_item_edit']['addInputEditable'] = true;
-				$context['shop_item_edit']['addInput'] = $tempItem->getAddInput();
+				$context['shop_item']['addInputEditable'] = true;
+				$context['shop_item']['addInput'] = $tempItem->getAddInput();
 			}
 			else {
-				$context['shop_item_edit']['addInputEditable'] = false;
+				$context['shop_item']['addInputEditable'] = false;
 			}
 		}
 
 		// Let's put this below, so we can use the information we have
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $context['page_title'],
-			'description' => sprintf($txt['Shop_items_edit_desc'], $context['shop_item_edit']['name']),
+			'description' => sprintf($txt['Shop_items_edit_desc'], $context['shop_item']['name']),
 		);
 	}
 
@@ -718,51 +723,53 @@ class AdminShop_Items extends AdminShop
 		unset($getGD);
 
 		// Process uploaded file
-		if (isset($_FILES['newitem']['name']) && $_FILES['newitem']['name'] != '') {
+		if (isset($_FILES['newitem']['name']) && $_FILES['newitem']['name'] != '')
+		{
 			$sizes = @getimagesize($_FILES['newitem']['tmp_name']);
 
-		// No size, then it's probably not a valid pic.
-		if ($sizes === false) {
-			@unlink($_FILES['newitem']['tmp_name']);
-			fatal_error($txt['Store_error_invalid_picture'], false);
+			// No size, then it's probably not a valid pic.
+			if ($sizes === false) {
+				@unlink($_FILES['newitem']['tmp_name']);
+				fatal_error($txt['Store_error_invalid_picture'], false);
+			}
+
+			// Get the filesize
+			$filesize = $_FILES['newitem']['size'];
+
+			// Filename Member Id + Day + Month + Year + 24 hour, Minute Seconds
+			$extensions = array(
+				1 => 'gif',
+				2 => 'jpeg',
+				3 => 'png',
+				5 => 'psd',
+				6 => 'bmp',
+				7 => 'tiff',
+				8 => 'tiff',
+				9 => 'jpeg',
+				14 => 'iff',
+			);
+			$extension = isset($extensions[$sizes[2]]) ? $extensions[$sizes[2]] : '.bmp';
+			$filename = basename($_FILES['newitem']['name']).'.' . $extension;
+			$target_file = $boarddir.Shop::$itemsdir.basename($_FILES['newitem']['name']).'.'.$extension;
+
+			// Check if file already exists
+			if (file_exists($target_file)) {
+				fatal_error($txt['Shop_file_already_exists'], false);
+				$uploadOk = 0;
+			}
+			// Check file size
+			if ($_FILES['newitem']['size'] > 1000000) {
+				fatal_error($txt['Shop_file_too_large'], false);
+			}
+
+			move_uploaded_file($_FILES['newitem']['tmp_name'], $target_file);
+			@chmod($target_file, 0644);
+
+			// Get me out of here
+			redirectexit('action=admin;area=shopitems;sa=uploaditems;success');
 		}
-
-		// Get the filesize
-		$filesize = $_FILES['newitem']['size'];
-
-		// Filename Member Id + Day + Month + Year + 24 hour, Minute Seconds
-		$extensions = array(
-			1 => 'gif',
-			2 => 'jpeg',
-			3 => 'png',
-			5 => 'psd',
-			6 => 'bmp',
-			7 => 'tiff',
-			8 => 'tiff',
-			9 => 'jpeg',
-			14 => 'iff',
-		);
-		$extension = isset($extensions[$sizes[2]]) ? $extensions[$sizes[2]] : '.bmp';
-		$filename = basename($_FILES['newitem']['name']).'.' . $extension;
-		$target_file = $boarddir.Shop::$itemsdir.basename($_FILES['newitem']['name']).'.'.$extension;
-
-		// Check if file already exists
-		if (file_exists($target_file)) {
-			fatal_error($txt['Shop_file_already_exists'], false);
-			$uploadOk = 0;
-		}
-		// Check file size
-		if ($_FILES['newitem']['size'] > 1000000) {
-			fatal_error($txt['Shop_file_too_large'], false);
-		}
-
-		move_uploaded_file($_FILES['newitem']['tmp_name'], $target_file);
-		@chmod($target_file, 0644);
-
-		// Get me out of here
-		redirectexit('action=admin;area=shopitems;sa=uploaditems;success');
+		// No luck? Sorry...
+		else
+			redirectexit('action=admin;area=shopitems;sa=uploaditems;error');
 	}
-	// No luck? Sorry...
-	else
-		redirectexit('action=admin;area=shopitems;sa=uploaditems;error');
 }

@@ -203,45 +203,47 @@ function template_Shop_itemsAdd()
 	</div>';
 }
 
-function template_Shop_itemsAdd2()
+function template_Shop_items()
 {
 	global $context, $txt, $scripturl, $modSettings, $boardurl;
 
 	echo '
 	<div class="windowbg">
-		<form method="post" action="' . $scripturl . '?action=admin;area=shopitems;sa=add3" name="Shopitemsadd">
-			<input type="hidden" name="item" value="', $context['shop_item_info']['name'], '" />
-			<input type="hidden" name="require_input" value="', $context['shop_item_info']['require_input'], '" />
-			<input type="hidden" name="can_use_item" value="', $context['shop_item_info']['can_use_item'], '" />
-			<input type="hidden" name="module" value="', $context['shop_item_info']['module'], '" />
+		<form method="post" action="' . $context['form_url'] . '" name="Shopitems">
+		', ($_REQUEST['sa'] == 'edit' ? '
+			<input type="hidden" name="id" value="'.$context['shop_item']['itemid'].'" />' : '
+			<input type="hidden" name="item" value="'.$context['shop_item']['name'].'" />
+			<input type="hidden" name="require_input" value="'.$context['shop_item']['require_input'].'" />
+			<input type="hidden" name="can_use_item" value="'.$context['shop_item']['can_use_item'].'" />
+			<input type="hidden" name="module" value="'.$context['shop_item']['module'].'" />'), '
 			<dl class="settings">
 				<dt>
 					<a id="setting_itemname"></a>
 					<span><label for="itemname">', $txt['Shop_item_name'], ':</label></span>
 				</dt>
 				<dd>
-					<input class="input_text" name="itemname" id="itemname" type="text" value="', $context['shop_item_info']['friendlyname'], '" style="width: 100%" />
+					<input class="input_text" name="itemname" id="itemname" type="text" value="', !empty($context['shop_item']['name']) ? $context['shop_item']['name'] : '', '" style="width: 100%" />
 				</dd>
 				<dt>
 					<a id="setting_itemdesc"></a>
 					<span><label for="itemdesc">', $txt['Shop_item_description'], ':</label></span>
 				</dt>
 				<dd>
-					<textarea name="itemdesc" id="itemdesc"  rows="2" style="width: 100%">', $context['shop_item_info']['desc'], '</textarea>
+					<textarea name="itemdesc" id="itemdesc"  rows="2" style="width: 100%">', !empty($context['shop_item']['desc']) ? $context['shop_item']['desc'] : '', '</textarea>
 				</dd>
 				<dt>
 					<a id="setting_itemprice"></a>
 					<span><label for="itemprice">', $txt['Shop_item_price'], ':</label></span>
 				</dt>
 				<dd>
-					', !empty($modSettings['Shop_credits_prefix']) ? $modSettings['Shop_credits_prefix']. ' &nbsp;' : '', '<input class="input_text" name="itemprice" id="itemprice" type="number" min="0" value="', $context['shop_item_info']['price'], '" size="5" />&nbsp; ', $modSettings['Shop_credits_suffix'], '
+					', !empty($modSettings['Shop_credits_prefix']) ? $modSettings['Shop_credits_prefix']. ' &nbsp;' : '', '<input class="input_text" name="itemprice" id="itemprice" type="number" min="0" value="', !empty($context['shop_item']['price']) ? $context['shop_item']['price'] : '', '" size="5" />&nbsp; ', !empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : '', '
 				</dd>
 				<dt>
 					<a id="setting_itemstatus"></a>
 					<span><label for="itemstatus">', $txt['Shop_item_enable'], ':</label></span>
 				</dt>
 				<dd>
-					<input class="input_check" type="checkbox" name="itemstatus" id="itemstatus" value="1" />
+					<input class="input_check" type="checkbox" name="itemstatus" id="itemstatus" value="1"', (!empty($context['shop_item']['status']) ? ' checked' : ''), '/>
 				</dd>
 			</dl>
 			<dl class="settings">
@@ -250,7 +252,7 @@ function template_Shop_itemsAdd2()
 					<span><label for="itemstock">', $txt['Shop_item_stock'], ':</label></span>
 				</dt>
 				<dd>
-					<input class="input_text" name="itemstock" id="itemstock" type="number" min="0" value="', $context['shop_item_info']['stock'], '" size="5" />
+					<input class="input_text" name="itemstock" id="itemstock" type="number" min="0" value="', !empty($context['shop_item']['stock']) ? $context['shop_item']['stock'] : '', '" size="5" />
 				</dd>
 				<dt>
 					<a id="setting_itemlimit"></a>
@@ -258,157 +260,7 @@ function template_Shop_itemsAdd2()
 					<span class="smalltext">', $txt['Shop_item_limit_desc'], '</span>
 				</dt>
 				<dd>
-					<input class="input_text" name="itemlimit" id="itemlimit" type="number" min="0" value="', $context['shop_item_info']['itemlimit'], '" size="5" />
-				</dd>
-			</dl>
-			<dl class="settings">
-				<dt>
-					<a id="setting_cat"></a>
-					<span><label for="cat">', $txt['Shop_item_category'], ':</label></span>
-				</dt>
-				<dd>
-					<select name="cat" id="cat">
-						<option value="0">', $txt['Shop_item_uncategorized'], '</option>';
-
-					if (!empty($context['shop_categories_list']))
-					{
-						echo '
-						<optgroup label="', $txt['Shop_item_category_select'], '">';
-
-						// List the categories if there are
-						foreach ($context['shop_categories_list'] as $category)
-						echo '
-							<option value="', $category['id'], '">', $category['name'], '</option>';
-
-					echo '
-						</optgroup>';
-
-					}
-
-				echo '
-					</select>
-				</dd>
-				<dt>
-					<a id="setting_icon"></a>
-					<span><label for="icon">', $txt['Shop_item_image'], ':</label></span>
-				</dt>
-				<dd>
-					<!-- TODO: Should JavaScript detect Sources URL? -->
-					<script type="text/javascript" language="javascript">
-					<!--
-						function show_image()
-						{
-							if (document.Shopitemsadd.icon.value !== "none")
-							{
-								// TODO: Should this detect the sources URL, rather than just assume?
-								var image_url = "', $boardurl . $context['items_url'], '" + document.Shopitemsadd.icon.value;
-								document.images["icon"].src = image_url;
-							}
-							else
-							{
-								document.images["icon"].src = "', $boardurl . $context['items_url'], 'blank.gif";
-							}
-						}
-					//-->
-					</script>
-					<select name="icon" id="icon" onchange="show_image()">
-						<optgroup label="', $txt['Shop_item_image_select'], '">
-							<option value="blank.gif" selected="selected">', $txt['Shop_items_none_select'], '</option>';
-
-						// List the images
-						foreach ($context['shop_images_list'] as $image)
-						echo '
-							<option value="', $image, '">', $image, '</option>';
-
-					echo '
-						</optgroup>
-					</select>
-					&nbsp;&nbsp;<img name="icon" src="', $boardurl . $context['items_url'], 'blank.gif" alt="" style="', $context['itemOpt'], ' border: 1px solid rgba(0,0,0,0.2);" /><br />
-					<span class="smalltext">', $txt['Shop_item_notice'], '</span>
-				</dd>
-			</dl>';
-
-		if (isset($context['shop_item_info']['addInput']) && (($context['shop_item_info']['addInput'] != '') && ($context['shop_item_info']['addInput'] == true)))
-		echo '
-			<hr />
-			<a id="addinput"></a>
-			<span><label for="addinput"><strong>', $txt['Shop_item_additional'], '</strong></label></span><br />
-			<span class="smalltext">', $txt['Shop_item_description_match'], '</span>
-			', $context['shop_item_info']['addInput'], '';
-
-		if (isset($context['shop_item_info']['can_use_item']) && (($context['shop_item_info']['can_use_item'] != '') && ($context['shop_item_info']['can_use_item'] == true)))
-		echo '
-			<dl class="settings">
-				<dt>
-					<a id="setting_itemdelete"></a>
-					<span><label for="itemdelete">', $txt['Shop_item_delete_after'], ':</label></span>
-				</dt>
-				<dd>
-					<input class="input_check" type="checkbox" name="itemdelete" id="itemdelete" ', ($context['shop_item_info']['delete_after_use'] ? ' checked' : ''), '/>
-				</dd>
-			</dl>';
-
-		echo '
-			<input class="button floatleft" type="submit" value="', $txt['Shop_item_add_items'], '" />
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
-		</form>
-	</div>';
-
-}
-
-function template_Shop_itemsEdit()
-{
-	global $context, $txt, $scripturl, $modSettings, $boardurl;
-
-	echo '
-	<div class="windowbg">
-		<form method="post" action="' . $scripturl . '?action=admin;area=shopitems;sa=edit2" name="Shopitemsedit">
-			<input type="hidden" name="id" value="', $context['shop_item_edit']['itemid'], '" />
-			<dl class="settings">
-				<dt>
-					<a id="setting_itemname"></a>
-					<span><label for="itemname">', $txt['Shop_item_name'], ':</label></span>
-				</dt>
-				<dd>
-					<input class="input_text" name="itemname" id="itemname" type="text" value="', $context['shop_item_edit']['name'], '" style="width: 100%" />
-				</dd>
-				<dt>
-					<a id="setting_itemdesc"></a>
-					<span><label for="itemdesc">', $txt['Shop_item_description'], ':</label></span>
-				</dt>
-				<dd>
-					<textarea name="itemdesc" id="itemdesc"  rows="2" style="width: 100%">', $context['shop_item_edit']['desc'], '</textarea>
-				</dd>
-				<dt>
-					<a id="setting_itemprice"></a>
-					<span><label for="itemprice">', $txt['Shop_item_price'], ':</label></span>
-				</dt>
-				<dd>
-					', !empty($modSettings['Shop_credits_prefix']) ? $modSettings['Shop_credits_prefix']. ' &nbsp;' : '', '<input class="input_text" name="itemprice" id="itemprice" type="number" min="0" value="', $context['shop_item_edit']['price'], '" size="5" />&nbsp; ', $modSettings['Shop_credits_suffix'], '
-				</dd>
-				<dt>
-					<a id="setting_itemstatus"></a>
-					<span><label for="itemstatus">', $txt['Shop_item_enable'], ':</label></span>
-				</dt>
-				<dd>
-					<input class="input_check" type="checkbox" name="itemstatus" id="itemstatus" value="1"', ($context['shop_item_edit']['status'] ? ' checked' : ''), '/>
-				</dd>
-			</dl>
-			<dl class="settings">
-				<dt>
-					<a id="setting_itemstock"></a>
-					<span><label for="itemstock">', $txt['Shop_item_stock'], ':</label></span>
-				</dt>
-				<dd>
-					<input class="input_text" name="itemstock" id="itemstock" type="number" min="0" value="', $context['shop_item_edit']['stock'], '" size="5" />
-				</dd>
-				<dt>
-					<a id="setting_itemlimit"></a>
-					<span><label for="itemlimit">', $txt['Shop_item_limit'], ':</label></span><br />
-					<span class="smalltext">', $txt['Shop_item_limit_desc'], '</span>
-				</dt>
-				<dd>
-					<input class="input_text" name="itemlimit" id="itemlimit" type="number" min="0" value="', $context['shop_item_edit']['itemlimit'], '" size="5" />
+					<input class="input_text" name="itemlimit" id="itemlimit" type="number" min="0" value="', !empty($context['shop_item']['itemlimit']) ? $context['shop_item']['itemlimit'] : '', '" size="5" />
 				</dd>
 			</dl>
 			<dl class="settings">
@@ -427,7 +279,7 @@ function template_Shop_itemsEdit()
 						// List the categories
 						foreach ($context['shop_categories_list'] as $category)
 						echo '
-							<option value="', $category['id'], '"', ($context['shop_item_edit']['catid'] == $category['id'] ? ' selected="selected"' : ''), '>', $category['name'], '</option>';
+							<option value="', $category['id'], '"', ((!empty($context['shop_item']['catid']) && $context['shop_item']['catid'] == $category['id']) ? ' selected="selected"' : ''), '>', $category['name'], '</option>';
 
 					echo '
 						</optgroup>';
@@ -446,10 +298,10 @@ function template_Shop_itemsEdit()
 					<!--
 						function show_image()
 						{
-							if (document.Shopitemsedit.icon.value !== "none")
+							if (document.Shopitems.icon.value !== "none")
 							{
 								// TODO: Should this detect the sources URL, rather than just assume?
-								var image_url = "', $boardurl . $context['items_url'], '" + document.Shopitemsedit.icon.value;
+								var image_url = "', $boardurl . $context['items_url'], '" + document.Shopitems.icon.value;
 								document.images["icon"].src = image_url;
 							}
 							else
@@ -461,30 +313,30 @@ function template_Shop_itemsEdit()
 					</script>
 					<select name="icon" id="icon" onchange="show_image()">
 						<optgroup label="', $txt['Shop_item_image_select'], '">
-							<option value="blank.gif"', ($context['shop_item_edit']['image'] == 'blank.gif' ? ' selected="selected"' : ''), '>', $txt['Shop_items_none_select'], '</option>';
+							<option value="blank.gif"', ((empty($context['shop_item']['image']) || $context['shop_item']['image'] == 'blank.gif') ? ' selected="selected"' : ''), '>', $txt['Shop_items_none_select'], '</option>';
 
 						// List the images
 						foreach ($context['shop_images_list'] as $image)
 						echo '
-							<option value="', $image, '"', ($context['shop_item_edit']['image'] == $image ? ' selected="selected"' : ''), '>', $image, '</option>';
+							<option value="', $image, '"', ((!empty($context['shop_item']['image']) && $context['shop_item']['image'] == $image) ? ' selected="selected"' : ''), '>', $image, '</option>';
 
 					echo '
 						</optgroup>
 					</select>
-					&nbsp;&nbsp;<img name="icon" src="', $boardurl . $context['items_url'], $context['shop_item_edit']['image'], '" alt="" style="', $context['itemOpt'], ' border: 1px solid rgba(0,0,0,0.2);" /><br />
+					&nbsp;&nbsp;<img name="icon" src="', $boardurl . $context['items_url'], !empty($context['shop_item']['image']) ? $context['shop_item']['image'] : 'blank.gif', '" alt="" style="', $context['itemOpt'], ' border: 1px solid rgba(0,0,0,0.2);" /><br />
 					<span class="smalltext">', $txt['Shop_item_notice'], '</span>
 				</dd>
 			</dl>';
 
-		if ((($context['shop_item_edit']['addInputEditable'] == true) && isset($context['shop_item_edit']['addInput'])) && (($context['shop_item_edit']['addInput'] != '') && ($context['shop_item_edit']['addInput'] == true)))
+		if (!empty($context['shop_item']['addInputEditable']) && isset($context['shop_item']['addInput']) && !empty($context['shop_item']['addInput']))
 		echo '
 			<hr />
 			<a id="addinput"></a>
 			<span><label for="addinput"><strong>', $txt['Shop_item_additional'], '</strong></label></span><br />
 			<span class="smalltext">', $txt['Shop_item_description_match'], '</span>
-			', $context['shop_item_edit']['addInput'], '';
+			', $context['shop_item']['addInput'], '';
 
-		if (isset($context['shop_item_edit']['can_use_item']) && (($context['shop_item_edit']['can_use_item'] != '') && ($context['shop_item_edit']['can_use_item'] == true)))
+		if (isset($context['shop_item']['can_use_item']) && !empty($context['shop_item_']['can_use_item']))
 		echo '
 			<dl class="settings">
 				<dt>
@@ -492,13 +344,13 @@ function template_Shop_itemsEdit()
 					<span><label for="itemdelete">', $txt['Shop_item_delete_after'], ':</label></span>
 				</dt>
 				<dd>
-					<input class="input_check" type="checkbox" name="itemdelete" id="itemdelete" ', ($context['shop_item_edit']['delete_after_use'] ? ' checked' : ''), '/>
+					<input class="input_check" type="checkbox" name="itemdelete" id="itemdelete" ', (!empty($context['shop_item']['delete_after_use']) ? ' checked' : ''), '/>
 				</dd>
 			</dl>';
 
 		echo '
-			<input class="button floatleft" type="submit" value="', $txt['Shop_item_save_item'], '" />
-			<input class="button floatleft" type="button" value="', $txt['Shop_no_goback2'], '" onclick="window.location=\'', $scripturl, '?action=admin;area=shopitems\'" />
+			<input class="button floatleft" type="submit" value="', ($_REQUEST['sa'] == 'edit' ? $txt['Shop_item_save_item'] : $txt['Shop_item_add_items']), '" />
+			', ($_REQUEST['sa'] == 'edit' ? '<input class="button floatleft" type="button" value="'.$txt['Shop_no_goback2'].'" onclick="window.location=\''.$scripturl.'?action=admin;area=shopitems\'" />' : ''), '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 		</form>
 	</div>';
@@ -545,20 +397,22 @@ function template_Shop_categoriesDelete()
 
 }
 
-function template_Shop_categoriesAdd()
+function template_Shop_categories()
 {
 	global $context, $txt, $scripturl, $modSettings, $boardurl;
 
 	echo '
 	<div class="windowbg">
-		<form method="post" action="' . $scripturl . '?action=admin;area=shopcategories;sa=add2" name="Shopcategoriesadd">
+		<form method="post" action="' . $context['form_url'] . '" name="Shopcategories">
+		', ($_REQUEST['sa'] == 'edit' ? '
+			<input type="hidden" name="id" value="'.$context['shop_category']['catid'].'" />' : ''), '
 			<dl class="settings">
 				<dt>
 					<a id="setting_catname"></a>
 					<span><label for="catname">', $txt['Shop_item_name'], ':</label></span>
 				</dt>
 				<dd>
-					<input class="input_text" name="catname" id="catname" type="text" style="width: 100%" />
+					<input class="input_text" name="catname" id="catname" type="text" value="', !empty($context['shop_category']['name']) ? $context['shop_category']['name'] : '', '" style="width: 100%" />
 				</dd>
 
 				<dt>
@@ -566,7 +420,7 @@ function template_Shop_categoriesAdd()
 					<span><label for="catdesc">', $txt['Shop_item_description'], ':</label></span>
 				</dt>
 				<dd>
-					<textarea name="catdesc" id="catdesc"  rows="2" style="width: 100%"></textarea>
+					<textarea name="catdesc" id="catdesc"  rows="2" style="width: 100%">', !empty($context['shop_category']['description']) ? $context['shop_category']['description'] : '', '</textarea>
 				</dd>
 			</dl>
 			<dl class="settings">
@@ -580,10 +434,10 @@ function template_Shop_categoriesAdd()
 					<!--
 						function show_image()
 						{
-							if (document.Shopcategoriesadd.caticon.value !== "none")
+							if (document.Shopcategories.caticon.value !== "none")
 							{
 								// TODO: Should this detect the sources URL, rather than just assume?
-								var image_url = "', $boardurl . $context['items_url'], '" + document.Shopcategoriesadd.caticon.value;
+								var image_url = "', $boardurl . $context['items_url'], '" + document.Shopcategories.caticon.value;
 								document.images["caticon"].src = image_url;
 							}
 							else
@@ -595,92 +449,21 @@ function template_Shop_categoriesAdd()
 					</script>
 					<select name="caticon" id="caticon" onchange="show_image()">
 						<optgroup label="', $txt['Shop_item_image_select'], '">
-							<option value="blank.gif" selected="selected">', $txt['Shop_items_none_select'], '</option>';
+							<option value="blank.gif"', ((empty($context['shop_category']['image']) || $context['shop_category']['image'] == 'blank.gif') ? ' selected="selected"' : ''), '>', $txt['Shop_items_none_select'], '</option>';
 
 						// List the images
 						foreach ($context['shop_images_list'] as $image)
 						echo '
-							<option value="', $image, '">', $image, '</option>';
+							<option value="', $image, '"', ((!empty($context['shop_category']['image']) && $context['shop_category']['image'] == $image) ? ' selected="selected"' : ''), '>', $image, '</option>';
 
 					echo '
 						</optgroup>
 					</select>
-					&nbsp;&nbsp;<img name="caticon" src="', $boardurl . $context['items_url'], 'blank.gif" alt="" style="', $context['itemOpt'], ' border: 1px solid rgba(0,0,0,0.2);" /><br />
+					&nbsp;&nbsp;<img name="caticon" src="', $boardurl . $context['items_url'], !empty($context['shop_category']['image']) ? $context['shop_category']['image'] : 'blank.gif', '" alt="" style="', $context['itemOpt'], ' border: 1px solid rgba(0,0,0,0.2);" /><br />
 					<span class="smalltext">', $txt['Shop_item_notice'], '</span>
 				</dd>
 			</dl>
-			<input class="button floatleft" type="submit" value="', $txt['Shop_category_add_category'], '" />
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
-		</form>
-	</div>';
-}
-
-function template_Shop_categoriesEdit()
-{
-	global $context, $txt, $scripturl, $modSettings, $boardurl;
-
-	echo '
-	<div class="windowbg">
-		<form method="post" action="' . $scripturl . '?action=admin;area=shopcategories;sa=edit2" name="Shopcategoriesedit">
-		<input type="hidden" name="id" value="', $context['shop_category_edit']['catid'], '" />
-			<dl class="settings">
-				<dt>
-					<a id="setting_catname"></a>
-					<span><label for="catname">', $txt['Shop_item_name'], ':</label></span>
-				</dt>
-				<dd>
-					<input class="input_text" name="catname" id="catname" type="text" value="', $context['shop_category_edit']['name'], '" style="width: 100%" />
-				</dd>
-
-				<dt>
-					<a id="setting_catdesc"></a>
-					<span><label for="catdesc">', $txt['Shop_item_description'], ':</label></span>
-				</dt>
-				<dd>
-					<textarea name="catdesc" id="catdesc"  rows="2" style="width: 100%">', $context['shop_category_edit']['description'], '</textarea>
-				</dd>
-			</dl>
-			<dl class="settings">
-				<dt>
-					<a id="setting_caticon"></a>
-					<span><label for="caticon">', $txt['Shop_item_image'], ':</label></span>
-				</dt>
-				<dd>
-					<!-- TODO: Should JavaScript detect Sources URL? -->
-					<script type="text/javascript" language="javascript">
-					<!--
-						function show_image()
-						{
-							if (document.Shopcategoriesedit.caticon.value !== "none")
-							{
-								// TODO: Should this detect the sources URL, rather than just assume?
-								var image_url = "', $boardurl . $context['items_url'], '" + document.Shopcategoriesedit.caticon.value;
-								document.images["caticon"].src = image_url;
-							}
-							else
-							{
-								document.images["caticon"].src = "', $boardurl . $context['items_url'], 'blank.gif";
-							}
-						}
-					//-->
-					</script>
-					<select name="caticon" id="caticon" onchange="show_image()">
-						<optgroup label="', $txt['Shop_item_image_select'], '">
-							<option value="blank.gif"', ($context['shop_category_edit']['image'] == 'blank.gif' ? ' selected="selected"' : ''), '>', $txt['Shop_items_none_select'], '</option>';
-
-						// List the images
-						foreach ($context['shop_images_list'] as $image)
-						echo '
-							<option value="', $image, '"', ($context['shop_category_edit']['image'] == $image ? ' selected="selected"' : ''), '>', $image, '</option>';
-
-					echo '
-						</optgroup>
-					</select>
-					&nbsp;&nbsp;<img name="caticon" src="', $boardurl . $context['items_url'], $context['shop_category_edit']['image'], '" alt="" style="', $context['itemOpt'], ' border: 1px solid rgba(0,0,0,0.2);" /><br />
-					<span class="smalltext">', $txt['Shop_item_notice'], '</span>
-				</dd>
-			</dl>
-			<input class="button floatleft" type="submit" value="', $txt['Shop_category_save_category'], '" />
+			<input class="button floatleft" type="submit" value="', ($_REQUEST['sa'] == 'edit' ? $txt['Shop_category_save_category'] : $txt['Shop_category_add_category']), '" />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 		</form>
 	</div>';
