@@ -33,13 +33,13 @@ if (!defined('SMF'))
 				'shopinfo' => array(
 					'label' => $txt['Shop_tab_info'],
 					'icon' => 'administration',
-					'function' => 'self::Info',
+					'function' => 'AdminShop::Info',
 				),
 				'shopsettings' => array(
 					'label' => $txt['Shop_tab_settings'],
 					'icon' => 'features',
 					'file' => 'Shop/AdminShop-Settings.php',
-					'function' => 'AdminShop_Settings::Main',
+					'function' => 'AdminShopSettings::Main',
 					'permission' => array('admin_forum'),
 					'subsections' => array(
 						'general' => array($txt['Shop_settings_general']),
@@ -52,7 +52,7 @@ if (!defined('SMF'))
 					'label' => $txt['Shop_tab_items'],
 					'icon' => 'smiley',
 					'file' => 'Shop/AdminShop-Items.php',
-					'function' => 'AdminShop_Items::Main',
+					'function' => 'AdminShopItems::Main',
 					'permission' => array('shop_canManage'),
 					'custom_url' => $scripturl . '?action=admin;area=shopitems;sa=index',
 					'subsections' => array(
@@ -65,7 +65,7 @@ if (!defined('SMF'))
 					'label' => $txt['Shop_tab_modules'],
 					'icon' => 'modifications',
 					'file' => 'Shop/AdminShop-Modules.php',
-					'function' => 'AdminShop_Modules::Main',
+					'function' => 'AdminShopModules::Main',
 					'permission' => array('admin_forum'),
 					'custom_url' => $scripturl . '?action=admin;area=shopmodules;sa=index',
 					'subsections' => array(
@@ -77,7 +77,7 @@ if (!defined('SMF'))
 					'label' => $txt['Shop_tab_categories'],
 					'icon' => 'boards',
 					'file' => 'Shop/AdminShop-Categories.php',
-					'function' => 'AdminShop_Categories::Main',
+					'function' => 'AdminShopCategories::Main',
 					'permission' => array('shop_canManage'),
 					'custom_url' => $scripturl . '?action=admin;area=shopcategories;sa=index',
 					'subsections' => array(
@@ -89,7 +89,7 @@ if (!defined('SMF'))
 					'label' => $txt['Shop_tab_games'],
 					'icon' => 'paid',
 					'file' => 'Shop/AdminShop-Games.php',
-					'function' => 'AdminShop_Games::Main',
+					'function' => 'AdminShopGames::Main',
 					'permission' => array('shop_canManage'),
 					'custom_url' => $scripturl . '?action=admin;area=shopgames;sa=slots',
 					'subsections' => array(
@@ -104,7 +104,7 @@ if (!defined('SMF'))
 					'label' => $txt['Shop_tab_inventory'],
 					'icon' => 'maintain',
 					'file' => 'Shop/AdminShop-Inventory.php',
-					'function' => 'AdminShop_Inventory::Main',
+					'function' => 'AdminShopInventory::Main',
 					'permission' => array('shop_canManage'),
 					'custom_url' => $scripturl . '?action=admin;area=shopinventory;sa=search',
 					'subsections' => array(
@@ -119,7 +119,7 @@ if (!defined('SMF'))
 					'label' => $txt['Shop_tab_logs'],
 					'icon' => 'logs',
 					'file' => 'Shop/AdminShop-Logs.php',
-					'function' => 'AdminShop_Inventory::Main',
+					'function' => 'AdminShopLogs::Main',
 					'permission' => array('shop_canManage'),
 					'custom_url' => $scripturl . '?action=admin;area=shoplogs',
 					'subsections' => array(
@@ -137,7 +137,7 @@ if (!defined('SMF'))
 		);
 
 		// Permissions
-		add_integration_function('integrate_load_permissions', 'AdminShop::Perms', false);
+		add_integration_function('integrate_load_permissions', 'AdminShop::Permissions', false);
 		add_integration_function('integrate_load_illegal_guest_permissions', 'AdminShop::IllegalPerms', false);
 		// Boards settings
 		add_integration_function('integrate_pre_boardtree', 'AdminShop::preboardTree', false);
@@ -148,7 +148,7 @@ if (!defined('SMF'))
 	}
 
 	/**
-	 * AdminShop::Perms()
+	 * AdminShop::Permissions()
 	 *
 	 * ST Shop permissions
 	 * @param array $permissionGroups An array containing all possible permissions groups.
@@ -156,7 +156,7 @@ if (!defined('SMF'))
 	 * @return void
 	 * @author Jessica González <suki@missallsunday.com>
 	 */
-	public static function Perms(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions)
+	public static function Permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions)
 	{
 		global $txt;
 
@@ -205,7 +205,7 @@ if (!defined('SMF'))
 		$context['non_guest_permissions'] = array_merge($context['non_guest_permissions'],$shop_permissions);
 	}
 
-	public static function Shop_preboardTree(&$boardColumns, &$boardParameters, &$boardJoins, &$boardWhere, &$boardOrder)
+	public static function preboardTree(&$boardColumns, &$boardParameters, &$boardJoins, &$boardWhere, &$boardOrder)
 	{
 		array_push($boardColumns,'b.Shop_credits_count','b.Shop_credits_topic','b.Shop_credits_post','b.Shop_credits_bonus');
 	}

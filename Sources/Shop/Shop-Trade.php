@@ -149,11 +149,11 @@ class ShopTrade extends ShopHome
 			'default_sort_col' => 'item_name',
 			'default_sort_dir' => 'DESC',
 			'get_items' => array(
-				'function' => 'self::Get',
+				'function' => 'ShopTrade::Get',
 				'params' => array(isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null),
 			),
 			'get_count' => array(
-				'function' => 'self::Count',
+				'function' => 'ShopTrade::Count',
 				'params' => array(isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null),
 			),
 			'no_items_label' => $txt['Shop_no_items'],
@@ -482,11 +482,11 @@ class ShopTrade extends ShopHome
 			'default_sort_col' => 'item_name',
 			'default_sort_dir' => 'DESC',
 			'get_items' => array(
-				'function' => 'self::Get',
+				'function' => 'ShopTrade::Get',
 				'params' => array(isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null, false, $context['member']['id']),
 			),
 			'get_count' => array(
-				'function' => 'self::Count',
+				'function' => 'ShopTrade::Count',
 				'params' => array(isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null, false, $context['member']['id']),
 			),
 			'no_items_label' => $txt['Shop_no_items'],
@@ -1019,10 +1019,10 @@ class ShopTrade extends ShopHome
 			'base_href' => '?action=shop;sa=tradelog',
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => 'self::logGet',
+				'function' => 'ShopTrade::logGet',
 			),
 			'get_count' => array(
-				'function' => 'self::logCount',
+				'function' => 'ShopTrade::logCount',
 			),
 			'no_items_label' => $txt['Shop_logs_empty'],
 			'no_items_align' => 'center',

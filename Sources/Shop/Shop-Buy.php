@@ -48,11 +48,11 @@ class ShopBuy extends ShopHome
 			'default_sort_col' => 'item_name',
 			'default_sort_dir' => 'ASC',
 			'get_items' => array(
-				'function' => 'self::Get',
+				'function' => 'ShopBuy::Get',
 				'params' => array(isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null),
 			),
 			'get_count' => array(
-				'function' => 'self::Count',
+				'function' => 'ShopBuy::Count',
 				'params' => array(isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null),
 			),
 			'no_items_label' => $txt['Shop_no_items'],

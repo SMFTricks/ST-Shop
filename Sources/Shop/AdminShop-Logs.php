@@ -11,7 +11,7 @@
 if (!defined('SMF'))
 	die('No direct access...');
 
-class AdminShop_Logs extends AdminShop
+class AdminShopLogs extends AdminShop
 {
 	public static function Main()
 	{
@@ -22,14 +22,14 @@ class AdminShop_Logs extends AdminShop
 		$context['items_url'] = Shop::$itemsdir;
 
 		$subactions = array(
-			'admin_money' => 'self::Money',
-			'admin_items' => 'self::Items',
-			'buy' => 'self::Buy',
-			'money' => 'self::Money',
-			'items' => 'self::Items',
-			'trade' => 'self::Trade',
-			'bank' => 'self::Bank',
-			'games' => 'self::Games',
+			'admin_money' => 'AdminShopLogs::Money',
+			'admin_items' => 'AdminShopLogs::Items',
+			'buy' => 'AdminShopLogs::Buy',
+			'money' => 'AdminShopLogs::Money',
+			'items' => 'AdminShopLogs::Items',
+			'trade' => 'AdminShopLogs::Trade',
+			'bank' => 'AdminShopLogs::Bank',
+			'games' => 'AdminShopLogs::Games',
 		);
 
 		// Disabled sections?
@@ -249,11 +249,11 @@ class AdminShop_Logs extends AdminShop
 			'base_href' => '?action=admin;area=shoplogs;sa=money',
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => 'self::Get',
+				'function' => 'AdminShopLogs::Get',
 				'params' => array('money', $is_admin),
 			),
 			'get_count' => array(
-				'function' => 'self::Count',
+				'function' => 'AdminShopLogs::Count',
 				'params' => array('money', $is_admin),
 			),
 			'no_items_label' => $txt['Shop_logs_empty'],
@@ -358,11 +358,11 @@ class AdminShop_Logs extends AdminShop
 			'base_href' => '?action=admin;area=shoplogs;sa=items',
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => 'self::Get',
+				'function' => 'AdminShopLogs::Get',
 				'params' => array('items', $is_admin),
 			),
 			'get_count' => array(
-				'function' => 'self::Count',
+				'function' => 'AdminShopLogs::Count',
 				'params' => array('items', $is_admin),
 			),
 			'no_items_label' => $txt['Shop_logs_empty'],
@@ -472,11 +472,11 @@ class AdminShop_Logs extends AdminShop
 			'base_href' => '?action=admin;area=shoplogs;sa=buy',
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => 'self::Get',
+				'function' => 'AdminShopLogs::Get',
 				'params' => array('buy'),
 			),
 			'get_count' => array(
-				'function' => 'self::Count',
+				'function' => 'AdminShopLogs::Count',
 				'params' => array('buy'),
 			),
 			'no_items_label' => $txt['Shop_logs_empty'],
@@ -580,11 +580,11 @@ class AdminShop_Logs extends AdminShop
 			'base_href' => '?action=admin;area=shoplogs;sa=trade',
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => 'self::Get',
+				'function' => 'AdminShopLogs::Get',
 				'params' => array('trade'),
 			),
 			'get_count' => array(
-				'function' => 'self::Count',
+				'function' => 'AdminShopLogs::Count',
 				'params' => array('trade'),
 			),
 			'no_items_label' => $txt['Shop_logs_empty'],
@@ -722,11 +722,11 @@ class AdminShop_Logs extends AdminShop
 			'base_href' => '?action=admin;area=shoplogs;sa=bank',
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => 'self::Get',
+				'function' => 'AdminShopLogs::Get',
 				'params' => array('bank'),
 			),
 			'get_count' => array(
-				'function' => 'self::Count',
+				'function' => 'AdminShopLogs::Count',
 				'params' => array('bank'),
 			),
 			'no_items_label' => $txt['Shop_logs_empty'],
@@ -846,11 +846,11 @@ class AdminShop_Logs extends AdminShop
 			'base_href' => '?action=admin;area=shoplogs;sa=games',
 			'default_sort_col' => 'date',
 			'get_items' => array(
-				'function' => 'self::Get',
+				'function' => 'AdminShopLogs::Get',
 				'params' => array('games'),
 			),
 			'get_count' => array(
-				'function' => 'self::Count',
+				'function' => 'AdminShopLogs::Count',
 				'params' => array('games'),
 			),
 			'no_items_label' => $txt['Shop_logs_empty'],

@@ -11,7 +11,7 @@
 if (!defined('SMF'))
 	die('No direct access...');
 
-class AdminShop_Inventory extends AdminShop
+class AdminShopInventory extends AdminShop
 {
 	public static function Main()
 	{
@@ -22,18 +22,18 @@ class AdminShop_Inventory extends AdminShop
 		$context['items_url'] = Shop::$itemsdir;
 
 		$subactions = array(
-			'search' => 'self::Search',
-			'search2' => 'self::Search2',
-			'userinv' => 'self::User',
-			'delete' => 'self::Delete',
-			'restock' => 'self::Restock',
-			'restock2' => 'self::Restock2',
-			'groupcredits' => 'self::Group',
-			'groupcredits2' => 'self::Group2',
-			'usercredits' => 'self::Credits',
-			'usercredits2' => 'self::Credits2',
-			'useritems' => 'self::Items',
-			'useritems2' => 'self::Items2',
+			'search' => 'AdminShopInventory::Search',
+			'search2' => 'AdminShopInventory::Search2',
+			'userinv' => 'AdminShopInventory::User',
+			'delete' => 'AdminShopInventory::Delete',
+			'restock' => 'AdminShopInventory::Restock',
+			'restock2' => 'AdminShopInventory::Restock2',
+			'groupcredits' => 'AdminShopInventory::Group',
+			'groupcredits2' => 'AdminShopInventory::Group2',
+			'usercredits' => 'AdminShopInventory::Credits',
+			'usercredits2' => 'AdminShopInventory::Credits2',
+			'useritems' => 'AdminShopInventory::Items',
+			'useritems2' => 'AdminShopInventory::Items2',
 		);
 
 		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'search';
@@ -225,11 +225,11 @@ class AdminShop_Inventory extends AdminShop
 			'default_sort_col' => 'item_date',
 			'default_sort_dir' => 'DESC',
 			'get_items' => array(
-				'function' => 'self::Get',
+				'function' => 'AdminShopInventory::Get',
 				'params' => array($context['id_member']),
 			),
 			'get_count' => array(
-				'function' => 'self::Count',
+				'function' => 'AdminShopInventory::Count',
 				'params' => array($context['id_member']),
 			),
 			'no_items_label' => $txt['Shop_inventory_no_items'],

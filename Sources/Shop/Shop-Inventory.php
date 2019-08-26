@@ -72,11 +72,11 @@ class ShopInventory extends ShopHome
 			'default_sort_col' => 'item_date',
 			'default_sort_dir' => 'DESC',
 			'get_items' => array(
-				'function' => 'self::Get',
+				'function' => 'ShopInventory::Get',
 				'params' => array($context['id_member'], isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null),
 			),
 			'get_count' => array(
-				'function' => 'self::Count',
+				'function' => 'ShopInventory::Count',
 				'params' => array($context['id_member'], isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null),
 			),
 			'no_items_label' => $txt['Shop_inventory_no_items'],

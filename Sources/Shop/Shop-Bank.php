@@ -13,7 +13,7 @@ if (!defined('SMF'))
 
 class ShopBank extends ShopHome
 {
-	function Main()
+	public static function Main()
 	{
 		global $context, $scripturl, $modSettings, $user_info, $txt;
 
@@ -58,7 +58,7 @@ class ShopBank extends ShopHome
 			$context['Shop']['bank']['success'] = $txt['Shop_bank_withdraw_successfull'];
 	}
 
-	function Trans()
+	public static function Trans()
 	{
 		global $context, $smcFunc, $user_info, $modSettings, $txt;
 

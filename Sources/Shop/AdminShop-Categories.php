@@ -11,7 +11,7 @@
 if (!defined('SMF'))
 	die('No direct access...');
 
-class AdminShop_Categories extends AdminShop
+class AdminShopCategories extends AdminShop
 {
 	public static function Main()
 	{
@@ -22,13 +22,13 @@ class AdminShop_Categories extends AdminShop
 		$context['items_url'] = Shop::$itemsdir;
 
 		$subactions = array(
-			'index' => 'self::Index',
-			'add' => 'self::Add',
-			'add2' => 'self::Add2',
-			'edit' => 'self::Edit',
-			'edit2' => 'self::Edit2',
-			'delete' => 'self::Delete',
-			'delete2' => 'self::Delete2',
+			'index' => 'AdminShopCategories::Index',
+			'add' => 'AdminShopCategories::Add',
+			'add2' => 'AdminShopCategories::Add2',
+			'edit' => 'AdminShopCategories::Edit',
+			'edit2' => 'AdminShopCategories::Edit2',
+			'delete' => 'AdminShopCategories::Delete',
+			'delete2' => 'AdminShopCategories::Delete2',
 		);
 
 		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'index';
@@ -63,10 +63,10 @@ class AdminShop_Categories extends AdminShop
 			'base_href' => '?action=admin;area=shopcategories;sa=index',
 			'default_sort_col' => 'modify',
 			'get_items' => array(
-				'function' => 'parent::categoriesGet',
+				'function' => 'AdminShop::categoriesGet',
 			),
 			'get_count' => array(
-				'function' => 'parent::categoriesCount',
+				'function' => 'AdminShop::categoriesCount',
 			),
 			'no_items_label' => $txt['Shop_no_categories'],
 			'no_items_align' => 'center',
@@ -181,7 +181,7 @@ class AdminShop_Categories extends AdminShop
 
 	public static function Add()
 	{
-		global $context, $boarddir, $smcFunc, $modSettings, $txt, $item_info;
+		global $context, $boarddir, $smcFunc, $modSettings, $txt, $item_info, $scripturl;
 
 		// Image format
 		if (!empty($modSettings['Shop_images_resize']))
@@ -191,11 +191,13 @@ class AdminShop_Categories extends AdminShop
 
 		// Images...
 		$context['shop_images_list'] = Shop::getImageList();
+		// Form
+		$context['form_url'] = $scripturl .'?action=admin;area=shopcategories;sa=add2';
 
 		// Set all the page stuff
 		$context['page_title'] = $txt['Shop_tab_categories'] . ' - '. $txt['Shop_categories_add'];
 		$context[$context['admin_menu_name']]['tab_data']['title'] = $context['page_title'];
-		$context['sub_template'] = 'Shop_categoriesAdd';
+		$context['sub_template'] = 'Shop_categories';
 	}
 
 	public static function Add2()
@@ -234,7 +236,7 @@ class AdminShop_Categories extends AdminShop
 
 	public static function Edit()
 	{
-		global $context, $smcFunc, $sourcedir, $modSettings, $txt;
+		global $context, $smcFunc, $sourcedir, $modSettings, $txt, $scripturl;
 
 		// If item is not set, something is terribly wrong or is trying to access this page without actually editing an item
 		if (!isset($_REQUEST['id']))
@@ -242,7 +244,7 @@ class AdminShop_Categories extends AdminShop
 
 		// Set all the page stuff
 		$context['page_title'] = $txt['Shop_tab_settings'] . ' - '. $txt['Shop_categories_edit'];
-		$context['sub_template'] = 'Shop_categoriesEdit';
+		$context['sub_template'] = 'Shop_categories';
 
 		if (!empty($modSettings['Shop_images_resize']))
 			$context['itemOpt'] = 'width: '. $modSettings['Shop_images_width']. '; height: '. $modSettings['Shop_images_height']. ';';
@@ -269,7 +271,7 @@ class AdminShop_Categories extends AdminShop
 			fatal_error($txt['Shop_category_notfound'], false);
 
 		// Set all the information (for use in the template)
-		$context['shop_category_edit'] = array(
+		$context['shop_category'] = array(
 			'catid' => $id,
 			'name' => $row['name'],
 			'description' => $row['description'],
@@ -278,12 +280,12 @@ class AdminShop_Categories extends AdminShop
 
 		// Images...
 		$context['shop_images_list'] = Shop::getImageList();
-		// ... and categories
-		$context['shop_categories_list'] = Shop::getCatList();
+		// Form
+		$context['form_url'] = $scripturl .'?action=admin;area=shopcategories;sa=edit2';
 		// Let's put this below, so we can use the information we have
 		$context[$context['admin_menu_name']]['tab_data'] = array(
 			'title' => $context['page_title'],
-			'description' => sprintf($txt['Shop_categories_edit_desc'], $context['shop_category_edit']['name']),
+			'description' => sprintf($txt['Shop_categories_edit_desc'], $context['shop_category']['name']),
 		);
 	}
 

@@ -11,17 +11,17 @@
 if (!defined('SMF'))
 	die('No direct access...');
 
-class AdminShop_Settings extends AdminShop
+class AdminShopSettings extends AdminShop
 {
 	public static function Main()
 	{
 		global $context, $txt;
 
 		$subactions = array(
-			'general' => 'self::General',
-			'credits' => 'self::Credits',
-			'permissions' => 'self::Perms',
-			'profile' => 'self::Profile',
+			'general' => 'AdminShopSettings::General',
+			'credits' => 'AdminShopSettings::Credits',
+			'permissions' => 'AdminShopSettings::Perms',
+			'profile' => 'AdminShopSettings::Profile',
 		);
 
 		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'general';

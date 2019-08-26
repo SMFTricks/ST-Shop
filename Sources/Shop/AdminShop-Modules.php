@@ -11,7 +11,7 @@
 if (!defined('SMF'))
 	die('No direct access...');
 
-class AdminShop_Modules extends AdminShop
+class AdminShopModules extends AdminShop
 {
 	public static function Main()
 	{
@@ -22,11 +22,11 @@ class AdminShop_Modules extends AdminShop
 		$context['items_url'] = Shop::$itemsdir;
 
 		$subactions = array(
-			'index' => 'self::Index',
-			'delete' => 'self::Delete',
-			'delete2' => 'self::Delete2',
-			'uploadmodules' => 'self::Upload',
-			'uploadmodules2' => 'self::Upload2',
+			'index' => 'AdminShopModules::Index',
+			'delete' => 'AdminShopModules::Delete',
+			'delete2' => 'AdminShopModules::Delete2',
+			'uploadmodules' => 'AdminShopModules::Upload',
+			'uploadmodules2' => 'AdminShopModules::Upload2',
 		);
 
 		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'index';
@@ -103,10 +103,10 @@ class AdminShop_Modules extends AdminShop
 			'base_href' => '?action=admin;area=shopmodules;sa=index',
 			'default_sort_col' => 'function',
 			'get_items' => array(
-				'function' => 'self::modulesGet',
+				'function' => 'AdminShopModules::modulesGet',
 			),
 			'get_count' => array(
-				'function' => 'self::modulesCount',
+				'function' => 'AdminShopModules::modulesCount',
 			),
 			'no_items_label' => $txt['Shop_no_modules'],
 			'no_items_align' => 'center',

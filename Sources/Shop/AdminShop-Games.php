@@ -11,18 +11,18 @@
 if (!defined('SMF'))
 	die('No direct access...');
 
-class AdminShop_Games extends AdminShop
+class AdminShopGames extends AdminShop
 {
 	public static function Main()
 	{
 		global $context, $txt;
 
 		$subactions = array(
-			'slots' => 'self::Slots',
-			'lucky2' => 'self::Lucky2',
-			'number' => 'self::Number',
-			'pairs' => 'self::Pairs',
-			'dice' => 'self::Dice',
+			'slots' => 'AdminShopGames::Slots',
+			'lucky2' => 'AdminShopGames::Lucky2',
+			'number' => 'AdminShopGames::Number',
+			'pairs' => 'AdminShopGames::Pairs',
+			'dice' => 'AdminShopGames::Dice',
 		);
 
 		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'general';

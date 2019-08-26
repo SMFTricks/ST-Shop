@@ -28,7 +28,7 @@ class ProfileShop
 					'label' => $txt['Shop_view_inventory'],
 					'custom_url' => $scripturl . '?action=shop;sa=inventory',
 					'file' => 'Shop/Shop-Inventory.php',
-					'function' => 'Shop_mainInv',
+					'function' => 'ShopInventory::Main',
 					'icon' => 'replies',
 					'enabled' => !empty($modSettings['Shop_enable_shop']),
 					'permission' => array(
@@ -40,7 +40,7 @@ class ProfileShop
 					'label' => $txt['Shop_view_mytrades'],
 					'custom_url' => $scripturl . '?action=shop;sa=mytrades',
 					'file' => 'Shop/Shop-Trade.php',
-					'function' => 'Shop_tradeProfile',
+					'function' => 'ShopTrade::Profile',
 					'icon' => 'inbox',
 					'enabled' => !empty($modSettings['Shop_enable_shop']) && !empty($modSettings['Shop_enable_trade']),
 					'permission' => array(
@@ -139,6 +139,7 @@ class ProfileShop
 		global $user_profile, $modSettings, $txt, $sourcedir;
 
 		loadLanguage('Shop');
+		require_once($sourcedir.'/Shop/Shop-Home.php');
 		require_once($sourcedir.'/Shop/Shop-Inventory.php');
 		$profile = $user_profile[$user];
 		$profile['shop_inventory'] = ShopInventory::Profile($profile);

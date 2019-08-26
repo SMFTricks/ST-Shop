@@ -53,10 +53,10 @@ class ShopHome
 		
 		$subactions = array(
 			'home' => array(
-				'function' => 'self::Home',
+				'function' => 'ShopHome::Home',
 			),
 			'whohas' => array(
-				'function' => 'self::Who',
+				'function' => 'ShopHome::Who',
 			),
 			'buy' => array(
 				'function' => 'ShopBuy::Main',
@@ -192,13 +192,13 @@ class ShopHome
 
 		$context['shop_links'] = array(
 			'home' => array(
-				'action' => array('home', 'whohas'),
+				'action' => array('home'),
 				'label' => $txt['Shop_shop_home'],
 				'permission' => 'shop_canAccess',
 				'enable' => 'Shop_enable_shop'
 			),
 			'buy' => array(
-				'action' => array('buy','buy2','buy3'),
+				'action' => array('buy','buy2','buy3', 'whohas'),
 				'label' => $txt['Shop_shop_buy'],
 				'permission' => 'shop_canBuy',
 				'enable' => 'Shop_enable_shop'
@@ -632,11 +632,11 @@ class ShopHome
 			'default_sort_col' => 'item_count',
 			'default_sort_dir' => 'DESC',
 			'get_items' => array(
-				'function' => 'self::whoGet',
+				'function' => 'ShopHome::whoGet',
 				'params' => array($itemid),
 			),
 			'get_count' => array(
-				'function' => 'self::whoCount',
+				'function' => 'ShopHome::whoCount',
 				'params' => array($itemid),
 			),
 			'no_items_label' => $txt['Shop_inventory_no_items'],
