@@ -16,7 +16,7 @@ class Shop
 	public static $name = 'Shop';
 	public static $txtpattern = 'Shop_';
 	public static $version = '3.0.1';
-	public static $itemsdir = '/shop_items/items';
+	public static $itemsdir = '/shop_items/items/';
 	public static $modulesdir = '/shop_items/modules';
 	public static $gamesdir = '/shop_items/games';
 	public static $supportSite = 'https://smftricks.com/index.php?action=.xml;sa=news;board=51;limit=10;type=rss2';
@@ -186,12 +186,12 @@ class Shop
 		// Load our Profile file
 		require_once($sourcedir . '/Shop/ProfileShop.php');
 		$hooks = array(
-			'load_member_data' => 'ProfileShop::Shop_profileData',
-			'user_info' => 'ProfileShop::Shop_profileInfo',
-			'simple_actions' => 'ProfileShop::Shop_profileActions',
-			'member_context' => 'ProfileShop::Shop_profileContext',
-			'load_custom_profile_fields' => 'ProfileShop::Shop_profileCustomFields',
-			'register' => 'ProfileShop::Shop_profileRegister',
+			'load_member_data' => 'ProfileShop::Data',
+			'user_info' => 'ProfileShop::Info',
+			'simple_actions' => 'ProfileShop::Actions',
+			'member_context' => 'ProfileShop::Context',
+			'load_custom_profile_fields' => 'ProfileShop::CustomFields',
+			'register' => 'ProfileShop::Register',
 		);
 		foreach ($hooks as $point => $callable)
 			add_integration_function('integrate_' . $point, $callable, false);
@@ -210,7 +210,7 @@ class Shop
 		global $sourcedir;
 
 		// The main action
-		$actions['shop'] = array('Shop/Shop.php', 'Shop');
+		$actions['shop'] = array('Shop/Shop-Home.php', 'ShopHome::Main');
 		// Feed
 		$actions['shopfeed'] = array(false, 'Shop::getFeed');
 
@@ -218,11 +218,11 @@ class Shop
 		switch ($_REQUEST['action']) {
 			case 'admin':
 				require_once($sourcedir . '/Shop/AdminShop.php');
-				add_integration_function('integrate_admin_areas', 'AdminShop::Shop_adminAreas', false);
+				add_integration_function('integrate_admin_areas', 'AdminShop::hookAreas', false);
 				break;
 			case 'profile':
 				require_once($sourcedir . '/Shop/ProfileShop.php');
-				add_integration_function('integrate_pre_profile_areas', 'ProfileShop::Shop_profileAreas', false);
+				add_integration_function('integrate_pre_profile_areas', 'ProfileShop::hookAreas', false);
 				break;
 			case 'who':
 				loadLanguage('Shop');
@@ -309,7 +309,7 @@ class Shop
 		global $context, $txt;
 
 		if (isset($context['current_action']) && $context['current_action'] === 'shop')
-			return '<br /><div style="text-align: center;"><span class="smalltext">Powered by <a href="http://smftricks.com" target="_blank" rel="noopener">ST Shop</a></span></div>';
+			return '<br /><div style="text-align: center;"><span class="smalltext">Powered by <a href="https://smftricks.com" target="_blank" rel="noopener">ST Shop</a></span></div>';
 	}
 
 	/**
