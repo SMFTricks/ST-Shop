@@ -25,6 +25,7 @@
 		<require-dir name="Sources" destination="$boarddir">Source files</require-dir>
 		<!-- Hooks -->
 		<hook hook="integrate_pre_include" function="$sourcedir/Shop/Shop.php" />
+		<hook hook="integrate_pre_include" function="$sourcedir/Shop/Shop-Template.php" />
 		<hook hook="integrate_pre_load" function="Shop::initialize" file="$sourcedir/Shop/Shop.php" />
 		<!-- Database and Hooks -->
 		<database>install.php</database>
@@ -46,6 +47,7 @@
 		<!-- Item Modules and Images -->
 		<remove-dir name="$boarddir/shop_items">Shop items and modules</remove-dir>
 		<!-- Hooks Remove -->
+		<hook hook="integrate_pre_include" function="$sourcedir/Shop/Shop.php" reverse="true" />
 		<hook hook="integrate_pre_include" function="$sourcedir/Shop/Shop.php" reverse="true" />
 		<hook hook="integrate_pre_load" function="Shop::initialize" file="$sourcedir/Shop/Shop.php" reverse="true" />
 		<!-- Database -->
