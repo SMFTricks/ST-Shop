@@ -167,6 +167,7 @@ class Shop
 			'actions' => 'Shop::hookActions',
 			'menu_buttons' => 'Shop::hookButtons',
 			'after_create_post' => 'Shop::afterPost',
+			//'remove_message' => 'Shop::removePost',
 		);
 		foreach ($hooks as $point => $callable)
 			add_integration_function('integrate_' . $point, $callable, false);
@@ -441,7 +442,7 @@ class Shop
 	/**
 	 * Shop::afterPost()
 	 *
-	 * Used in the who's online action.
+	 * Used for giving money/credits/points to the users when posting.
 	 * @param array $msgOptions An array of information/options for the post
 	 * @param array $topicOptions An array of information/options for the topic
 	 * @param array $posterOptions An array of information/options for the poster
@@ -464,18 +465,19 @@ class Shop
 					'key' => $topicOptions['board'],
 				)
 			);				
-			$board_info = $smcFunc['db_fetch_assoc']($result_shop);
+			$shop_info = $smcFunc['db_fetch_assoc']($result_shop);
+			$smcFunc['db_free_result']($result_shop);
 
-			if (!empty($board_info['Shop_credits_count']))
+			if (!empty($shop_info['Shop_credits_count']))
 			{
 				if (empty($topicOptions['id']))
-					$credits = !empty($board_info['Shop_credits_topic']) ? $board_info['Shop_credits_topic'] : $modSettings['Shop_credits_topic'];
+					$credits = !empty($shop_info['Shop_credits_topic']) ? $shop_info['Shop_credits_topic'] : $modSettings['Shop_credits_topic'];
 				else
-					$credits = !empty($board_info['Shop_credits_post']) ? $board_info['Shop_credits_post'] : $modSettings['Shop_credits_post'];
+					$credits = !empty($shop_info['Shop_credits_post']) ? $shop_info['Shop_credits_post'] : $modSettings['Shop_credits_post'];
 			
 				// Bonus
 				$bonus = 0;
-				if (!empty($board_info['Shop_credits_bonus']) && (($modSettings['Shop_credits_word'] > 0) || ($modSettings['Shop_credits_character'] > 0))) {
+				if (!empty($shop_info['Shop_credits_bonus']) && (($modSettings['Shop_credits_word'] > 0) || ($modSettings['Shop_credits_character'] > 0))) {
 					// no, BBCCode won't count
 					$plaintext = preg_replace('[\[(.*?)\]]', ' ', $_POST['message']);
 					// convert newlines to spaces
@@ -507,6 +509,91 @@ class Shop
 					)
 				);
 			}
+		}
+	}
+
+	/**
+	 * Shop::removePost()
+	 *
+	 * Deduct points from user if post was deleted.
+	 * @param int $message id of the message
+	 * @return void
+	 */
+	public static function removePost($message, $row, $recycle)
+	{
+		global $smcFunc, $modSettings, $board_info;
+
+		if(!empty($modSettings['Shop_enable_shop']))
+		{
+			$result_shop = $smcFunc['db_query']('', '
+				SELECT Shop_credits_count, Shop_credits_topic, Shop_credits_post, Shop_credits_bonus
+				FROM {db_prefix}boards
+				WHERE id_board = {int:key}
+				LIMIT 1',
+				array(
+					'key' => $board_info['id'],
+				)
+			);
+			$shop_info = $smcFunc['db_fetch_assoc']($result_shop);
+			$smcFunc['db_free_result']($result_shop);
+
+			$credits = !empty($shop_info['Shop_credits_post']) ? $shop_info['Shop_credits_post'] : $modSettings['Shop_credits_post'];
+			if (!empty($shop_info['Shop_credits_count']) && !empty($recycle))
+			{
+				$getMessage = $smcFunc['db_query']('', '
+					SELECT id_member, modified_time, body
+					FROM {db_prefix}messages
+					WHERE id_msg = {int:key}
+					LIMIT 1',
+					array(
+						'key' => $message,
+					)
+				);
+				$deleted_message = $smcFunc['db_fetch_assoc']($getMessage);
+				$smcFunc['db_free_result']($getMessage);
+
+				// Check if it was edited
+				if (!empty($deleted_message['modified_time']))
+					$deleted_message['body'] = '';
+			}
+			elseif (!empty($shop_info['Shop_credits_count']) && !empty($modSettings['search_custom_index_config']) && empty($recycle))
+				$deleted_message['body'] = $row['body'];
+			else
+				$deleted_message['body'] = '';
+			
+			// Bonus
+			$bonus = 0;
+			if (!empty($shop_info['Shop_credits_bonus']) && (($modSettings['Shop_credits_word'] > 0) || ($modSettings['Shop_credits_character'] > 0)))
+			{
+					// no, BBCCode won't count
+					$plaintext = preg_replace('[\[(.*?)\]]', ' ', $deleted_message['body']);
+					// convert newlines to spaces
+					$plaintext = str_replace(array('<br />', "\r", "\n"), ' ', $plaintext);
+					// convert multiple spaces into one
+					$plaintext = preg_replace('/\s+/', ' ', $plaintext);
+
+					// bonus for each word
+					$bonus += ($modSettings['Shop_credits_word'] * str_word_count($plaintext));
+					// and for each letter
+					$bonus += ($modSettings['Shop_credits_character'] * strlen($plaintext));
+					
+					// Limit?
+					if (isset($modSettings['Shop_credits_limit']) && $modSettings['Shop_credits_limit'] != 0 && $bonus > $modSettings['Shop_credits_limit'])
+						$bonus = $modSettings['Shop_credits_limit'];
+			}
+			// Credits + Bonus
+			$point = ($bonus + $credits);
+			// and finally, deduct credits
+			$result = $smcFunc['db_query']('','
+				UPDATE {db_prefix}members
+				SET shopMoney = shopMoney - {int:point}
+				WHERE id_member = {int:id_member}
+				LIMIT 1',
+				array(
+					'point' => $point,
+					'id_member' => $row['id_member'],
+				)
+			);
 		}
 	}
 
