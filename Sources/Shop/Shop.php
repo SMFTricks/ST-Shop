@@ -387,6 +387,9 @@ class Shop
 				// Trade list
 				elseif ($actions['sa'] == 'tradelist' && allowedTo('shop_canTrade'))
 					$who = $txt['whoallow_shop_tradelist'];
+				// Trade list
+				elseif ($actions['sa'] == 'tradelog' && allowedTo('shop_canTrade'))
+					$who = $txt['whoallow_shop_tradelog'];
 				// Personal trade list
 				elseif ($actions['sa'] == 'mytrades' && allowedTo('shop_canTrade'))
 				{
