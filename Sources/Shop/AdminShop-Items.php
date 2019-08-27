@@ -380,7 +380,7 @@ class AdminShopItems extends AdminShop
 
 		if(!empty($module) && !empty($row)) {
 			// Open tha file
-			require_once($boarddir . Shop::$modulesdir . '/' . $context['shop_item']['name'] . '.php');
+			require_once($boarddir . Shop::$modulesdir . $context['shop_item']['name'] . '.php');
 			// Create an instance of the item
 			// TODO: Simplify this somehow?
 			eval('$tempItem = new item_' . $context['shop_item']['name'] . ';');
@@ -584,10 +584,10 @@ class AdminShopItems extends AdminShop
 		if(!empty($context['shop_item']['module']))
 		{
 			// Is the item still there?
-			if (!file_exists($boarddir . Shop::$modulesdir . '/' . $context['shop_item']['file'] . '.php'))
-				fatal_lang_error('Shop_item_no_module', false, array(Shop::$modulesdir . '/' . $context['shop_item']['file']));
+			if (!file_exists($boarddir . Shop::$modulesdir . $context['shop_item']['file'] . '.php'))
+				fatal_lang_error('Shop_item_no_module', false, array(Shop::$modulesdir . $context['shop_item']['file']));
 
-			require_once($boarddir . Shop::$modulesdir . '/' . $context['shop_item']['file'] . '.php');
+			require_once($boarddir . Shop::$modulesdir . $context['shop_item']['file'] . '.php');
 			// Create an instance of the item (it's used below)
 			eval('$tempItem = new item_' . $context['shop_item']['file'] . ';');
 			// Get the actual info

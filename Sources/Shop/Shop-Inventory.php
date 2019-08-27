@@ -622,7 +622,7 @@ class ShopInventory extends ShopHome
 		$item_info[4] = $item['info4'];
 
 		// Is the item still there?
-		if (!file_exists($boarddir . Shop::$modulesdir . '/' . $item['file'] . '.php'))
+		if (!file_exists($boarddir . Shop::$modulesdir . $item['file'] . '.php'))
 		{
 			// Update the item information
 			$smcFunc['db_query']('', '
@@ -639,7 +639,7 @@ class ShopInventory extends ShopHome
 		}
 
 		//... and the actual item.
-		require_once($boarddir . Shop::$modulesdir . '/' . $item['file'] . '.php');
+		require_once($boarddir . Shop::$modulesdir . $item['file'] . '.php');
 
 		// Create the item, ...
 		$context['shop']['use']['name'] = $item['name'];
@@ -710,7 +710,7 @@ class ShopInventory extends ShopHome
 		$item_info[4] = $item['info4'];
 
 		//... and the actual item.
-		require_once($boarddir . Shop::$modulesdir . '/' . $item['file'] . '.php');
+		require_once($boarddir . Shop::$modulesdir . $item['file'] . '.php');
 		$context['shop']['use']['name'] = $item['name'];
 
 		// Create the item, ...
