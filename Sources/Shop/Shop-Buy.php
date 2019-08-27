@@ -271,7 +271,7 @@ class ShopBuy extends ShopHome
 		// We need to find out the difference if there's not enough money
 		$notenough = ($row['price'] - $user_info['shopMoney']);
 		// How many of this item does the user own?
-		$limit = Shop_buyCheckLimit($id);
+		$limit = parent::CheckLimit($id);
 
 		// Is that id actually valid?
 		// Also, let's check if this "smart" guy is not trying to buy a disabled item
@@ -289,7 +289,7 @@ class ShopBuy extends ShopHome
 		// Proceed
 		else {
 			// Handle item purchase and money deduction and log it
-			Shop_logBuy($row['itemid'], $user_info['id'], $row['price']);
+			parent::logBuy($row['itemid'], $user_info['id'], $row['price']);
 			// Let's get out of here and later we'll show a nice message
 			redirectexit('action=shop;sa=buy3;id='. $id);
 		}
