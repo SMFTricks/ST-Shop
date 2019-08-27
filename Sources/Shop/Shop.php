@@ -736,7 +736,7 @@ class Shop
 			$context['itemOpt'] = 'width: 32px; height: 32px;';
 
 		// Item images...
-		$context['items_url'] = self::$itemsdir . '/';
+		$context['items_url'] = self::$itemsdir;
 
 		$formatname = '<img src="'. $boardurl . $context['items_url'] . $image. '" alt="'.$description.'" title="'.$description.'" style="'. $context['itemOpt']. ' vertical-align: middle;" />';
 		return $formatname;
