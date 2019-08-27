@@ -905,3 +905,13 @@
 
 		}
 	}
+	else
+	{
+		$smcFunc['db_query']('', '
+			DELETE FROM {db_prefix}scheduled_tasks
+			WHERE task = {string:name}',
+			array(
+				'name' => 'bank_interest',
+			)
+		);
+	}
