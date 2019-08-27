@@ -188,7 +188,7 @@ function template_Shop_invSearch()
 				<div id="membernameItemContainer"></div>
 				<span class="smalltext">', $txt['Shop_inventory_member_name_desc'], '</span>
 				<br /><br />
-				<input class="button_submit floatleft" type="submit" value="', $txt['search'], '" />
+				<input class="button floatleft" type="submit" value="', $txt['search'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 			</form>
 		</div>
@@ -234,7 +234,7 @@ function template_Shop_invTradeSet()
 				<br />
 				<span class="smalltext">', $txt['Shop_trade_cost_desc'], '</span>
 				<br /><br />
-				<input class="button_submit floatleft" type="submit" value="', $txt['Shop_item_trade_go'], '" />
+				<input class="button floatleft" type="submit" value="', $txt['Shop_item_trade_go'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 			</form>
 		</div>';
@@ -259,7 +259,7 @@ function template_Shop_invUseitem()
 			<form method="post" action="', $scripturl,'?action=shop;sa=invused;id=', $_REQUEST['id'], '">
 				', $txt['Shop_inventory_use_confirm'], '<br /><br />
 				', $context['shop']['use']['input'], '<br />
-				<input class="button_submit floatleft" type="submit" value="', $txt['Shop_item_useit'], '" />
+				<input class="button floatleft" type="submit" value="', $txt['Shop_item_useit'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 			</form>
 		</div>';
@@ -308,7 +308,7 @@ function template_Shop_mainBank()
 				', $modSettings['Shop_credits_prefix'], '&nbsp;<input class="input_text" type="number" min="1" name="amount" size="10" />&nbsp;', $modSettings['Shop_credits_suffix'], '
 
 				<br /><br />
-				<input class="button_submit floatleft" type="submit" value="', $txt['go'], '" />
+				<input class="button floatleft" type="submit" value="', $txt['go'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 			</form>
 		</div>';
@@ -385,7 +385,7 @@ function template_Shop_mainGift()
 			if ((isset($_REQUEST['sa']) && ($_REQUEST['sa'] != 'sendmoney')) && !empty($context['shop_user_items_list']) || (isset($_REQUEST['sa']) && ($_REQUEST['sa'] == 'sendmoney')))
 				echo '
 				<br />
-				<input class="button_submit floatleft" type="submit" value="', ($_REQUEST['sa'] == 'sendmoney') ? $context['shop']['send_money'] : $txt['Shop_gift_send_item'], '" />';
+				<input class="button floatleft" type="submit" value="', ($_REQUEST['sa'] == 'sendmoney') ? $context['shop']['send_money'] : $txt['Shop_gift_send_item'], '" />';
 	echo '
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 			</form>
@@ -668,7 +668,7 @@ function template_Shop_gamesPlay_below()
 	echo'
 				<br />
 				<form method="post" action="',$scripturl,'?action=shop;sa=games;play=', $_REQUEST['play'], ';do">
-					<input class="button_submit floatleft" type="submit" value="', ((isset($_REQUEST['do']) && isset($_REQUEST['play'])) ? $txt['Shop_games_again'] : $context['spin']), '" />
+					<input class="button floatleft" type="submit" value="', ((isset($_REQUEST['do']) && isset($_REQUEST['play'])) ? $txt['Shop_games_again'] : $context['spin']), '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 				</form>	
 				<br /><br />
