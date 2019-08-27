@@ -35,7 +35,7 @@ class item_StickyTopic extends itemTemplate
 	function getItemDetails()
 	{
 		$this->authorName = 'Diego Andr&eacute;s';
-		$this->authorWeb = 'http://www.smftricks.com/';
+		$this->authorWeb = 'https://www.smftricks.com/';
 		$this->authorEmail = 'admin@smftricks.com';
 
 		$this->name = 'Sticky Topic';

@@ -1,12 +1,12 @@
 <?php
 /**********************************************************************************
-* SMFShop item                                                                    *
+* ST Shop item                                                                    *
 ***********************************************************************************
-* SMFShop: Shop MOD for Simple Machines Forum                                     *
+* ST Shop: Shop MOD for Simple Machines Forum                                     *
 * =============================================================================== *
 * Software Version:           ST Shop 0.7                                         *
 * Software by:                SA Development (http://sleepy-arcade.ath.cx/)       *
-* Copyright 2005-2018 by:     wdm2005 (https://github.com/SAMods)                 *
+* Copyright 2005-2018 by:     Sleepy Arcade (https://github.com/SAMods)                 *
 * Support, News, Updates at:  https://github.com/SAMods                           *
 *                                                                                 *
 * Forum software by:          Simple Machines (http://www.simplemachines.org)     *
@@ -33,8 +33,8 @@ class item_GamesPass extends itemTemplate
 {
 	function getItemDetails()
 	{
-		$this->authorName = 'wdm2005';
-		$this->authorWeb = 'http://sleepy-arcade.ath.cx/';
+		$this->authorName = 'Sleepy Arcade';
+		$this->authorWeb = 'https://www.simplemachines.org/community/index.php?action=profile;u=84438';
 		$this->authorEmail = 'wdm2005@blueyonder.co.uk';
 
 		$this->name = 'Games Room Pass xxx days';
