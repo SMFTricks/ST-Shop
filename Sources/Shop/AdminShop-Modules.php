@@ -217,95 +217,101 @@ class AdminShopModules extends AdminShop
 
 		checkSession();
 
-		$uploadto = $boarddir . Shop::$modulesdir . '/';
-		$target_file = $uploadto . basename($_FILES['newitem']['name']);
-		$uploadOk = 1;
-		$filename = basename($_FILES['newitem']['name'], '.php');
-		$imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
+		$fail = true;
+		$filename = '';
+		$upload = false;
 
-		// Check if image file is a actual image or fake image
-		if (isset($_REQUEST['submit'])) {
-			$check = getimagesize($_FILES['newitem']['tmp_name']);
-			if($check !== false)
-				$uploadOk = 1;
-			else
-				$uploadOk = 0;
+		// Upload File Form
+		if (isset($_FILES['newitem']['name']) && $_FILES['newitem']['name'] != '') {
+			$filename = $_FILES['newitem']['name'];
+			$filesize = $_FILES['newitem']['size'];
+			$upload = true;
+			$fail = false;
 		}
-		// Allow certain file formats
-		if ($imageFileType != 'php') {
-			fatal_error($txt['Shop_file_error_type2'], false);
-			$uploadOk = 0;
-		}
-		// Check if file already exists
-		if (file_exists($target_file)) {
-			fatal_error($txt['Shop_file_already_exists'], false);
-			$uploadOk = 0;
-		}
-		// Check file size
-		if ($_FILES['newitem']['size'] > 500000) {
-			fatal_error($txt['Shop_file_too_large'], false);
-			$uploadOk = 0;
-		}
-		// Check if $uploadOk is set to 0 by an error
-		if ($uploadOk == 0)
-			redirectexit('action=admin;area=shopmodules;sa=uploadmodules;error');
-		else {
-			if (move_uploaded_file($_FILES['newitem']['tmp_name'], $target_file)) {
-				// Add the new information to the database
-				require_once($boarddir . Shop::$modulesdir . '/' . basename($_FILES['newitem']['name']));
-				// Create an instance of the item (it's used below)
-				$code = '
-					if (class_exists(\'item_' . $filename . '\')) {
-						$tempItem = new item_' . $filename . ';
-						return true;
+
+		if ($fail == false)
+		{
+			// Copy the file
+			$ext = pathinfo($filename, PATHINFO_EXTENSION);
+			$filename = str_replace(('.'.$ext), '', $filename);
+			$uploadto = $boarddir . Shop::$modulesdir;
+			$target_file = $uploadto . basename($_FILES['newitem']['name']);
+
+			// Allow certain file formats
+			if ($ext != 'php') {
+				fatal_error($txt['Shop_file_error_type2'], false);
+				$uploadOk = false;
+			}
+			// Check if file already exists
+			if (file_exists($target_file)) {
+				fatal_error($txt['Shop_file_already_exists'], false);
+				$upload = false;
+			}
+			// Check file size
+			if ($_FILES['newitem']['size'] > 500000) {
+				fatal_error($txt['Shop_file_too_large'], false);
+				$upload = false;
+			}
+
+			if ($upload == true)
+			{
+				if (move_uploaded_file($_FILES['newitem']['tmp_name'], $target_file))
+				{
+					// Add the new information to the database
+					require_once($boarddir . Shop::$modulesdir . basename($_FILES['newitem']['name']));
+					// Create an instance of the item (it's used below)
+					$code = '
+						if (class_exists(\'item_' . $filename . '\')) {
+							$tempItem = new item_' . $filename . ';
+							return true;
+						}
+						else
+							return false;';	
+					// If we could create an instance of the item...
+					if (eval($code) !== FALSE) {
+						// Get the actual info
+						$tempItem->getItemDetails();
+						// Insert the actual item
+						$smcFunc['db_insert']('',
+							'{db_prefix}shop_modules',
+							array(
+								'name' => 'string', 
+								'description' => 'string',
+								'price' => 'float',
+								'file' => 'string',
+								'author' => 'string',
+								'email' => 'string',
+								'web' => 'string',
+								'require_input' => 'int',
+								'can_use' => 'int',
+								'editable_input' => 'int',
+								),
+							array(
+								'name' => $tempItem->name, 
+								'description' => $tempItem->desc,
+								'price' => $tempItem->price,
+								'file' => $filename,
+								'author' => $tempItem->authorName,
+								'email' => $tempItem->authorEmail,
+								'web' => $tempItem->authorWeb,
+								'require_input' => (int) $tempItem->require_input,
+								'can_use' => (int) $tempItem->can_use_item,
+								'editable_input' => (int) $tempItem->addInput_editable,
+								),
+							array()
+						);
+						// Get me out of here
+						redirectexit('action=admin;area=shopmodules;sa=uploadmodules;success');
 					}
-					else
-						return false;';	
-				// If we could create an instance of the item...
-				if (eval($code) !== FALSE) {
-					// Get the actual info
-					$tempItem->getItemDetails();
-					// Insert the actual item
-					$smcFunc['db_insert']('',
-						'{db_prefix}shop_modules',
-						array(
-							'name' => 'string', 
-							'description' => 'string',
-							'price' => 'float',
-							'file' => 'string',
-							'author' => 'string',
-							'email' => 'string',
-							'web' => 'string',
-							'require_input' => 'int',
-							'can_use' => 'int',
-							'editable_input' => 'int',
-							),
-						array(
-							'name' => $tempItem->name, 
-							'description' => $tempItem->desc,
-							'price' => $tempItem->price,
-							'file' => $filename,
-							'author' => $tempItem->authorName,
-							'email' => $tempItem->authorEmail,
-							'web' => $tempItem->authorWeb,
-							'require_input' => (int) $tempItem->require_input,
-							'can_use' => (int) $tempItem->can_use_item,
-							'editable_input' => (int) $tempItem->addInput_editable,
-							),
-						array()
-					);
-					// Get me out of here
-					redirectexit('action=admin;area=shopmodules;sa=uploadmodules;success');
-				}
-				else {
-					unlink($boarddir . Shop::$modulesdir . '/' . basename($_FILES['newitem']['name']));
-					fatal_error($txt['Shop_modules_invalid'], false);
+					else {
+						unlink($boarddir . Shop::$modulesdir . basename($_FILES['newitem']['name']));
+						fatal_error($txt['Shop_modules_invalid'], false);
+					}
 				}
 			}
-			else
-				// No luck? Sorry...
-				redirectexit('action=admin;area=shopmodules;sa=uploadmodules;error');
 		}
+		else
+			redirectexit('action=admin;area=shopmodules;sa=uploadmodules;error');
 	}
 
 	public static function Delete()
@@ -397,7 +403,7 @@ class AdminShopModules extends AdminShop
 
 		// Delete files from directory
 		foreach ($_REQUEST['files'] as $key => $file) 
-			unlink($boarddir . Shop::$modulesdir . '/' . basename($file. '.php'));
+			unlink($boarddir . Shop::$modulesdir . basename($file. '.php'));
 
 		// Send the user to the items list with a message
 		redirectexit('action=admin;area=shopmodules;sa=index;deleted');
