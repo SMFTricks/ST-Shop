@@ -15,9 +15,9 @@ class Shop
 {
 	public static $name = 'Shop';
 	public static $txtpattern = 'Shop_';
-	public static $version = '3.1';
+	public static $version = '3.1.1';
 	public static $itemsdir = '/shop_items/items/';
-	public static $modulesdir = '/shop_items/modules';
+	public static $modulesdir = '/shop_items/modules/';
 	public static $gamesdir = '/shop_items/games';
 	public static $supportSite = 'https://smftricks.com/index.php?action=.xml;sa=news;board=51;limit=10;type=rss2';
 
