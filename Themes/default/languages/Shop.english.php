@@ -154,9 +154,11 @@ $txt['Shop_noty_trade_desc'] = 'Send an alert to the seller when his item on tra
 $txt['Shop_noty_credits'] = 'Notify credits received';
 $txt['Shop_noty_item'] = 'Notify credits received';
 $txt['alert_group_shop'] = 'Shop alerts';
-$txt['alert_shop_credits'] = 'When I receive '.$modSettings['Shop_credits_suffix'] . ' from someone';
-$txt['alert_shop_items'] = 'When I receive a shop gift from someone';
-$txt['alert_shop_traded'] = 'When someone purchased an item from my trades list';
+$txt['alert_shop_usercredits'] = 'When I receive '.$modSettings['Shop_credits_suffix'] . ' from someone';
+$txt['alert_shop_useritems'] = 'When I receive a shop gift from someone';
+$txt['alert_shop_usertraded'] = 'When someone purchased an item from my trades list';
+$txt['alert_shop_traded'] = '{member_link} has purchased your item {item_name} listed on the Trade Center';
+
 
 // Admin Items
 $txt['Shop_settings_profile'] = 'Posting and Profile';

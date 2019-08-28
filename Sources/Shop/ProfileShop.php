@@ -317,10 +317,10 @@ class ProfileShop
 		global $modSettings;
 
 		if (!empty($modSettings['Shop_noty_credits']))
-			$alert_types['shop']['shop_credits'] = array('alert' => 'yes', 'email' => 'never');
+			$alert_types['shop']['shop_usercredits'] = array('alert' => 'yes', 'email' => 'never');
 		if (!empty($modSettings['Shop_noty_items']))
-			$alert_types['shop']['shop_items'] = array('alert' => 'yes', 'email' => 'never');
+			$alert_types['shop']['shop_useritems'] = array('alert' => 'yes', 'email' => 'never');
 		if (!empty($modSettings['Shop_noty_trade']))
-			$alert_types['shop']{'shop_traded'} = array('alert' => 'yes', 'email' => 'never');
+			$alert_types['shop']{'shop_usertraded'} = array('alert' => 'yes', 'email' => 'never');
 	}
 }

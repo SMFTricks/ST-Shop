@@ -751,7 +751,7 @@ class ShopTrade extends ShopHome
 
 		// Get the item's information
 		$result = $smcFunc['db_query']('', '
-			SELECT p.id, p.itemid, p.trading, p.tradecost, p.userid, s.status, s.name, s.itemlimit
+			SELECT p.id, p.itemid, p.trading, p.tradecost, p.userid, s.status, s.name, s.itemlimit, s.image
 			FROM {db_prefix}shop_inventory AS p
 				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
 			WHERE p.id = {int:id} AND p.trading = 1 AND s.status = 1',
@@ -791,6 +791,9 @@ class ShopTrade extends ShopHome
 		parent::logBuy($row['itemid'], $user_info['id'], $row['tradecost'], $row['userid'], $fee, $row['id']);
 		// Send a PM to the seller saying that his item was successfully bought
 		self::sendPM($row['userid'], $row['name'], $row['tradecost'], $fee);
+		// Send an alert
+		if (!empty($modSettings['Shop_noty_trade']))
+			Shop::deployAlert($row['userid'], 'traded', $row['id'], '?action=shop;sa=tradelog', $row);
 		// Let's get out of here and later we'll show a nice message
 		redirectexit('action=shop;sa=trade3;id='. $id);
 	}
