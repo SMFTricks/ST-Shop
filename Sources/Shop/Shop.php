@@ -15,7 +15,7 @@ class Shop
 {
 	public static $name = 'Shop';
 	public static $txtpattern = 'Shop_';
-	public static $version = '3.1.2';
+	public static $version = '3.2';
 	public static $itemsdir = '/shop_items/items/';
 	public static $modulesdir = '/shop_items/modules/';
 	public static $gamesdir = '/shop_items/games';
@@ -45,6 +45,7 @@ class Shop
 			'Shop_credits_register' => 200,
 			'Shop_credits_topic' => 25,
 			'Shop_credits_post' => 10,
+			'Shop_credits_likes_post' => 0,
 			'Shop_credits_word' => 0,
 			'Shop_credits_character' => 0,
 			'Shop_credits_limit' => 0,
@@ -168,6 +169,7 @@ class Shop
 			'menu_buttons' => 'Shop::hookButtons',
 			'after_create_post' => 'Shop::afterPost',
 			//'remove_message' => 'Shop::removePost',
+			//'issue_like' => 'Shop::likePost',
 		);
 		foreach ($hooks as $point => $callable)
 			add_integration_function('integrate_' . $point, $callable, false);
@@ -193,6 +195,7 @@ class Shop
 			'member_context' => 'ProfileShop::Context',
 			'load_custom_profile_fields' => 'ProfileShop::CustomFields',
 			'register' => 'ProfileShop::Register',
+			'alert_types' => 'ProfileShop::alertTypes',
 		);
 		foreach ($hooks as $point => $callable)
 			add_integration_function('integrate_' . $point, $callable, false);
@@ -537,63 +540,123 @@ class Shop
 			$shop_info = $smcFunc['db_fetch_assoc']($result_shop);
 			$smcFunc['db_free_result']($result_shop);
 
-			$credits = !empty($shop_info['Shop_credits_post']) ? $shop_info['Shop_credits_post'] : $modSettings['Shop_credits_post'];
-			if (!empty($shop_info['Shop_credits_count']) && !empty($recycle))
+			// Credits enabled for this board?
+			if (!empty($shop_info['Shop_credits_count']))
 			{
-				$getMessage = $smcFunc['db_query']('', '
-					SELECT id_member, modified_time, body
-					FROM {db_prefix}messages
-					WHERE id_msg = {int:key}
+				$credits = !empty($shop_info['Shop_credits_post']) ? $shop_info['Shop_credits_post'] : $modSettings['Shop_credits_post'];
+				if (!empty($modSettings['search_custom_index_config']))
+					$deleted_message['body'] = $row['body'];
+				elseif (!empty($recycle))
+				{
+					$getMessage = $smcFunc['db_query']('', '
+						SELECT id_msg, body
+						FROM {db_prefix}messages
+						WHERE id_msg = {int:key}
+						LIMIT 1',
+						array(
+							'key' => $message,
+						)
+					);
+					$deleted_message = $smcFunc['db_fetch_assoc']($getMessage);
+					$smcFunc['db_free_result']($getMessage);
+				}
+				else
+					$deleted_message['body'] = '';
+				
+				// Bonus
+				$bonus = 0;
+				if (!empty($shop_info['Shop_credits_bonus']) && (($modSettings['Shop_credits_word'] > 0) || ($modSettings['Shop_credits_character'] > 0)))
+				{
+						// no, BBCCode won't count
+						$plaintext = preg_replace('[\[(.*?)\]]', ' ', $deleted_message['body']);
+						// convert newlines to spaces
+						$plaintext = str_replace(array('<br />', "\r", "\n"), ' ', $plaintext);
+						// convert multiple spaces into one
+						$plaintext = preg_replace('/\s+/', ' ', $plaintext);
+
+						// bonus for each word
+						$bonus += ($modSettings['Shop_credits_word'] * str_word_count($plaintext));
+						// and for each letter
+						$bonus += ($modSettings['Shop_credits_character'] * strlen($plaintext));
+						
+						// Limit?
+						if (isset($modSettings['Shop_credits_limit']) && $modSettings['Shop_credits_limit'] != 0 && $bonus > $modSettings['Shop_credits_limit'])
+							$bonus = $modSettings['Shop_credits_limit'];
+				}
+				// Credits + Bonus
+				$point = ($bonus + $credits);
+				// and finally, deduct credits
+				$result = $smcFunc['db_query']('','
+					UPDATE {db_prefix}members
+					SET shopMoney = shopMoney - {int:point}
+					WHERE id_member = {int:id_member}
 					LIMIT 1',
 					array(
-						'key' => $message,
+						'point' => $point,
+						'id_member' => $row['id_member'],
 					)
 				);
-				$deleted_message = $smcFunc['db_fetch_assoc']($getMessage);
-				$smcFunc['db_free_result']($getMessage);
-
-				// Check if it was edited
-				if (!empty($deleted_message['modified_time']))
-					$deleted_message['body'] = '';
 			}
-			elseif (!empty($shop_info['Shop_credits_count']) && !empty($modSettings['search_custom_index_config']) && empty($recycle))
-				$deleted_message['body'] = $row['body'];
-			else
-				$deleted_message['body'] = '';
-			
-			// Bonus
-			$bonus = 0;
-			if (!empty($shop_info['Shop_credits_bonus']) && (($modSettings['Shop_credits_word'] > 0) || ($modSettings['Shop_credits_character'] > 0)))
+		}
+	}
+
+	/**
+	 * Shop::likePost()
+	 *
+	 * Gives or removes points to author of the post for each like.
+	 * @param int $message id of the message
+	 * @return void
+	 */
+	public static function likePost($like_type, $like_content, $like_userid, $alreadyLiked, $validlikes)
+	{
+		global $smcFunc, $modSettings;
+
+		//Are we giving credits per like?
+		if (!empty($modSettings['Shop_credits_likes_post']))
+		{
+			// We are only interested in messages for now
+			if ($like_type == 'msg')
 			{
-					// no, BBCCode won't count
-					$plaintext = preg_replace('[\[(.*?)\]]', ' ', $deleted_message['body']);
-					// convert newlines to spaces
-					$plaintext = str_replace(array('<br />', "\r", "\n"), ' ', $plaintext);
-					// convert multiple spaces into one
-					$plaintext = preg_replace('/\s+/', ' ', $plaintext);
+				$msglikes = $smcFunc['db_query']('', '
+					SELECT id_member
+					FROM {db_prefix}messages
+					WHERE id_msg = {int:like}',
+					array(
+						'like' => $like_content,
+					)
+				);
+				$likedAuthor = $smcFunc['db_fetch_assoc']($msglikes);
+				$smcFunc['db_free_result']($msglikes);
 
-					// bonus for each word
-					$bonus += ($modSettings['Shop_credits_word'] * str_word_count($plaintext));
-					// and for each letter
-					$bonus += ($modSettings['Shop_credits_character'] * strlen($plaintext));
-					
-					// Limit?
-					if (isset($modSettings['Shop_credits_limit']) && $modSettings['Shop_credits_limit'] != 0 && $bonus > $modSettings['Shop_credits_limit'])
-						$bonus = $modSettings['Shop_credits_limit'];
+				// Like removed, points too!
+				if ($alreadyLiked)
+				{
+					$result = $smcFunc['db_query']('','
+						UPDATE {db_prefix}members
+						SET shopMoney = shopMoney - {int:likepost}
+						WHERE id_member = {int:id_member}
+						LIMIT 1',
+						array(
+							'likepost' => $modSettings['Shop_credits_likes_post'],
+							'id_member' => $likedAuthor['id_member'],
+						)
+					);
+				}
+				// Post liked, points delivered!
+				else
+				{
+					$result = $smcFunc['db_query']('','
+						UPDATE {db_prefix}members
+						SET shopMoney = shopMoney + {int:likepost}
+						WHERE id_member = {int:id_member}
+						LIMIT 1',
+						array(
+							'likepost' => $modSettings['Shop_credits_likes_post'],
+							'id_member' => $likedAuthor['id_member'],
+						)
+					);
+				}
 			}
-			// Credits + Bonus
-			$point = ($bonus + $credits);
-			// and finally, deduct credits
-			$result = $smcFunc['db_query']('','
-				UPDATE {db_prefix}members
-				SET shopMoney = shopMoney - {int:point}
-				WHERE id_member = {int:id_member}
-				LIMIT 1',
-				array(
-					'point' => $point,
-					'id_member' => $row['id_member'],
-				)
-			);
 		}
 	}
 
