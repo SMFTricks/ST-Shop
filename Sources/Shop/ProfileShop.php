@@ -311,4 +311,16 @@ class ProfileShop
 			'shopMoney' => $modSettings['Shop_credits_register'],
 		);
 	}
+
+	public static function alertTypes(&$alert_types, &$group_options)
+	{
+		global $modSettings;
+
+		if (!empty($modSettings['Shop_noty_credits']))
+			$alert_types['shop']['shop_credits'] = array('alert' => 'yes', 'email' => 'never');
+		if (!empty($modSettings['Shop_noty_items']))
+			$alert_types['shop']['shop_items'] = array('alert' => 'yes', 'email' => 'never');
+		if (!empty($modSettings['Shop_noty_trade']))
+			$alert_types['shop']{'shop_traded'} = array('alert' => 'yes', 'email' => 'never');
+	}
 }
