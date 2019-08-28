@@ -46,6 +46,7 @@ if (!defined('SMF'))
 						'credits' => array($txt['Shop_settings_credits']),
 						'permissions' => array($txt['Shop_settings_permissions']),
 						'profile' => array($txt['Shop_settings_profile']),
+						'notifications' => array($txt['Shop_settings_notifications']),
 					),
 				),
 				'shopitems' => array(

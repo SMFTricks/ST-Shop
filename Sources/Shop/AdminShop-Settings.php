@@ -22,6 +22,7 @@ class AdminShopSettings extends AdminShop
 			'credits' => 'AdminShopSettings::Credits',
 			'permissions' => 'AdminShopSettings::Perms',
 			'profile' => 'AdminShopSettings::Profile',
+			'notifications' => 'AdminShopSettings::Notifications',
 		);
 
 		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'general';
@@ -35,6 +36,7 @@ class AdminShopSettings extends AdminShop
 				'credits' => array('description' => $txt['Shop_settings_credits_desc']),
 				'permissions' => array('description' => $txt['Shop_settings_permissions_desc']),
 				'profile' => array('description' => $txt['Shop_settings_profile_desc']),
+				'notifications' => array('description' => $txt['Shop_settings_notifications_desc']),
 			),
 		);
 
@@ -127,6 +129,7 @@ class AdminShopSettings extends AdminShop
 			array('int', 'Shop_credits_register'),
 			array('int', 'Shop_credits_topic'),
 			array('int', 'Shop_credits_post'),
+			array('int', 'Shop_credits_likes_post'),
 			'',
 			array('int', 'Shop_credits_word'),
 			array('int', 'Shop_credits_character'),
@@ -259,5 +262,24 @@ class AdminShopSettings extends AdminShop
 		);
 
 		self::Save($config_vars, $return_config, 'profile');
+	}
+
+	public static function Notifications($return_config = false)
+	{
+		global $context, $scripturl, $sourcedir, $txt;
+
+		require_once($sourcedir . '/ManageServer.php');
+		loadTemplate('Admin');
+		$context['sub_template'] = 'show_settings';
+		$context['page_title'] = $txt['Shop_tab_settings']. ' - ' . $txt['Shop_settings_notifications'];
+		$context[$context['admin_menu_name']]['tab_data']['title'] = $context['page_title'];
+
+		$config_vars = array(
+			array('check', 'Shop_noty_trade', 'subtext' => $txt['Shop_noty_trade_desc']),
+			array('check', 'Shop_noty_credits'),
+			array('check', 'Shop_noty_item'),
+		);
+
+		self::Save($config_vars, $return_config, 'notifications');
 	}
 }
