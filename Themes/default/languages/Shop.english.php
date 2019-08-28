@@ -92,6 +92,7 @@ $txt['Shop_credits_register'] = 'Credits upon registration';
 $txt['Shop_credits_topic'] = 'Credits received per new topic';
 $txt['Shop_credits_post'] = 'Credits received per new post';
 $txt['Shop_credits_word'] = 'Credits received per word';
+$txt['Shop_credits_likes_post'] = 'Credits received per like on post';
 $txt['Shop_credits_character'] = 'Credits received per character';
 $txt['Shop_credits_limit'] = 'Limit of credits received in a post';
 $txt['Shop_credits_limit_desc'] = 'If you have set an amount per word or characters, here you can set the limit of credits that the user can receive.';
@@ -144,6 +145,18 @@ $txt['Shop_inventory_placement']  = 'Items inventory placement (posts)';
 $txt['Shop_inventory_allow_hide'] = 'Allow users to hide inventory';
 $txt['Shop_inventory_allow_hide_desc'] = 'User will be able to hide their inventory on posts and profile.';
 $txt['Shop_inventory_show_same_once'] = 'Show the same item only once';
+
+// Notifications
+$txt['Shop_settings_notifications'] = 'Notificacions';
+$txt['Shop_settings_notifications_desc'] = 'In this area to you activate alerts for the users on certain actions.';
+$txt['Shop_noty_trade'] = 'Notify successfull trade';
+$txt['Shop_noty_trade_desc'] = 'Send an alert to the seller when his item on trade was bought by someone.';
+$txt['Shop_noty_credits'] = 'Notify credits received';
+$txt['Shop_noty_item'] = 'Notify credits received';
+$txt['alert_group_shop'] = 'Shop alerts';
+$txt['alert_shop_credits'] = 'When I receive '.$modSettings['Shop_credits_suffix'] . ' from someone';
+$txt['alert_shop_items'] = 'When I receive a shop gift from someone';
+$txt['alert_shop_traded'] = 'When someone purchased an item from my trades list';
 
 // Admin Items
 $txt['Shop_settings_profile'] = 'Posting and Profile';
