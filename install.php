@@ -20,6 +20,40 @@
 
 	if (empty($context['uninstalling']))
 	{
+		// Enable the alert by default
+		$smcFunc['db_insert'](
+			'ignore',
+			'{db_prefix}user_alerts_prefs',
+			array(
+				'id_member' => 'int',
+				'alert_pref' => 'string',
+				'alert_value' => 'int',
+			),
+			array(
+				array(
+					0,
+					'shop_credits',
+					1,
+				),
+				array(
+					0,
+					'shop_items',
+					1,
+				),
+				array(
+					0,
+					'shop_traded',
+					1,
+				),
+				array(
+					0,
+					'shop_games',
+					1,
+				),
+			),
+			array('id_task')
+		);
+
 		// Scheduled Task
 		$smcFunc['db_insert'](
 			'ignore',
