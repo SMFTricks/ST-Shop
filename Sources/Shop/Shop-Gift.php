@@ -198,6 +198,9 @@ class ShopGift extends ShopHome
 				parent::logGift($user_info['id'], $memID, $message, 0, $row['itemid'], $row['id']);
 				// Send a PM to the user that its going to receive the item.
 				self::sendPM('item', $memID, $row['name'], '', $message);
+				// Send an alert
+				if (!empty($modSettings['Shop_noty_items']))
+					Shop::deployAlert($memID, 'items', $row['id'], '?action=shop;sa=inventory', $row);
 				// Let's get out of here and later we'll show a nice message
 				redirectexit('action=shop;sa=gift3;id='. $row['id']);
 			}
@@ -220,6 +223,9 @@ class ShopGift extends ShopHome
 				parent::logGift($user_info['id'], $memID, $message, $amount);
 				// Send a PM to the user that its going to receive the money.
 				self::sendPM('money', $memID, '', $amount, $message);
+				// Send an alert
+				if (!empty($modSettings['Shop_noty_credits']))
+					Shop::deployAlert($memID, 'credits', $user_info['id'], '?action=shop', array('amount' => $amount));
 				// Let's get out of here and later we'll show a nice message
 				redirectexit('action=shop;sa=gift3');
 			}
@@ -240,6 +246,7 @@ class ShopGift extends ShopHome
 
 		// Set all the page stuff
 		$context['page_title'] = $txt['Shop_main_button'] . ' - ' . $txt['Shop_shop_gift'];
+		$context['template_layers'][] = 'Shop_main';
 		$context['template_layers'][] = 'Shop_giftTabs';
 		$context['sub_template'] = 'Shop_giftSent';
 		$context['linktree'][] = array(

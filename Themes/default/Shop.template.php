@@ -230,10 +230,11 @@ function template_Shop_invTradeSet()
 			<form method="post" action="', $scripturl,'?action=shop;sa=invtrade2;id=', $_REQUEST['id'], '">
 				<input type="hidden" name="trade" value="', $_REQUEST['id'], '" />
 				', $txt['Shop_trade_cost'], '
-				&nbsp;<input class="input_text" type="text" name="tradecost" id="tradecost" size="20" />
+				&nbsp;<input class="input_text" type="number" name="tradecost" id="tradecost" size="20" />
 				<br />
 				<span class="smalltext">', $txt['Shop_trade_cost_desc'], '</span>
 				<br /><br />
+				<input class="button floatleft" type="button" value="', $txt['Shop_no_goback2'], '" onclick="window.location=\'', $scripturl, '?action=shop;area=inventory\'" />
 				<input class="button floatleft" type="submit" value="', $txt['Shop_item_trade_go'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 			</form>
@@ -489,7 +490,8 @@ function template_Shop_mainTrade_above()
 			<a class="button', (in_array($_REQUEST['sa'],$tab['action'])) ? ' active' : '', '" href="' , $scripturl . '?action=shop;sa=', $tab['action'][0], '">', $tab['label'], '</a>';
 	}
 	echo '
-	</div>';
+	</div>
+	<div class="clear"></div>';
 }
 
 function template_Shop_mainTrade_below(){}

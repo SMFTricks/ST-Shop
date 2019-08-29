@@ -152,12 +152,14 @@ $txt['Shop_settings_notifications_desc'] = 'In this area to you activate alerts 
 $txt['Shop_noty_trade'] = 'Notify successfull trade';
 $txt['Shop_noty_trade_desc'] = 'Send an alert to the seller when his item on trade was bought by someone.';
 $txt['Shop_noty_credits'] = 'Notify credits received';
-$txt['Shop_noty_item'] = 'Notify credits received';
+$txt['Shop_noty_items'] = 'Notify item/gift received';
 $txt['alert_group_shop'] = 'Shop alerts';
 $txt['alert_shop_usercredits'] = 'When I receive '.$modSettings['Shop_credits_suffix'] . ' from someone';
 $txt['alert_shop_useritems'] = 'When I receive a shop gift from someone';
 $txt['alert_shop_usertraded'] = 'When someone purchased an item from my trades list';
 $txt['alert_shop_traded'] = '{member_link} has purchased your item {item_name} listed on the Trade Center';
+$txt['alert_shop_credits'] = '{member_link} has sent you {amount}';
+$txt['alert_shop_items'] = '{member_link} has sent you a gift';
 
 
 // Admin Items
@@ -387,7 +389,6 @@ $txt['Shop_inventory_useritems_noitems'] = 'There are no items in the shop';
 $txt['Shop_inventory_useritems_nostock'] = 'No enough stock of this item for the number of selected users';
 $txt['Shop_useritems_sent'] = 'Selected item was successfully sent';
 
-
 // Files
 $txt['Shop_file_already_exists'] = 'Sorry, that file already exists.';
 $txt['Shop_file_error_type1'] = 'Sorry, only JPG, JPEG, PNG & GIF files are allowed.';
@@ -532,7 +533,7 @@ $txt['Shop_inventory_member_name'] = 'Member name:';
 $txt['Shop_inventory_member_name_desc'] = 'Type the name of the user you want to search.';
 $txt['Shop_inventory_member_find'] = 'Find members';
 $txt['Shop_inventory_viewing_who'] = 'Viewing %s\'s inventory';
-$txt['Shop_item_date'] = 'Bought on';
+$txt['Shop_item_date'] = 'Date';
 $txt['Shop_item_traded'] = 'The item was successfully added to the Trade Center.<br /> You will receive a personal message when someone buys it. You can also remove it from the Trade Center whenever you want.';
 
 // Bank

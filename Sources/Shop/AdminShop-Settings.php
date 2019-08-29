@@ -277,7 +277,7 @@ class AdminShopSettings extends AdminShop
 		$config_vars = array(
 			array('check', 'Shop_noty_trade', 'subtext' => $txt['Shop_noty_trade_desc']),
 			array('check', 'Shop_noty_credits'),
-			array('check', 'Shop_noty_item'),
+			array('check', 'Shop_noty_items'),
 		);
 
 		self::Save($config_vars, $return_config, 'notifications');

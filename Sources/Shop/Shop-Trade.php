@@ -1138,7 +1138,16 @@ class ShopTrade extends ShopHome
 							else
 								$fee = 0;
 
-							return Shop::formatCash($fee);
+							$sign ='';
+							$color = '';
+							// color it because it's bad?
+							if ($fee > 0)
+							{
+								$color = 'red';
+								$sign = '-';
+							}
+
+							return '<span'.(!empty($color) ? ' style="color: '.$color.'"' : '').'>'.$sign.Shop::formatCash($fee).'</span>';
 						},
 						'style' => 'width: 12%'
 					),
