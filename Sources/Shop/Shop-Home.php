@@ -176,6 +176,9 @@ class ShopHome
 			),
 		);
 
+		// Magic sections?
+		call_integration_hook('integrate_shop_home_actions', array(&$subactions));
+
 		if (isset($_REQUEST['sa']) && array_key_exists($_REQUEST['sa'], $subactions) && ($_REQUEST['sa'] != 'home')) {
 			$sa = $_REQUEST['sa'];
 			if (isset($subactions[$sa]['file']))
@@ -240,6 +243,8 @@ class ShopHome
 				'enable' => 'Shop_enable_stats'
 			),
 		);
+		// Magic tabs?
+		call_integration_hook('integrate_shop_home_tabs', array(&$context['shop_links']));
 		// Return the tabs
 		return $context['shop_links'];
 	}
