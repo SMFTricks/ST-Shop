@@ -69,7 +69,7 @@ class item_Steal extends itemTemplate
 					<span class="smalltext">'.$txt['Shop_steal_setting1_desc'].'</span>
 				</dt>
 				<dd>
-					<input class="input_text" type="number" min="1" max="100" id="info1" name="info1" value="' . $item_info[1] . '" />
+					<input class="input_text" type="number" min="1" id="info1" name="info1" value="' . $item_info[1] . '" />
 				</dd>
 				<dt>
 					'. $txt['Shop_steal_setting2']. '<br/>
