@@ -741,8 +741,10 @@ $txt['Shop_st_success'] = 'The topic <a href="'. $scripturl . '?topic=%1$d.0">%2
 // Steal
 $txt['Shop_steal_setting1'] = 'Probability of successful steal:';
 $txt['Shop_steal_setting1_desc'] = 'For steal, user does NOT need to, and shouldn\'t know the probability! It\'s more fun this way :-)';
-$txt['Shop_steal_setting2'] = 'Send notifications:';
-$txt['Shop_steal_setting2_desc'] = 'When a user gets robbed he will receive a notification informing him who robbed him and how much they stole from him.';
+$txt['Shop_steal_setting2'] = 'Send personal message:';
+$txt['Shop_steal_setting2_desc'] = 'When a user gets robbed he will receive a pm with information about who robbed him and how much they stole from him.';
+$txt['Shop_steal_setting3'] = 'Send alert:';
+$txt['Shop_steal_setting3_desc'] = 'When a user gets robbed he will receive an alert with information about who robbed him and how much they stole from him.';
 $txt['Shop_steal_from'] = 'Steal from:';
 $txt['Shop_steal_success1'] = 'You successfully stole from %2$s, although you only got %1$s!';
 $txt['Shop_steal_success2'] = 'You successfully stole %1$s from %2$s! It\'s their fault for not having the money in the bank!';
@@ -750,4 +752,5 @@ $txt['Shop_steal_error'] = 'Steal unsuccessful! Sorry, better luck next time.';
 $txt['Shop_steal_error_zero'] = 'That user is not carrying money on their pocket.';
 $txt['Shop_steal_error_yourself'] = 'What are you doing? You cannot steal from yourself.';
 $txt['Shop_steal_notification_robbed'] = 'You just got robbed!';
-$txt['Shop_steal_notification_message'] = 'We are sorry to inform you that you just have been robbed!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has stripped you of [i]%3$s[/i] from your pocket. You now have [i]%4$s[/i] remaining in your pocket.' . "\n\n" . ' Next time put your money safe in the Shop Bank.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
+$txt['Shop_steal_notification_pm'] = 'We are sorry to inform you that you just have been robbed!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has stripped you of [i]%3$s[/i] from your pocket. You now have [i]%4$s[/i] remaining in your pocket.' . "\n\n" . ' Next time put your money safe in the Shop Bank.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
+$txt['alert_shop_module_steal'] = '{member_link} just robbed you {amount} from your pocket!';

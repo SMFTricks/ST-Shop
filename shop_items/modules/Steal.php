@@ -55,9 +55,12 @@ class item_Steal extends itemTemplate
 		if (empty($item_info[1]) || !isset($item_info[1]))
 			$item_info[1] = 40;
 
-		// By default enabled
+		// By default disabled
 		if (empty($item_info[2]) || !isset($item_info[2]))
 			$item_info[2] = 0;
+		// By default disabled
+		if (empty($item_info[3]) || !isset($item_info[3]))
+			$item_info[3] = 0;
 
 		$info = '
 			<dl class="settings">
@@ -74,6 +77,13 @@ class item_Steal extends itemTemplate
 				</dt>
 				<dd>
 					<input class="input_check" type="checkbox" id="info2" name="info2" value="1"'. ($item_info[2] == 1 ? ' checked' : ''). ' />
+				</dd>
+				<dt>
+					'. $txt['Shop_steal_setting3']. '<br/>
+					<span class="smalltext">'.$txt['Shop_steal_setting3_desc'].'</span>
+				</dt>
+				<dd>
+					<input class="input_check" type="checkbox" id="info3" name="info3" value="1"'. ($item_info[3] == 1 ? ' checked' : ''). ' />
 				</dd>
 			</dl>';
 
@@ -110,7 +120,7 @@ class item_Steal extends itemTemplate
 
 	function onUse()
 	{
-		global $user_info, $item_info, $smcFunc, $txt;
+		global $user_info, $item_info, $smcFunc, $txt, $settings;
 
 		// By default 40
 		if (empty($item_info[1]) || !isset($item_info[1]))
@@ -193,6 +203,11 @@ class item_Steal extends itemTemplate
 			$final_value2 = $user_info['shopMoney'] + $steal_amount;
 			updateMemberData($user_info['id'], array('shopMoney' => $final_value2));
 
+			$extra_items = array(
+				'item_icon' => $settings['images_url'] . '/icons/shop/steal.png',
+				'amount' => Shop::formatCash($steal_amount),
+			);
+
 			// Now we are going to tell the user how much he got
 			if ($steal_amount < 200)
 				$info_result = '<div class="infobox">' . sprintf($txt['Shop_steal_success1'], Shop::formatCash($steal_amount), $memName) . '</div>';
@@ -200,9 +215,12 @@ class item_Steal extends itemTemplate
 			else
 				$info_result = '<div class="infobox">' . sprintf($txt['Shop_steal_success2'], Shop::formatCash($steal_amount), $memName) . '</div>';
 
-			// Notify the user
-			if ($item_info[2] == 1)
+			// Send PM
+			if (!empty($item_info[2]))
 				self::stealPM($memID, $steal_amount, $final_value1);
+			// Send Alert
+			if (!empty($item_info[3]))
+				Shop::deployAlert($memID, 'module_steal', $user_info['id'], '?action=shop', $extra_items, false);
 		}
 		else
 			$info_result = '<div class="errorbox">' . $txt['Shop_steal_error'] . '</div>';
@@ -231,7 +249,7 @@ class item_Steal extends itemTemplate
 		$subject = $txt['Shop_steal_notification_robbed'];
 
 		// The actual message
-		$message = sprintf($txt['Shop_steal_notification_message'], $user_info['id'], $user_info['name'], Shop::formatCash($steal_amount), Shop::formatCash($current_money));
+		$message = sprintf($txt['Shop_steal_notification_pm'], $user_info['id'], $user_info['name'], Shop::formatCash($steal_amount), Shop::formatCash($current_money));
 
 		// We need this file
 		require_once($sourcedir . '/Subs-Post.php');
