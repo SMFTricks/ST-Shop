@@ -722,7 +722,7 @@ class ShopTrade extends ShopHome
 
 	public static function Transaction()
 	{
-		global $smcFunc, $context, $user_info, $modSettings, $scripturl, $txt;
+		global $smcFunc, $context, $user_info, $modSettings, $scripturl, $txt, $boardurl, $settings;
 
 		// What if the Inventories are disabled?
 		if (empty($modSettings['Shop_enable_trade']))
@@ -765,6 +765,8 @@ class ShopTrade extends ShopHome
 		// How many of this item does the user own?
 		$limit = parent::CheckLimit($row['itemid']);
 
+		// Little array of info
+		$extra_items = array();
 		// Is that id actually valid?
 		// Also, let's check if this "smart" guy is not trying to buy a disabled item or an item that is not set for trading
 		if (empty($row))
@@ -782,7 +784,9 @@ class ShopTrade extends ShopHome
 			$notenough = ($row['tradecost'] - $user_info['shopMoney']);
 			fatal_lang_error('Shop_buy_item_notenough', false, array($modSettings['Shop_credits_suffix'], $row['name'], $notenough, $modSettings['Shop_credits_prefix']));
 		}
-
+		// Add more info
+		$extra_items['item_name'] = $row['name'];
+		$extra_items['item_icon'] = $boardurl . self::$itemsdir . $row['image'];
 		// The amount that the user received
 		$totalrec = (int) ($row['tradecost'] - (($row['tradecost'] * $modSettings['Shop_items_trade_fee'])/100));
 		// The actual fee he has to pay:
@@ -793,7 +797,7 @@ class ShopTrade extends ShopHome
 		self::sendPM($row['userid'], $row['name'], $row['tradecost'], $fee);
 		// Send an alert
 		if (!empty($modSettings['Shop_noty_trade']))
-			Shop::deployAlert($row['userid'], 'traded', $row['id'], '?action=shop;sa=tradelog', $row);
+			Shop::deployAlert($row['userid'], 'traded', $row['id'], '?action=shop;sa=tradelog', $extra_items);
 		// Let's get out of here and later we'll show a nice message
 		redirectexit('action=shop;sa=trade3;id='. $id);
 	}

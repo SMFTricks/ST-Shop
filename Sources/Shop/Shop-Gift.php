@@ -89,7 +89,7 @@ class ShopGift extends ShopHome
 
 	public static function Send()
 	{
-		global $smcFunc, $context, $user_info, $modSettings, $scripturl, $txt;
+		global $smcFunc, $context, $user_info, $modSettings, $scripturl, $txt, $settings;
 
 		// What if the Inventories are disabled?
 		if (empty($modSettings['Shop_enable_gift']))
@@ -168,7 +168,10 @@ class ShopGift extends ShopHome
 			fatal_error($txt['Shop_gift_not_yourself'], false);
 
 		// Did the user leave a message? Nice :)
-		$message = $_REQUEST['message'];
+		$message = $smcFunc['htmlspecialchars']($_REQUEST['message'], ENT_QUOTES);
+
+		// Little array of info
+		$extra_items = array();
 		
 		if (!isset($_REQUEST['money']) && isset($_REQUEST['item']))
 		{
@@ -190,17 +193,18 @@ class ShopGift extends ShopHome
 			// Is that id actually valid?
 			if (empty($row) || ($row['status'] == 0) || ($row['trading'] == 1))
 				fatal_error($txt['Shop_item_notfound'], false);
-			
 			// Proceed
 			else
 			{
+				// Add some info
+				$extra_items['item_icon'] = $settings['images_url'] . '/icons/shop/top_gifts_r.png';
 				// Send the gift and log the information
 				parent::logGift($user_info['id'], $memID, $message, 0, $row['itemid'], $row['id']);
 				// Send a PM to the user that its going to receive the item.
 				self::sendPM('item', $memID, $row['name'], '', $message);
 				// Send an alert
 				if (!empty($modSettings['Shop_noty_items']))
-					Shop::deployAlert($memID, 'items', $row['id'], '?action=shop;sa=inventory', $row);
+					Shop::deployAlert($memID, 'items', $row['id'], '?action=shop;sa=inventory', $extra_items);
 				// Let's get out of here and later we'll show a nice message
 				redirectexit('action=shop;sa=gift3;id='. $row['id']);
 			}
@@ -219,13 +223,16 @@ class ShopGift extends ShopHome
 			// Proceed
 			else
 			{
+				// Add some info
+				$extra_items['item_icon'] = $settings['images_url'] . '/icons/shop/top_money_r.png';
+				$extra_items['amount'] = Shop::formatCash($amount);
 				// Send the gift and log the information
 				parent::logGift($user_info['id'], $memID, $message, $amount);
 				// Send a PM to the user that its going to receive the money.
 				self::sendPM('money', $memID, '', $amount, $message);
 				// Send an alert
 				if (!empty($modSettings['Shop_noty_credits']))
-					Shop::deployAlert($memID, 'credits', $user_info['id'], '?action=shop', array('amount' => $amount));
+					Shop::deployAlert($memID, 'credits', $user_info['id'], '?action=shop', $extra_items);
 				// Let's get out of here and later we'll show a nice message
 				redirectexit('action=shop;sa=gift3');
 			}

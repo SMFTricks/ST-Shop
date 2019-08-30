@@ -15,7 +15,7 @@ class Shop
 {
 	public static $name = 'Shop';
 	public static $txtpattern = 'Shop_';
-	public static $version = '3.2';
+	public static $version = '3.2.1';
 	public static $itemsdir = '/shop_items/items/';
 	public static $modulesdir = '/shop_items/modules/';
 	public static $gamesdir = '/shop_items/games';
@@ -665,18 +665,21 @@ class Shop
 		}
 	}
 
-	public static function deployAlert($id_member, $type, $content_id, $link, $details = array())
+	public static function deployAlert($id_member, $type, $content_id, $link, $extra_items = array(), $ask = true)
 	{
-		global $smcFunc, $sourcedir, $user_info, $settings, $scripturl, $boardurl;
+		global $smcFunc, $sourcedir, $user_info, $scripturl;
 
-		// Check user preferences
-		require_once($sourcedir . '/Subs-Notify.php');
-		$prefs = getNotifyPrefs($id_member, 'shop_user'.$type, true);
+		// Should we ask the user?
+		if (!empty($ask))
+		{
+			// Check user preferences
+			require_once($sourcedir . '/Subs-Notify.php');
+			$prefs = getNotifyPrefs($id_member, 'shop_user'.$type, true);
 
-		// Send alert
-		// Check the value. If no value or it's empty, they didn't want alerts, oh well.
-		if (empty($prefs[$id_member]['shop_user'.$type]))
-			return true;
+			// Check the value. If no value or it's empty, they didn't want alerts, oh well.
+			if (empty($prefs[$id_member]['shop_user'.$type]))
+				return true;
+		}
 
 		$author = false;
 		// We need to figure out who the owner of this is.
@@ -725,28 +728,8 @@ class Shop
 			return true;
 		$smcFunc['db_free_result']($request);
 
-		$extra_items = array(
-			'shop_link' => $scripturl . $link,
-		);
-
-		// Add more items
-		switch ($type)
-		{
-			case 'traded':
-				$extra_items['item_name'] = $details['name'];
-				$extra_items['item_icon'] = $boardurl . self::$itemsdir . $details['image'];
-				break;
-			case 'credits':
-				$extra_items['item_icon'] = $settings['images_url'] . '/icons/shop/top_money_r.png';
-				$extra_items['amount'] = Shop::formatCash($details['amount']);
-				break;
-			case 'items':
-				$extra_items['item_icon'] = $settings['images_url'] . '/icons/shop/top_gifts_r.png';
-				break;
-		}
-
-		// Magic items?
-		call_integration_hook('integrate_shop_alerts', array(&$extra_items));
+		// Alert link
+		$extra_items['shop_link'] = $scripturl.$link;
 
 		// Issue, update, move on.
 		$smcFunc['db_insert']('insert',
@@ -788,11 +771,7 @@ class Shop
 	public static function fetchAlerts(&$alerts, &$formats)
 	{
 		foreach ($alerts as $alert_id => $alert)
-			if ($alert['content_type'] == 'shop' && $alert['content_action'] == 'traded')
-				$alerts[$alert_id]['icon'] = '<img class="alert_icon" style="width:16px;height:16px" src="'.$alert['extra']['item_icon'].'">';
-			elseif ($alert['content_type'] == 'shop' && $alert['content_action'] == 'credits')
-				$alerts[$alert_id]['icon'] = '<img class="alert_icon" src="'.$alert['extra']['item_icon'].'">';
-			elseif ($alert['content_type'] == 'shop' && $alert['content_action'] == 'items')
+			if ($alert['content_type'] == 'shop' && isset($alert['extra']['item_icon']))
 				$alerts[$alert_id]['icon'] = '<img class="alert_icon" src="'.$alert['extra']['item_icon'].'">';
 	}
 
