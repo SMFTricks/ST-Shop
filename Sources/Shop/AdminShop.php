@@ -137,6 +137,9 @@ if (!defined('SMF'))
 			),
 		);
 
+		// Add more items?
+		call_integration_hook('integrate_shop_admin_areas', array(&$admin_areas['shop']));
+
 		// Permissions
 		add_integration_function('integrate_load_permissions', 'AdminShop::Permissions', false);
 		add_integration_function('integrate_load_illegal_guest_permissions', 'AdminShop::IllegalPerms', false);
