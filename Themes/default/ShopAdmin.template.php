@@ -336,7 +336,7 @@ function template_Shop_items()
 			<span class="smalltext">', $txt['Shop_item_description_match'], '</span>
 			', $context['shop_item']['addInput'], '';
 
-		if (isset($context['shop_item']['can_use_item']) && !empty($context['shop_item_']['can_use_item']))
+		if (isset($context['shop_item']['can_use_item']) && !empty($context['shop_item']['can_use_item']))
 		echo '
 			<dl class="settings">
 				<dt>
