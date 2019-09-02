@@ -42,5 +42,5 @@
 * You can install ST Shop through the package manager of your forum administration.
 
 ## Changelog
-You can find the changelog for Simple Pokes on SMF Tricks: [Changelog](https://smftricks.com/index.php?board=51.0)
+You can find the changelog for ST Shop on SMF Tricks: [Changelog](https://smftricks.com/index.php?board=51.0)
 
