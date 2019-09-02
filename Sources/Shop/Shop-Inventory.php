@@ -712,6 +712,7 @@ class ShopInventory extends ShopHome
 		//... and the actual item.
 		require_once($boarddir . Shop::$modulesdir . $item['file'] . '.php');
 		$context['shop']['use']['name'] = $item['name'];
+		$context['shop']['use']['id'] = $item['itemid'];
 
 		// Create the item, ...
 		eval('$temp = new item_' . $item['file'] . ';');
