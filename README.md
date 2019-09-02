@@ -3,7 +3,7 @@
  </p>
  
 ## ST Shop for SMF
-- Developed by Diego Andrés: https://github.com/Daniel15
+- Developed by Diego Andrés: https://github.com/DiegoAndresCortes
 - Original developer: Sleepy Arcade™: https://github.com/SAMods
 - Original idea: Daniel15: https://github.com/Daniel15
 
