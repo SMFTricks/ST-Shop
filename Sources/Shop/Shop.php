@@ -15,7 +15,7 @@ class Shop
 {
 	public static $name = 'Shop';
 	public static $txtpattern = 'Shop_';
-	public static $version = '3.2.1';
+	public static $version = '3.2.3';
 	public static $itemsdir = '/shop_items/items/';
 	public static $modulesdir = '/shop_items/modules/';
 	public static $gamesdir = '/shop_items/games';
@@ -799,35 +799,6 @@ class Shop
 					'interest' => ($modSettings['Shop_bank_interest'] / 100),
 					'yesterday' => $yesterday,
 				)
-			);
-
-			// ID of the task
-			$query = $smcFunc['db_query']('', '
-				SELECT s.id_task, s.task
-				FROM {db_prefix}scheduled_tasks AS s
-				WHERE s.task = {string:task}',
-				array(
-					'task' => 'bank_interest'
-				)
-			);
-			$row = $smcFunc['db_fetch_assoc']($query);
-			$smcFunc['db_free_result']($query);
-
-			// Log the task
-			$total_time = round(array_sum(explode(' ', microtime())) - array_sum(explode(' ', time())), 3);
-			$smcFunc['db_insert']('',
-				'{db_prefix}log_scheduled_tasks',
-				array(
-					'id_task' => 'int',
-					'time_run' => 'int',
-					'time_taken' => 'float',
-				),
-				array(
-					$row['id_task'],
-					time(),
-					(int) $total_time,
-				),
-				array()
 			);
 		}
 	}
