@@ -3,9 +3,9 @@
  </p>
  
 ## ST Shop for SMF
-- Developed by Diego Andrés: https://github.com/DiegoAndresCortes
-- Original developer: Sleepy Arcade™: https://github.com/SAMods
-- Original idea: Daniel15: https://github.com/Daniel15
+- Developed by [Diego Andrés](https://github.com/DiegoAndresCortes)
+- Original developer: [Sleepy Arcade™](https://github.com/SAMods)
+- Original idea: [Daniel15](https://github.com/Daniel15)
 
 ## Introduction
 * ST Shop allows you to add a shop to your forum and gives you a wide variety of options to customize your shop for your users experience.
@@ -40,3 +40,7 @@
 
 ## How to install
 * You can install ST Shop through the package manager of your forum administration.
+
+## Changelog
+You can find the changelog for Simple Pokes on SMF Tricks: [Changelog](https://smftricks.com/index.php?board=51.0)
+
