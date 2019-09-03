@@ -138,7 +138,7 @@ if (!defined('SMF'))
 		);
 
 		// Add more items?
-		call_integration_hook('integrate_shop_admin_areas', array(&$admin_areas['shop']));
+		call_integration_hook('integrate_shop_admin_areas', array(&$admin_areas['shop']['areas']));
 
 		// Permissions
 		add_integration_function('integrate_load_permissions', 'AdminShop::Permissions', false);
@@ -218,12 +218,15 @@ if (!defined('SMF'))
 	{
 		global $boards;
 
-		$boards[$row['id_board']] += array(
-			'Shop_credits_count' => $row['Shop_credits_count'],
-			'Shop_credits_topic' => $row['Shop_credits_topic'],
-			'Shop_credits_post' => $row['Shop_credits_post'],
-			'Shop_credits_bonus' => $row['Shop_credits_bonus'],
-		);
+		if (!empty($row['id_board']))
+		{
+			$boards[$row['id_board']] += array(
+				'Shop_credits_count' => $row['Shop_credits_count'],
+				'Shop_credits_topic' => $row['Shop_credits_topic'],
+				'Shop_credits_post' => $row['Shop_credits_post'],
+				'Shop_credits_bonus' => $row['Shop_credits_bonus'],
+			);
+		}
 	}
 
 	public static function boardEdit()
