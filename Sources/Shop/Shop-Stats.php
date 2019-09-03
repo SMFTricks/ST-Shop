@@ -11,7 +11,7 @@
 if (!defined('SMF'))
 	die('No direct access...');
 
-class ShopStats extends ShopHome
+class ShopStats
 {
 	public static function Main()
 	{
@@ -116,7 +116,7 @@ class ShopStats extends ShopHome
 		call_integration_hook('integrate_shop_stats', array(&$context['stats_blocks']));
 	}
 
-	public static function Richest($type = 'pocket')
+	public static function Richest($type = 'pocket', $limit = 5)
 	{
 		global $smcFunc, $context, $scripturl, $modSettings;
 
@@ -128,8 +128,9 @@ class ShopStats extends ShopHome
 				FROM {db_prefix}members AS m
 				WHERE'. ($type == 'bank' ? ' m.shopBank' : ' m.shopMoney'). ' > {int:money}
 				ORDER BY'. ($type == 'bank' ? ' m.shopBank' : ' m.shopMoney'). ' DESC
-				LIMIT 5',
+				LIMIT {int:limit}',
 				array(
+					'limit' => $limit,
 					'money' => 0,
 				)
 			);
@@ -161,7 +162,7 @@ class ShopStats extends ShopHome
 		return $context['shop_stats']['richest' . ($type == 'bank' ? '_bank' : '_pocket')];
 	}
 
-	public static function LastItems()
+	public static function LastItems($limit = 5)
 	{
 		global $smcFunc, $context;
 
@@ -171,8 +172,10 @@ class ShopStats extends ShopHome
 				FROM {db_prefix}shop_items
 				WHERE status = 1
 				ORDER BY itemid DESC
-				LIMIT 5',
-				array()
+				LIMIT {int:limit}',
+				array(
+					'limit' => $limit,
+				)
 			);
 			$context['shop_stats']['last_added'] = array();
 			while ($row_items = $smcFunc['db_fetch_assoc']($items_result))
@@ -188,7 +191,7 @@ class ShopStats extends ShopHome
 		return $context['shop_stats']['last_added'];
 	}
 
-	public static function LastBought()
+	public static function LastBought($limit = 5)
 	{
 		global $smcFunc, $context, $modSettings;
 
@@ -201,8 +204,9 @@ class ShopStats extends ShopHome
 				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = l.itemid)
 				WHERE s.status = 1
 				ORDER BY l.id DESC
-				LIMIT 5',
+				LIMIT {int:limit}',
 				array(
+					'limit' => $limit,
 				)
 			);
 			$context['shop_stats']['last_bought'] = array();
@@ -222,7 +226,7 @@ class ShopStats extends ShopHome
 		return $context['shop_stats']['last_bought'];
 	}
 
-	public static function MostBought()
+	public static function MostBought($limit = 5)
 	{
 		global $smcFunc, $context, $scripturl, $modSettings;
 
@@ -236,8 +240,9 @@ class ShopStats extends ShopHome
 				WHERE s.status = 1
 				GROUP BY l.itemid, s.name, s.image, s.status
 				ORDER BY count DESC
-				LIMIT 5',
+				LIMIT {int:limit}',
 				array(
+					'limit' => $limit,
 				)
 			);
 
@@ -269,7 +274,7 @@ class ShopStats extends ShopHome
 		return $context['shop_stats']['most_bought'];
 	}
 
-	public static function TopCats()
+	public static function TopCats($limit = 5)
 	{
 		global $smcFunc, $context, $modSettings;
 
@@ -283,8 +288,9 @@ class ShopStats extends ShopHome
 				WHERE s.catid <> 0 AND s.status = 1
 				GROUP BY s.catid, s.status, c.name, c.image
 				ORDER BY count DESC
-				LIMIT 5',
+				LIMIT {int:limit}',
 				array(
+					'limit' => $limit,
 				)
 			);
 
@@ -316,7 +322,7 @@ class ShopStats extends ShopHome
 		return $context['shop_stats']['top_cats'];
 	}
 
-	public static function TopBuyers()
+	public static function TopBuyers($limit = 5)
 	{
 		global $smcFunc, $context, $scripturl, $modSettings;
 
@@ -331,8 +337,9 @@ class ShopStats extends ShopHome
 				WHERE s.status = 1
 				GROUP BY l.userid, m.real_name, s.status
 				ORDER BY count DESC
-				LIMIT 5',
+				LIMIT {int:limit}',
 				array(
+					'limit' => $limit,
 				)
 			);
 
@@ -364,7 +371,7 @@ class ShopStats extends ShopHome
 		return $context['shop_stats']['top_buyers'];
 	}
 
-	public static function TopInventories()
+	public static function TopInventories($limit = 5)
 	{
 		global $smcFunc, $context, $scripturl, $modSettings;
 
@@ -379,8 +386,9 @@ class ShopStats extends ShopHome
 				WHERE s.status = 1 AND inv.trading = 0
 				GROUP BY inv.userid, inv.trading, s.status, m.real_name
 				ORDER BY count DESC
-				LIMIT 5',
+				LIMIT {int:limit}',
 				array(
+					'limit' => $limit,
 				)
 			);
 
@@ -412,7 +420,7 @@ class ShopStats extends ShopHome
 		return $context['shop_stats']['top_inventories'];
 	}
 
-	public static function TopGifts($type = NULL)
+	public static function TopGifts($type = NULL, $limit = 5)
 	{
 		global $smcFunc, $context, $scripturl, $modSettings;
 
@@ -427,8 +435,9 @@ class ShopStats extends ShopHome
 				WHERE s.status = 1 AND l.amount = 0 AND l.is_admin = 0
 				GROUP BY '.($type == 'received' ? 'l.receiver' : 'l.userid').', l.amount, l.is_admin, m.real_name, s.status
 				ORDER BY count DESC
-				LIMIT 5',
+				LIMIT {int:limit}',
 				array(
+					'limit' => $limit,
 				)
 			);
 
@@ -460,7 +469,7 @@ class ShopStats extends ShopHome
 		return $context['shop_stats']['top_gifts'];
 	}
 
-	public static function TopMoney($type = NULL)
+	public static function TopMoney($type = NULL, $limit = 5)
 	{
 		global $smcFunc, $context, $scripturl, $modSettings;
 
@@ -474,8 +483,9 @@ class ShopStats extends ShopHome
 				WHERE l.itemid = 0 AND l.is_admin = 0
 				GROUP BY '.($type == 'received' ? 'l.receiver' : 'l.userid').', l.itemid, l.is_admin, m.real_name
 				ORDER BY count DESC
-				LIMIT 5',
+				LIMIT {int:limit}',
 				array(
+					'limit' => $limit,
 				)
 			);
 
@@ -507,7 +517,7 @@ class ShopStats extends ShopHome
 		return $context['shop_stats']['top_money'];
 	}
 
-	public static function TopProfit()
+	public static function TopProfit($limit = 5)
 	{
 		global $smcFunc, $context, $scripturl, $modSettings;
 
@@ -522,8 +532,9 @@ class ShopStats extends ShopHome
 				WHERE s.status = 1 AND l.sellerid <> 0
 				GROUP BY l.sellerid, m.real_name, s.status
 				ORDER BY count DESC
-				LIMIT 5',
+				LIMIT {int:limit}',
 				array(
+					'limit' => $limit,
 				)
 			);
 
@@ -555,7 +566,7 @@ class ShopStats extends ShopHome
 		return $context['shop_stats']['top_profit'];
 	}
 
-	public static function TopSpent()
+	public static function TopSpent($limit = 5)
 	{
 		global $smcFunc, $context, $scripturl, $modSettings;
 
@@ -570,8 +581,9 @@ class ShopStats extends ShopHome
 				WHERE s.status = 1 AND l.sellerid <> 0
 				GROUP BY l.userid, l.sellerid, m.real_name, s.status
 				ORDER BY count DESC
-				LIMIT 5',
+				LIMIT {int:limit}',
 				array(
+					'limit' => $limit,
 				)
 			);
 
@@ -603,7 +615,7 @@ class ShopStats extends ShopHome
 		return $context['shop_stats']['top_spent'];
 	}
 
-	public static function MostTraded()
+	public static function MostTraded($limit = 5)
 	{
 		global $smcFunc, $context, $scripturl, $modSettings;
 
@@ -617,8 +629,9 @@ class ShopStats extends ShopHome
 				WHERE l.sellerid <> 0 AND s.status = 1 
 				GROUP BY l.itemid, s.name, s.image, s.status
 				ORDER BY count DESC
-				LIMIT 5',
+				LIMIT {int:limit}',
 				array(
+					'limit' => $limit,
 				)
 			);
 
@@ -650,7 +663,7 @@ class ShopStats extends ShopHome
 		return $context['shop_stats']['most_traded'];
 	}
 
-	public static function MostExpensive()
+	public static function MostExpensive($limit = 5)
 	{
 		global $smcFunc, $context, $scripturl, $modSettings;
 
@@ -663,8 +676,9 @@ class ShopStats extends ShopHome
 				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = l.itemid)
 				WHERE l.sellerid <> 0 AND s.status = 1 
 				ORDER BY l.amount DESC
-				LIMIT 5',
+				LIMIT {int:limit}',
 				array(
+					'limit' => $limit,
 				)
 			);
 
