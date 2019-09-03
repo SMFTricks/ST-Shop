@@ -412,7 +412,7 @@ if (!defined('SMF'))
 		// Get a list of all the item
 		$result = $smcFunc['db_query']('', '
 			SELECT s.name, s.catid, s.image, s.description, s.status
-			FROM {db_prefix}Shop_categories AS s
+			FROM {db_prefix}shop_categories AS s
 			ORDER by {raw:sort}
 			LIMIT {int:start}, {int:maxindex}',
 			array(
