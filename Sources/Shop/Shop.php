@@ -15,7 +15,7 @@ class Shop
 {
 	public static $name = 'Shop';
 	public static $txtpattern = 'Shop_';
-	public static $version = '3.2.5';
+	public static $version = '3.2.4';
 	public static $itemsdir = '/shop_items/items/';
 	public static $modulesdir = '/shop_items/modules/';
 	public static $gamesdir = '/shop_items/games';
@@ -1096,7 +1096,7 @@ class Shop
 
 		require_once($sourcedir . '/Class-CurlFetchWeb.php');
 		$fetch = new \curl_fetch_web_data();
-		$fetch->get_url_data(Shop::$supportSite);
+		$fetch->get_url_data(self::$supportSite);
 		if ($fetch->result('code') == 200 && !$fetch->result('error'))
 			$data = $fetch->result('body');
 		else
