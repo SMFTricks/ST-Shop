@@ -1,4 +1,4 @@
-[center][url=https://smftricks.com][img]http://smftricks.com/logos/logo.png[/img][/url][/center]
+[center][url=https://smftricks.com][img]https://smftricks.com/logos/logo.png[/img][/url][/center]
 
 [center][size=14pt]ST Shop for SMF[/size][/center]
 
