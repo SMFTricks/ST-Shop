@@ -129,7 +129,7 @@ class AdminShopSettings extends AdminShop
 			array('int', 'Shop_credits_register'),
 			array('int', 'Shop_credits_topic'),
 			array('int', 'Shop_credits_post'),
-			array('int', 'Shop_credits_likes_post'),
+			//array('int', 'Shop_credits_likes_post'),
 			'',
 			array('int', 'Shop_credits_word'),
 			array('int', 'Shop_credits_character'),

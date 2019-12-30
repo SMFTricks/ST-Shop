@@ -45,7 +45,7 @@ class Shop
 			'Shop_credits_register' => 200,
 			'Shop_credits_topic' => 25,
 			'Shop_credits_post' => 10,
-			'Shop_credits_likes_post' => 0,
+			//'Shop_credits_likes_post' => 0,
 			'Shop_credits_word' => 0,
 			'Shop_credits_character' => 0,
 			'Shop_credits_limit' => 0,
@@ -612,7 +612,7 @@ class Shop
 	 * @param int $message id of the message
 	 * @return void
 	 */
-	public static function likePost($like_type, $like_content, $like_userid, $alreadyLiked, $validlikes)
+	/*public static function likePost($like_type, $like_content, $like_userid, $alreadyLiked, $validlikes)
 	{
 		global $smcFunc, $modSettings;
 
@@ -663,7 +663,7 @@ class Shop
 				}
 			}
 		}
-	}
+	}*/
 
 	public static function deployAlert($id_member, $type, $content_id, $link, $extra_items = array(), $ask = true)
 	{
