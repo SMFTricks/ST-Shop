@@ -328,8 +328,8 @@ if (!defined('SMF'))
 								text: item.find("title").text(),
 								href: item.find("link").attr("href")
 							}),
-							parsedTime = new Date(item.find("pubDate").text().replace("T", " ").split("+")[0]),
-							updated = $("<span />").text( parsedTime.toDateString()),
+							parsedTime = item.find("pubDate").text(),
+							updated = $("<span />").text( parsedTime),
 							content = $("<div/>").html(item.find("description")).text(),
 							dt = $("<dt />").html(title),
 							dd = $("<dd />").html(content);
