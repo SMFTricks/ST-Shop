@@ -629,8 +629,7 @@ class ShopInventory extends ShopHome
 				UPDATE {db_prefix}shop_items
 				SET
 					status = 0
-				WHERE itemid = {int:id}
-				LIMIT 1',
+				WHERE itemid = {int:id}',
 				array(
 					'id' => $item['itemid'],
 				)
@@ -723,8 +722,7 @@ class ShopInventory extends ShopHome
 		{
 			$smcFunc['db_query']('', '
 				DELETE FROM {db_prefix}shop_inventory
-				WHERE id = {int:id}
-				LIMIT 1',
+				WHERE id = {int:id}',
 				array(
 					'id' => $use,
 				)

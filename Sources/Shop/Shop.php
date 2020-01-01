@@ -15,7 +15,7 @@ class Shop
 {
 	public static $name = 'Shop';
 	public static $txtpattern = 'Shop_';
-	public static $version = '3.2.4';
+	public static $version = '3.2.5.1';
 	public static $itemsdir = '/shop_items/items/';
 	public static $modulesdir = '/shop_items/modules/';
 	public static $gamesdir = '/shop_items/games';
@@ -467,8 +467,7 @@ class Shop
 			$result_shop = $smcFunc['db_query']('', '
 				SELECT Shop_credits_count, Shop_credits_topic, Shop_credits_post, Shop_credits_bonus
 				FROM {db_prefix}boards
-				WHERE id_board = {int:key}
-				LIMIT 1',
+				WHERE id_board = {int:key}',
 				array(
 					'key' => $topicOptions['board'],
 				)
@@ -509,8 +508,7 @@ class Shop
 				$result = $smcFunc['db_query']('','
 					UPDATE {db_prefix}members
 					SET shopMoney = shopMoney + {int:point}
-					WHERE id_member = {int:id_member}
-					LIMIT 1',
+					WHERE id_member = {int:id_member}',
 					array(
 						'point' => $point,
 						'id_member' => $posterOptions['id']
@@ -536,8 +534,7 @@ class Shop
 			$result_shop = $smcFunc['db_query']('', '
 				SELECT Shop_credits_count, Shop_credits_topic, Shop_credits_post, Shop_credits_bonus
 				FROM {db_prefix}boards
-				WHERE id_board = {int:key}
-				LIMIT 1',
+				WHERE id_board = {int:key}',
 				array(
 					'key' => $board_info['id'],
 				)
@@ -556,8 +553,7 @@ class Shop
 					$getMessage = $smcFunc['db_query']('', '
 						SELECT id_msg, body
 						FROM {db_prefix}messages
-						WHERE id_msg = {int:key}
-						LIMIT 1',
+						WHERE id_msg = {int:key}',
 						array(
 							'key' => $message,
 						)
@@ -594,8 +590,7 @@ class Shop
 				$result = $smcFunc['db_query']('','
 					UPDATE {db_prefix}members
 					SET shopMoney = shopMoney - {int:point}
-					WHERE id_member = {int:id_member}
-					LIMIT 1',
+					WHERE id_member = {int:id_member}',
 					array(
 						'point' => $point,
 						'id_member' => $row['id_member'],
@@ -639,8 +634,7 @@ class Shop
 					$result = $smcFunc['db_query']('','
 						UPDATE {db_prefix}members
 						SET shopMoney = shopMoney - {int:likepost}
-						WHERE id_member = {int:id_member}
-						LIMIT 1',
+						WHERE id_member = {int:id_member}',
 						array(
 							'likepost' => $modSettings['Shop_credits_likes_post'],
 							'id_member' => $likedAuthor['id_member'],
@@ -653,8 +647,7 @@ class Shop
 					$result = $smcFunc['db_query']('','
 						UPDATE {db_prefix}members
 						SET shopMoney = shopMoney + {int:likepost}
-						WHERE id_member = {int:id_member}
-						LIMIT 1',
+						WHERE id_member = {int:id_member}',
 						array(
 							'likepost' => $modSettings['Shop_credits_likes_post'],
 							'id_member' => $likedAuthor['id_member'],
@@ -686,8 +679,7 @@ class Shop
 		$request = $smcFunc['db_query']('', '
 			SELECT mem.id_member, mem.pm_ignore_list
 			FROM {db_prefix}members AS mem
-			WHERE mem.id_member = {int:user}
-			LIMIT 1',
+			WHERE mem.id_member = {int:user}',
 			array(
 				'user' => $id_member,
 			)

@@ -665,8 +665,7 @@ class AdminShopItems extends AdminShop
 				info2 = {int:info2},
 				info3 = {int:info3},
 				info4 = {int:info4}
-			WHERE itemid = {int:id}
-			LIMIT 1',
+			WHERE itemid = {int:id}',
 			array(
 				'name' => $smcFunc['htmlspecialchars']($_REQUEST['itemname'], ENT_QUOTES),
 				'description' => $smcFunc['htmlspecialchars']($_REQUEST['itemdesc'], ENT_QUOTES),

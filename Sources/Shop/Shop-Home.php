@@ -604,8 +604,7 @@ class ShopHome
 		$result = $smcFunc['db_query']('', '
 			SELECT name
 			FROM {db_prefix}shop_items
-			WHERE itemid = {int:id} AND status = 1
-			LIMIT 1',
+			WHERE itemid = {int:id} AND status = 1',
 			array(
 				'id' => $itemid
 			)
