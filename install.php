@@ -673,7 +673,7 @@
 			'{db_prefix}members', 
 			array(
 				'name' => 'shopBank',
-				'type' => 'int',
+				'type' => 'bigint',
 				'default' => 0,
 			)
 		);
