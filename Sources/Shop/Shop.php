@@ -15,7 +15,7 @@ class Shop
 {
 	public static $name = 'Shop';
 	public static $txtpattern = 'Shop_';
-	public static $version = '3.2.5.1';
+	public static $version = '3.2.6';
 	public static $itemsdir = '/shop_items/items/';
 	public static $modulesdir = '/shop_items/modules/';
 	public static $gamesdir = '/shop_items/games';
