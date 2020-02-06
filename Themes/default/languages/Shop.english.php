@@ -481,10 +481,10 @@ $txt['Shop_buy_item_who_this'] = 'Who owns this';
 $txt['Shop_whohas_desc'] = 'On this page you can see a list of every user that own the item <i>%s</i> and how many they have.';
 
 // Posting
-$txt['Shop_posting_credits_pocket'] = $modSettings['Shop_credits_suffix'];
-$txt['Shop_posting_credits_bank'] = 'Bank ' . $modSettings['Shop_credits_suffix'];
-$txt['Shop_posting_credits_pocket2'] = ' ' . $modSettings['Shop_credits_suffix'];
-$txt['Shop_posting_credits_bank2'] = ' ' . $modSettings['Shop_credits_suffix'] . ' in bank';
+$txt['Shop_posting_credits_pocket'] = !empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits';
+$txt['Shop_posting_credits_bank'] = 'Bank ' . !empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits';
+$txt['Shop_posting_credits_pocket2'] = ' ' . !empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits';
+$txt['Shop_posting_credits_bank2'] = ' ' .!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits' . ' in bank';
 $txt['Shop_posting_inventory'] = 'Items inventory';
 $txt['Shop_posting_inventory_all'] = 'View All';
 
