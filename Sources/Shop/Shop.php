@@ -525,7 +525,7 @@ class Shop
 	 * @param int $message id of the message
 	 * @return void
 	 */
-	public static function removePost($message, $row, $recycle)
+	/*public static function removePost($message, $row, $recycle)
 	{
 		global $smcFunc, $modSettings, $board_info;
 
@@ -598,7 +598,7 @@ class Shop
 				);
 			}
 		}
-	}
+	}*/
 
 	/**
 	 * Shop::likePost()
