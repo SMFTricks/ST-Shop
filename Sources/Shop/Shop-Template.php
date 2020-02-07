@@ -2,10 +2,10 @@
 
 /**
  * @package ST Shop
- * @version 3.0
+ * @version 3.2
  * @author Diego Andrés <diegoandres_cortes@outlook.com>
- * @copyright Copyright (c) 2018, Diego Andrés
- * @license http://www.mozilla.org/MPL/MPL-1.1.html
+ * @copyright Copyright (c) 2020, SMF Tricks
+ * @license https://www.mozilla.org/en-US/MPL/2.0/
  */
 
 if (!defined('SMF'))
@@ -13,7 +13,7 @@ if (!defined('SMF'))
 
 /**
  *
- * @copyright Copyright (c) 2005 - 2007, DanSoft Australia
+ * @copyright Copyright (c) 2020, DanSoft Australia
  * @author Daniel15 <dansoft@dansoftaustralia.net>
  *
  * Basically, this is a bare-bones item. All the defaults are defined here.
