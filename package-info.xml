@@ -48,7 +48,7 @@
 		<remove-dir name="$boarddir/shop_items">Shop items and modules</remove-dir>
 		<!-- Hooks Remove -->
 		<hook hook="integrate_pre_include" function="$sourcedir/Shop/Shop.php" reverse="true" />
-		<hook hook="integrate_pre_include" function="$sourcedir/Shop/Shop.php" reverse="true" />
+		<hook hook="integrate_pre_include" function="$sourcedir/Shop/Shop-Template.php" reverse="true" />
 		<hook hook="integrate_pre_load" function="Shop::initialize" file="$sourcedir/Shop/Shop.php" reverse="true" />
 		<!-- Database -->
 		<database>install.php</database>
