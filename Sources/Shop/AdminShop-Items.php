@@ -688,7 +688,7 @@ class AdminShopItems extends AdminShop
 		$id = (int) $_REQUEST['id'];
 
 		// Send him to the items list
-		redirectexit('action=admin;area=shopitems;sa=items;'. ';updated');
+		redirectexit('action=admin;area=shopitems;sa=items;updated');
 	}
 
 	public static function Upload()
