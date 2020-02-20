@@ -2,6 +2,9 @@
     <img src="https://smftricks.com/logos/logo.png">
  </p>
  
+ <img src="https://img.shields.io/badge/License-MPL%202.0-a05a3f?style=flat-square">  <img src="https://img.shields.io/badge/SMF-2.1-3f73a0?style=flat-square">
+
+ 
 ## ST Shop for SMF
 - Developed by [Diego Andrés](https://github.com/DiegoAndresCortes)
 - Original developer: [Sleepy Arcade™](https://github.com/SAMods)
