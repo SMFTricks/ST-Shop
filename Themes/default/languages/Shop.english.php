@@ -482,7 +482,7 @@ $txt['Shop_whohas_desc'] = 'On this page you can see a list of every user that o
 
 // Posting
 $txt['Shop_posting_credits_pocket'] = !empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits';
-$txt['Shop_posting_credits_bank'] = 'Bank ' . !empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits';
+$txt['Shop_posting_credits_bank'] = 'Bank ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits');
 $txt['Shop_posting_credits_pocket2'] = ' ' . !empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits';
 $txt['Shop_posting_credits_bank2'] = ' ' .!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits' . ' in bank';
 $txt['Shop_posting_inventory'] = 'Items inventory';
