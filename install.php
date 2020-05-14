@@ -32,22 +32,17 @@
 			array(
 				array(
 					0,
-					'shop_credits',
+					'shop_usercredits',
 					1,
 				),
 				array(
 					0,
-					'shop_items',
+					'shop_useritems',
 					1,
 				),
 				array(
 					0,
-					'shop_traded',
-					1,
-				),
-				array(
-					0,
-					'shop_games',
+					'shop_usertraded',
 					1,
 				),
 			),
@@ -114,7 +109,7 @@
 					'default' => 0,
 				),
 				array(
-					'name' => 'count',
+					'name' => 'stock',
 					'type' => 'smallint',
 					'null' => false,
 					'default' => 0,
@@ -125,11 +120,6 @@
 					'null' => false,
 					'size' => 10,
 					'default' => 0,
-				),
-				array(
-					'name' => 'function',
-					'type' => 'tinytext',
-					'null' => true,
 				),
 				array(
 					'name' => 'info1',
@@ -249,7 +239,7 @@
 					'null' => false,
 				),
 				array(
-					'name' => 'can_use',
+					'name' => 'can_use_item',
 					'type' => 'tinyint',
 					'default' => 0,
 					'null' => false,
@@ -372,12 +362,6 @@
 					'name' => 'description',
 					'type' => 'varchar',
 					'size' => 255,
-					'null' => false,
-				),
-				array(
-					'name' => 'status',
-					'type' => 'smallint',
-					'default' => 1,
 					'null' => false,
 				),
 			),

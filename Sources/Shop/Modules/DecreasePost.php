@@ -1,36 +1,57 @@
- <?php
-/**********************************************************************************
-* ST Shop item                                                                    *
-***********************************************************************************
-* ST Shop: Shop MOD for Simple Machines Forum                                     *
-* =============================================================================== *
-* Software Version:           ST Shop 3.0                                         *
-* $Date:: 2018-12-28 10:39:52 +0200 (za, 28 dic 2018)                             *
-* $Id:: ChangeOtherTitle.php  2018-12-28 08:39:52Z		                          *
-* Software by:                Diego Andrés (https://www.smftricks.com/)           *
-* Copyright 2018 by:          Diego Andrés (https://www.smftricks.com/)           *
-* Support, News, Updates at:  http://www.smftricks.com/                           *
-*                                                                                 *
-* Forum software by:          Simple Machines (http://www.simplemachines.org)     *
-**********************************************************************************/
+<?php
+
+/**
+ * @package ST Shop
+ * @version 4.0
+ * @author Diego Andrés <diegoandres_cortes@outlook.com>
+ * @copyright Copyright (c) 2020, SMF Tricks
+ * @license https://www.mozilla.org/en-US/MPL/2.0/
+ */
+
+namespace Shop\Modules;
+
+use Shop\Shop;
+use Shop\Helper;
 
 if (!defined('SMF'))
 	die('Hacking attempt...');
 
-class item_ChangeOtherTitle extends itemTemplate
+class DecreasePost extends Helper\Module
 {
-	function getItemDetails()
+	function _construct()
 	{
-		$this->authorName = 'Diego Andr&eacute;s';
-		$this->authorWeb = 'https://www.smftricks.com/';
-		$this->authorEmail ='admin@smftricks.com';
+		$this->authorName = 'Daniel15';
+		$this->authorWeb = 'http://www.dansoftaustralia.net/';
+		$this->authorEmail = 'dansoft@dansoftaustralia.net';
 
-		$this->name = 'Change Other\'s Title';
-		$this->desc = 'Change someone else\'s title';
+		$this->name = 'Decrease Posts by xxx';
+		$this->desc = 'Decrease <i>Someone else\'s</i> post count by xxx!!';
 		$this->price = 200;
 		
 		$this->require_input = true;
 		$this->can_use_item = true;
+		$this->addInput_editable = true;
+	}
+	
+	function getAddInput()
+	{
+		global $item_info, $txt;
+
+		// If it's empty, decrease 100 by default
+		if (empty($item_info[1]) || !isset($item_info[1]))
+			$item_info[1] = 100;
+
+		$info = '
+			<dl class="settings">
+				<dt>
+					'. $txt['Shop_dp_setting1']. '
+				</dt>
+				<dd>
+					<input class="input_text" type="number" min="1" id="info1" name="info1" value="' . $item_info[1] . '" />
+				</dd>
+			</dl>';
+
+		return $info;
 	}
 
 	function getUseInput()
@@ -41,12 +62,8 @@ class item_ChangeOtherTitle extends itemTemplate
 			$txt['Shop_inventory_member_name']. '
 			&nbsp;<input type="text" name="username" id="username" />
 			<div id="membernameItemContainer"></div>
-			<span class="smalltext">'. $txt['Shop_cot_find_desc']. '</span>
+			<span class="smalltext">'. $txt['Shop_dp_find_desc']. '</span>
 			<br /><br />
-			'. $txt['Shop_cot_title']. '
-			&nbsp;<input class="input_text" type="text" name="newtitle" size="50" />
-			<br />';
-		$search .= '
 			<script>
 				var oAddMemberSuggest = new smc_AutoSuggest({
 					sSelf: \'oAddMemberSuggest\',
@@ -67,14 +84,15 @@ class item_ChangeOtherTitle extends itemTemplate
 
 	function onUse()
 	{
-		global $smcFunc, $txt, $user_info;
+		global $smcFunc, $txt, $user_info, $item_info;
+
+		// Set it to 100 by default
+		if (empty($item_info[1]) || !isset($item_info[1]))
+			$item_info[1] = 100;
 
 		// Make sure we got an user
 		if (!isset($_REQUEST['username']) || empty($_REQUEST['username']))
 			fatal_error($txt['Shop_user_unable_tofind'], false);
-		// Somehow we missed the title?
-		elseif (!isset($_REQUEST['newtitle']))
-			fatal_error($txt['Shop_cot_empty_title'], false);
 
 		$member_query = array();
 		$member_parameters = array();
@@ -101,7 +119,7 @@ class item_ChangeOtherTitle extends itemTemplate
 		if (!empty($member_query))
 		{
 			$request = $smcFunc['db_query']('', '
-				SELECT id_member
+				SELECT id_member, posts
 				FROM {db_prefix}members
 				WHERE (' . implode(' OR ', $member_query) . ')
 				LIMIT 1',
@@ -109,6 +127,7 @@ class item_ChangeOtherTitle extends itemTemplate
 			);
 			$row = $smcFunc['db_fetch_assoc']($request);
 				$memID = $row['id_member'];
+				$pcount = $row['posts'];
 			$smcFunc['db_free_result']($request);
 		}
 
@@ -120,11 +139,12 @@ class item_ChangeOtherTitle extends itemTemplate
 			fatal_error($txt['Shop_user_unable_tofind'], false);
 		// You cannot affect yourself
 		elseif ($memID == $user_info['id'])
-			fatal_error($txt['Shop_cot_notown_title'], false);
+			fatal_error($txt['Shop_dp_yourself'], false);
 
 		// Update the information
-		updateMemberData($memID, array('usertitle' => $_REQUEST['newtitle']));
+		$final_value = $pcount - $item_info[1];
+		updateMemberData($memID, array('posts' => $final_value));
 
-		return '<div class="infobox">' . sprintf($txt['Shop_cot_success'], $_REQUEST['username'], $_REQUEST['newtitle']) . '</div>';
+		return '<div class="infobox">' . sprintf($txt['Shop_dp_success'], $_REQUEST['username'], $item_info[1]) . '</div>';
 	}
 }
