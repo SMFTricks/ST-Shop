@@ -2,11 +2,13 @@
 
 /**
  * @package ST Shop
- * @version 3.2
+ * @version 4.0
  * @author Diego Andrés <diegoandres_cortes@outlook.com>
  * @copyright Copyright (c) 2020, SMF Tricks
  * @license https://www.mozilla.org/en-US/MPL/2.0/
  */
+
+namespace Shop;
 
 if (!defined('SMF'))
 	die('No direct access...');
@@ -14,10 +16,9 @@ if (!defined('SMF'))
 class Shop
 {
 	public static $name = 'Shop';
-	public static $txtpattern = 'Shop_';
-	public static $version = '3.2.6.1';
+	public static $version = '4.0';
 	public static $itemsdir = '/shop_items/items/';
-	public static $modulesdir = '/shop_items/modules/';
+	public static $modulesdir = '/Shop/Modules/';
 	public static $gamesdir = '/shop_items/games';
 	public static $supportSite = 'https://smftricks.com/index.php?action=.xml;sa=news;board=51;limit=10;type=rss2';
 
@@ -25,7 +26,7 @@ class Shop
 	{
 		self::setDefaults();
 		self::defineHooks();
-		self::dataHooks();
+		self::userHooks();
 	}
 
 	/**
@@ -33,7 +34,6 @@ class Shop
 	 *
 	 * Sets almost every setting to a default value
 	 * @return void
-	 * @author Peter Spicer (Arantor)
 	 */
 	public static function setDefaults()
 	{
@@ -59,7 +59,6 @@ class Shop
 			'Shop_bank_deposit_min' => 0,
 			'Shop_credits_prefix' => '',
 			'Shop_credits_suffix' => 'Credits',
-			'Shop_images_resize' => 0,
 			'Shop_images_width' => '32px',
 			'Shop_images_height' => '32px',
 			'Shop_items_perpage' => 15,
@@ -163,47 +162,30 @@ class Shop
 	 *
 	 * Load hooks quietly
 	 * @return void
-	 * @author Peter Spicer (Arantor)
 	 */
 	public static function defineHooks()
 	{
 		$hooks = array(
-			'actions' => 'Shop::hookActions',
-			'menu_buttons' => 'Shop::hookButtons',
-			'after_create_post' => 'Shop::afterPost',
-			//'remove_message' => 'Shop::removePost',
+			'autoload' => 'autoload',
+			'menu_buttons' => 'hookButtons',
+			'actions' => 'hookActions',
 			//'issue_like' => 'Shop::likePost',
-			'show_alert' => 'Shop::showAlerts',
-			'fetch_alerts' => 'Shop::fetchAlerts',
+			//'show_alert' => 'Shop::showAlerts',
+			//'fetch_alerts' => 'Shop::fetchAlerts',
 		);
 		foreach ($hooks as $point => $callable)
-			add_integration_function('integrate_' . $point, $callable, false);
+			add_integration_function('integrate_' . $point, __CLASS__ . '::'.$callable, false);
 	}
 
 	/**
-	 * Shop::dataHooks()
+	 * Shop::autoload()
 	 *
-	 * Load member and custom fields hooks
+	 * @param array $classMap
 	 * @return void
-	 * @author Peter Spicer (Arantor)
 	 */
-	public static function dataHooks()
+	public static function autoload(&$classMap)
 	{
-		global $sourcedir;
-
-		// Load our Profile file
-		require_once($sourcedir . '/Shop/ProfileShop.php');
-		$hooks = array(
-			'load_member_data' => 'ProfileShop::Data',
-			'user_info' => 'ProfileShop::Info',
-			'simple_actions' => 'ProfileShop::Actions',
-			'member_context' => 'ProfileShop::Context',
-			'load_custom_profile_fields' => 'ProfileShop::CustomFields',
-			'register' => 'ProfileShop::Register',
-			'alert_types' => 'ProfileShop::alertTypes',
-		);
-		foreach ($hooks as $point => $callable)
-			add_integration_function('integrate_' . $point, $callable, false);
+		$classMap['Shop\\'] = 'Shop/';
 	}
 
 	/**
@@ -212,33 +194,61 @@ class Shop
 	 * Insert the actions needed by this mod
 	 * @param array $actions An array containing all possible SMF actions. This includes loading different hooks for certain areas.
 	 * @return void
-	 * @author Peter Spicer (Arantor)
 	 */
 	public static function hookActions(&$actions)
 	{
-		global $sourcedir;
-
 		// The main action
-		$actions['shop'] = array('Shop/Shop-Home.php', 'ShopHome::Main');
-		// Feed
-		$actions['shopfeed'] = array(false, 'Shop::getFeed');
+		$actions['shop'] = ['Shop/View/Home.php', __NAMESPACE__  . '\View\Home::main#'];
 
+		// Feed
+		$actions['shopfeed'] = array(false, __CLASS__ . '::getFeed');
+		
 		// Add some hooks by action
-		switch ($_REQUEST['action']) {
-			case 'admin':
-				require_once($sourcedir . '/Shop/AdminShop.php');
-				add_integration_function('integrate_admin_areas', 'AdminShop::hookAreas', false);
+		switch ($_REQUEST['action'])
+		{
+			case 'helpadmin':
+				loadLanguage(__NAMESPACE__ . '/ShopAdmin');
 				break;
-			case 'profile':
-				require_once($sourcedir . '/Shop/ProfileShop.php');
-				add_integration_function('integrate_pre_profile_areas', 'ProfileShop::hookAreas', false);
+			case 'admin':
+				add_integration_function('integrate_admin_areas', __NAMESPACE__ . '\Manage\Dashboard::hookAreas', false);
+				break;
+			case 'post':
+			case 'post2':
+				add_integration_function('integrate_after_create_post', __NAMESPACE__ . '\Integration\Posting::after_create_post', false);
 				break;
 			case 'who':
-				loadLanguage('Shop');
-				add_integration_function('who_allowed', 'Shop::whoAllowed', false);
-				add_integration_function('integrate_whos_online', 'Shop::whoData', false);
+				add_integration_function('who_allowed', __NAMESPACE__ . '\Integration\Who::who_allowed', false);
+				add_integration_function('integrate_whos_online', __NAMESPACE__ . '\Integration\Who::whos_online', false);
+				break;
+			case 'profile':
+				add_integration_function('integrate_pre_profile_areas', __NAMESPACE__ . '\Integration\Profile::hookAreas', false);
+				break;
+			case 'signup':
+			case 'signup2':
+				add_integration_function('integrate_register', __NAMESPACE__ . '\Integration\Signup::register', false);
 				break;
 		}
+	}
+
+	/**
+	 * Shop::userHooks()
+	 *
+	 * Load member and custom fields hooks
+	 * @return void
+	 */
+	public static function userHooks()
+	{
+		global $sourcedir;
+
+		// Load our Profile file
+		$hooks = array(
+			'load_member_data' => 'load_member_data',
+			'user_info' => 'user_info',
+			'simple_actions' => 'simple_actions',
+			'member_context' => 'member_context',
+		);
+		foreach ($hooks as $point => $callable)
+			add_integration_function('integrate_' . $point, __NAMESPACE__ . '\Integration\User::' . $callable, false);
 	}
 
 	/**
@@ -250,20 +260,29 @@ class Shop
 	 */
 	public static function hookButtons(&$buttons)
 	{
-		global $context, $txt, $scripturl, $modSettings, $settings;
+		global $context, $scripturl, $modSettings, $settings;
+
+		// Too lazy for adding the menu on all the sub-templates
+		if (!empty($modSettings['Shop_enable_shop']))
+		{
+			self::ShopLayer();
+
+			// Languages
+			loadLanguage(__NAMESPACE__ . '/Shop');
+		}
 
 		$before = 'mlist';
 		$temp_buttons = array();
 		foreach ($buttons as $k => $v) {
 			if ($k == $before) {
 				$temp_buttons['shop'] = array(
-					'title' => self::text('main_button'),
+					'title' => self::getText('main_button'),
 					'href' => $scripturl . '?action=shop',
 					'icon' => 'icons/shop.png',
 					'show' => (allowedTo('shop_canAccess') || allowedTo('shop_canManage')) && !empty($modSettings['Shop_enable_shop']),
 					'sub_buttons' => array(
 						'shopadmin' => array(
-							'title' => self::text('admin_button'),
+							'title' => self::getText('admin_button'),
 							'href' => $scripturl . '?action=admin;area=shopinfo',
 							'show' => allowedTo('shop_canManage'),
 						),
@@ -273,13 +292,6 @@ class Shop
 			$temp_buttons[$k] = $v;
 		}
 		$buttons = $temp_buttons;
-		
-		// Too lazy for adding the menu on all the sub-templates
-		if (!empty($modSettings['Shop_enable_shop']))
-			self::ShopLayer();
-
-		// DUH! winning!
-		self::shopCredits();
 	}
 
 	/**
@@ -287,7 +299,6 @@ class Shop
 	 *
 	 * Used for adding the shop tabs quickly
 	 * @return void
-	 * @author Diego Andrés
 	 */
 	public static function ShopLayer()
 	{
@@ -301,304 +312,14 @@ class Shop
 			if ($position !== false) {
 				$before = array_slice($context['template_layers'], 0, $position + 1);
 				$after = array_slice($context['template_layers'], $position + 1);
-				$context['template_layers'] = array_merge($before, array('Shop'), $after);
+				$context['template_layers'] = array_merge($before, array('shop'), $after);
 			}
 		}
 	}
 
-	/**
-	 * Shop::shopCredits()
-	 *
-	 * Used in the credits action.
-	 * @param boolean $return decide between returning a string or append it to a known context var.
-	 * @return string A link for copyright notice
-	 */
-	public static function shopCredits($return = false)
-	{
-		global $context, $txt;
+	
 
-		if (isset($context['current_action']) && $context['current_action'] === 'shop')
-			return '<br /><div style="text-align: center;"><span class="smalltext">Powered by <a href="https://smftricks.com" target="_blank" rel="noopener">ST Shop</a></span></div>';
-	}
-
-	/**
-	 * Shop::whoAllowed()
-	 *
-	 * Used in the who's online action.
-	 * @param $allowedActions is the array of actions that require a specific permission.
-	 * @return void
-	 */
-	public static function whoAllowed(&$allowedActions)
-	{
-		$allowedActions += array(
-			'shop' => array('shop_canAccess', 'shop_canManage'),
-			'shopinfo' => array('shop_canManage'),
-			'shopsettings' => array('shop_canManage'),
-			'shopitems' => array('shop_canManage'),
-			'shopmodules' => array('shop_canManage'),
-			'shopcategories' => array('shop_canManage'),
-			'shopgames' => array('shop_canManage'),
-			'shopinventory' => array('shop_canManage'),
-			'shoplogs' => array('shop_canManage'),
-		);
-	}
-
-	/**
-	 * Shop::whoData()
-	 *
-	 * Used in the who's online action.
-	 * @param $action It gets the request parameters 
-	 * @return string A text for the current action
-	 */
-	public static function whoData($actions)
-	{
-		global $memberContext, $txt, $modSettings;
-
-		if (isset($actions['action']) && $actions['action'] === 'shop')
-		{
-			if (isset($actions['sa']))
-			{
-				// Buying items
-				if ($actions['sa'] == 'buy' && allowedTo('shop_canBuy'))
-					$who = $txt['whoallow_shop_buy'];
-				// Gift items / Send money
-				elseif (($actions['sa'] == 'gift' || $actions['sa'] == 'sendmoney') && allowedTo('shop_canGift'))
-				{
-					$who = $txt['whoallow_shop_gift'];
-					if ($actions['sa'] == 'sendmoney')
-						$who = sprintf($txt['whoallow_shop_sendmoney'], $modSettings['Shop_credits_suffix']);
-				}
-				// Viewing Inventory
-				elseif (($actions['sa'] == 'inventory' || $actions['sa'] == 'search') && allowedTo('shop_viewInventory'))
-				{
-					// Searching
-					if ($actions['sa'] == 'search')
-						$who = $txt['whoallow_shop_search'];
-					// Viewing
-					else
-					{
-						$who = $txt['whoallow_shop_owninventory'];
-						if (!empty($actions['u']))
-						{
-							$temp = loadMemberData($actions['u'], false, 'profile');
-							loadMemberContext($actions['u']);
-							$membername = $memberContext[$actions['u']]['name'];
-							$who = sprintf($txt['whoallow_shop_inventory'], $membername, $actions['u']);
-						}
-					}
-				}
-				// Bank
-				elseif ($actions['sa'] == 'bank' && allowedTo('shop_canBank'))
-					$who = $txt['whoallow_shop_bank'];
-				// Trade center
-				elseif ($actions['sa'] == 'trade' && allowedTo('shop_canTrade'))
-					$who = $txt['whoallow_shop_trade'];
-				// Trade list
-				elseif ($actions['sa'] == 'tradelist' && allowedTo('shop_canTrade'))
-					$who = $txt['whoallow_shop_tradelist'];
-				// Trade list
-				elseif ($actions['sa'] == 'tradelog' && allowedTo('shop_canTrade'))
-					$who = $txt['whoallow_shop_tradelog'];
-				// Personal trade list
-				elseif ($actions['sa'] == 'mytrades' && allowedTo('shop_canTrade'))
-				{
-					$who = $txt['whoallow_shop_owntrades'];
-					if (!empty($actions['u']))
-					{
-						$temp = loadMemberData($actions['u'], false, 'profile');
-						loadMemberContext($actions['u']);
-						$membername = $memberContext[$actions['u']]['name'];
-						$who = sprintf($txt['whoallow_shop_othertrades'], $membername, $actions['u']);
-					}
-				}
-				// Stats
-				elseif ($actions['sa'] == 'stats' && allowedTo('shop_viewStats'))
-					$who = $txt['whoallow_shop_stats'];
-				// Games Room
-				elseif ($actions['sa'] == 'games' && allowedTo('shop_playGames'))
-				{
-					$who = $txt['whoallow_shop_games'];
-					// Playing a game?
-					if (isset($actions['play']))
-					{
-						// Slots
-						if ($actions['play'] == 'slots')
-							$who = $txt['whoallow_shop_games_slots'];
-						// Lucky2
-						elseif ($actions['play'] == 'lucky2')
-							$who = $txt['whoallow_shop_games_lucky2'];
-						// Number Slots
-						elseif ($actions['play'] == 'number')
-							$who = $txt['whoallow_shop_games_number'];
-						// Pairs
-						elseif ($actions['play'] == 'pairs')
-							$who = $txt['whoallow_shop_games_pairs'];
-						// Pairs
-						elseif ($actions['play'] == 'dice')
-							$who = $txt['whoallow_shop_games_dice'];
-					}
-				}
-			}
-		}
-
-		if (!isset($who))
-			return false;
-		else
-			return $who;
-	}
-
-	/**
-	 * Shop::afterPost()
-	 *
-	 * Used for giving money/credits/points to the users when posting.
-	 * @param array $msgOptions An array of information/options for the post
-	 * @param array $topicOptions An array of information/options for the topic
-	 * @param array $posterOptions An array of information/options for the poster
-	 * @param array $message_columns An array containing the columns of topics table
-	 * @param array $message_parameters An array containing the values for every column
-	 * @return void
-	 */
-	public static function afterPost($msgOptions, $topicOptions, $posterOptions, $message_columns, $message_parameters)
-	{
-		global $smcFunc, $modSettings;
-
-		if(!empty($modSettings['Shop_enable_shop']))
-		{
-			$result_shop = $smcFunc['db_query']('', '
-				SELECT Shop_credits_count, Shop_credits_topic, Shop_credits_post, Shop_credits_bonus
-				FROM {db_prefix}boards
-				WHERE id_board = {int:key}',
-				array(
-					'key' => $topicOptions['board'],
-				)
-			);				
-			$shop_info = $smcFunc['db_fetch_assoc']($result_shop);
-			$smcFunc['db_free_result']($result_shop);
-
-			if (!empty($shop_info['Shop_credits_count']))
-			{
-				if (empty($topicOptions['id']))
-					$credits = !empty($shop_info['Shop_credits_topic']) ? $shop_info['Shop_credits_topic'] : $modSettings['Shop_credits_topic'];
-				else
-					$credits = !empty($shop_info['Shop_credits_post']) ? $shop_info['Shop_credits_post'] : $modSettings['Shop_credits_post'];
-			
-				// Bonus
-				$bonus = 0;
-				if (!empty($shop_info['Shop_credits_bonus']) && (($modSettings['Shop_credits_word'] > 0) || ($modSettings['Shop_credits_character'] > 0))) {
-					// no, BBCCode won't count
-					$plaintext = preg_replace('[\[(.*?)\]]', ' ', $_POST['message']);
-					// convert newlines to spaces
-					$plaintext = str_replace(array('<br />', "\r", "\n"), ' ', $plaintext);
-					// convert multiple spaces into one
-					$plaintext = preg_replace('/\s+/', ' ', $plaintext);
-					
-					// bonus for each word
-					$bonus += ($modSettings['Shop_credits_word'] * str_word_count($plaintext));
-					// and for each letter
-					$bonus += ($modSettings['Shop_credits_character'] * strlen($plaintext));
-					
-					// Limit?
-					if (isset($modSettings['Shop_credits_limit']) && $modSettings['Shop_credits_limit'] != 0 && $bonus > $modSettings['Shop_credits_limit'])
-						$bonus = $modSettings['Shop_credits_limit'];
-				}
-
-				// Credits + Bonus
-				$point = ($bonus + $credits);
-				// and finally, give credits
-				$result = $smcFunc['db_query']('','
-					UPDATE {db_prefix}members
-					SET shopMoney = shopMoney + {int:point}
-					WHERE id_member = {int:id_member}',
-					array(
-						'point' => $point,
-						'id_member' => $posterOptions['id']
-					)
-				);
-			}
-		}
-	}
-
-	/**
-	 * Shop::removePost()
-	 *
-	 * Deduct points from user if post was deleted.
-	 * @param int $message id of the message
-	 * @return void
-	 */
-	/*public static function removePost($message, $row, $recycle)
-	{
-		global $smcFunc, $modSettings, $board_info;
-
-		if(!empty($modSettings['Shop_enable_shop']))
-		{
-			$result_shop = $smcFunc['db_query']('', '
-				SELECT Shop_credits_count, Shop_credits_topic, Shop_credits_post, Shop_credits_bonus
-				FROM {db_prefix}boards
-				WHERE id_board = {int:key}',
-				array(
-					'key' => $board_info['id'],
-				)
-			);
-			$shop_info = $smcFunc['db_fetch_assoc']($result_shop);
-			$smcFunc['db_free_result']($result_shop);
-
-			// Credits enabled for this board?
-			if (!empty($shop_info['Shop_credits_count']))
-			{
-				$credits = !empty($shop_info['Shop_credits_post']) ? $shop_info['Shop_credits_post'] : $modSettings['Shop_credits_post'];
-				if (!empty($modSettings['search_custom_index_config']))
-					$deleted_message['body'] = $row['body'];
-				elseif (!empty($recycle))
-				{
-					$getMessage = $smcFunc['db_query']('', '
-						SELECT id_msg, body
-						FROM {db_prefix}messages
-						WHERE id_msg = {int:key}',
-						array(
-							'key' => $message,
-						)
-					);
-					$deleted_message = $smcFunc['db_fetch_assoc']($getMessage);
-					$smcFunc['db_free_result']($getMessage);
-				}
-				else
-					$deleted_message['body'] = '';
-				
-				// Bonus
-				$bonus = 0;
-				if (!empty($shop_info['Shop_credits_bonus']) && (($modSettings['Shop_credits_word'] > 0) || ($modSettings['Shop_credits_character'] > 0)))
-				{
-						// no, BBCCode won't count
-						$plaintext = preg_replace('[\[(.*?)\]]', ' ', $deleted_message['body']);
-						// convert newlines to spaces
-						$plaintext = str_replace(array('<br />', "\r", "\n"), ' ', $plaintext);
-						// convert multiple spaces into one
-						$plaintext = preg_replace('/\s+/', ' ', $plaintext);
-
-						// bonus for each word
-						$bonus += ($modSettings['Shop_credits_word'] * str_word_count($plaintext));
-						// and for each letter
-						$bonus += ($modSettings['Shop_credits_character'] * strlen($plaintext));
-						
-						// Limit?
-						if (isset($modSettings['Shop_credits_limit']) && $modSettings['Shop_credits_limit'] != 0 && $bonus > $modSettings['Shop_credits_limit'])
-							$bonus = $modSettings['Shop_credits_limit'];
-				}
-				// Credits + Bonus
-				$point = ($bonus + $credits);
-				// and finally, deduct credits
-				$result = $smcFunc['db_query']('','
-					UPDATE {db_prefix}members
-					SET shopMoney = shopMoney - {int:point}
-					WHERE id_member = {int:id_member}',
-					array(
-						'point' => $point,
-						'id_member' => $row['id_member'],
-					)
-				);
-			}
-		}
-	}*/
+	
 
 	/**
 	 * Shop::likePost()
@@ -795,284 +516,20 @@ class Shop
 		}
 	}
 
-	/**
-	 * Shop::formatCash()
-	 *
-	 * It gives the money a format, adding the suffix and prefix set in the admin
-	 * @param $money An amount of Shop money 
-	 * @return string A text containing the specified money with format
-	 */
-	public static function formatCash($money)
-	{
-		global $modSettings;
 
-		// Make 100% sure it's an int
-		$money = (int) $money;
 
-		return $modSettings['Shop_credits_prefix'] . $money . ' ' . $modSettings['Shop_credits_suffix'];
-	}
 
-	/**
-	 * Shop::getImageList()
-	 *
-	 * It provides the list of images that can be used for items and categories
-	 * @return array The list of images
-	 */
-	public static function getImageList()
-	{
-		global $boarddir;
-
-		// Start with an empty array
-		$imageList = array();
-		// Try to open the images directory
-		
-		if ($handle = opendir($boarddir. self::$itemsdir)) {
-			// For each file in the directory...
-			while (false !== ($file = readdir($handle))) {
-				// ...if it's a valid file, add it to the list
-				if (!in_array($file, array('.', '..', 'blank.gif')))
-					$imageList[] = $file;
-			}
-			// Sort the list
-			sort($imageList);
-			return $imageList;
-		}
-		// Otherwise, if directory inaccessible, show an error
-		else
-			fatal_error(self::text('cannot_open_images'));
-	}
-
-	/**
-	 * Shop::getCatList()
-	 *
-	 * It provides the list of categories added into the shop
-	 * @return array The list of current categories
-	 */
-	public static function getCatList()
-	{
-		global $smcFunc;
-		
-		$cats = array();
-		// Get all the categories
-		$result = $smcFunc['db_query']('','
-			SELECT catid, name, image, description
-			FROM {db_prefix}shop_categories
-			ORDER BY name ASC',
-			array()
-		);
-
-		// Loop through all the categories
-		while ($row =  $smcFunc['db_fetch_assoc']($result))
-			// Let's add this to our array
-			$cats[] = array(
-				'id' => $row['catid'],
-				'name' => $row['name'],
-				'image' => $row['image'],
-				'description' => $row['description'],
-			);
-		$smcFunc['db_free_result']($result);
-		
-		// Return the array
-		return $cats;
-	}
-
-	/**
-	 * Shop::getShopItemsList()
-	 *
-	 * It provides a FULL list of enabled items
-	 * @param $stock A simple flag to indicate if you want to rule out items without stock
-	 * @return array The list of items in the shop
-	 */
-	public static function getShopItemsList($stock = 0)
-	{
-		global $smcFunc;
-		
-		$shopitems = array();
-		// Get all the categories
-		$result = $smcFunc['db_query']('','
-			SELECT s.itemid, s.count, s.name, s.status
-			FROM {db_prefix}shop_items AS s 
-			WHERE s.status = 1'. ($stock == 1 ? ' AND s.count <> 0' : '').'
-			ORDER BY name ASC',
-			array()
-		);
-
-		// Loop through all the categories
-		while ($row =  $smcFunc['db_fetch_assoc']($result))
-			// Let's add this to our array
-			$shopitems[] = array(
-				'id' => $row['itemid'],
-				'name' => $row['name'],
-			);
-		$smcFunc['db_free_result']($result);
-		
-		// Return the array
-		return $shopitems;
-	}
-
-	/**
-	 * Shop::getUserItemsList()
-	 *
-	 * A FULL list of items from a specific member (Inventory)
-	 * @param $id The id of the desired user
-	 * @return array The inventory of a certain user
-	 */
-	public static function getUserItemsList($id)
-	{
-		global $smcFunc;
-		
-		$useritems = array();
-		// Get all the categories
-		$result = $smcFunc['db_query']('','
-			SELECT p.id, p.itemid, p.userid, p.trading, s.name, s.status
-			FROM {db_prefix}shop_inventory AS p
-			LEFT JOIN {db_prefix}shop_items AS s ON (p.itemid = s.itemid)
-			WHERE p.userid = {int:userid} and p.trading = 0 and s.status = 1
-			ORDER BY name ASC',
-			array(
-				'userid' => $id,
-			)
-		);
-
-		// Loop through all the categories
-		while ($row =  $smcFunc['db_fetch_assoc']($result))
-			// Let's add this to our array
-			$useritems[] = array(
-				'id' => $row['id'],
-				'name' => $row['name'],
-				'itemid' => $row['itemid'],				
-			);
-		$smcFunc['db_free_result']($result);
-		
-		// Return the array
-		return $useritems;
-	}
-
-	/**
-	 * Shop::ShopImageFormat()
-	 *
-	 * Gives the provided item format with his image
-	 * @param $image The image of an item
-	 * @param $description Optional parameter for including the description in the title/alt
-	 * @return string A formatted image
-	 */
-	public static function ShopImageFormat($image, $description = '')
-	{
-		global $scripturl, $modSettings, $context, $boardurl;
-
-		// Resize the images...
-		if (!empty($modSettings['Shop_images_resize']))
-				$context['itemOpt'] = 'width: '. $modSettings['Shop_images_width']. '; height: '. $modSettings['Shop_images_height']. ';';
-		else
-			$context['itemOpt'] = 'width: 32px; height: 32px;';
-
-		// Item images...
-		$context['items_url'] = self::$itemsdir;
-
-		$formatname = '<img src="'. $boardurl . $context['items_url'] . $image. '" alt="'.$description.'" title="'.$description.'" style="'. $context['itemOpt']. ' vertical-align: middle;" />';
-		return $formatname;
-	}
 	
 	/**
-	 * Shop::text()
+	 * Shop::getText()
 	 *
 	 * Gets a string key, and returns the associated text string.
-	 * @param string $var The text string key.
-	 * @global $txt
-	 * @return string|boolean
-	 * @author Jessica González <suki@missallsunday.com>
 	 */
-	public static function text($var)
+	public function getText($text, $pattern = true)
 	{
 		global $txt;
 
-		if (empty($var))
-			return false;
-
-		// Load the mod's language file.
-		loadLanguage(self::$name);
-
-		if (!empty($txt[self::$txtpattern.$var]))
-			return $txt[self::$txtpattern.$var];
-
-		else
-			return false;
-	}
-
-	/**
-	 * Shop::credits()
-	 *
-	 * Includes a list of contributors, developers and third party scripts that helped to build this MOD
-	 * @return array The list of credits
-	 */
-	public static function credits()
-	{
-		// Dear contributor, please feel free to add yourself here.
-		$credits = array(
-			'dev' => array(
-				'name' => 'Developer(s)',
-				'users' => array(
-					'diego' => array(
-						'name' => 'Diego Andr&eacute;s',
-						'site' => 'https://smftricks.com',
-					),
-				),
-			),
-			'icons' => array(
-				'name' => 'Icons',
-				'users' => array(
-					'fugue' => array(
-						'name' => 'Fugue Icons',
-						'site' => 'https://p.yusukekamiyamane.com/',
-					),
-				),
-			),
-			'thanksto' => array(
-				'name' => 'Special Thanks',
-				'users' => array(
-					'daniel15' => array(
-						'name' => 'Daniel15',
-						'site' => 'https://www.simplemachines.org/community/index.php?action=profile;u=9547',
-						'desc' => 'Original Shop mod',
-					),
-					'sa' => array(
-						'name' => 'SA',
-						'site' => 'https://www.simplemachines.org/community/index.php?action=profile;u=84438',
-						'desc' => 'Original Developer',
-					),
-					'vbgamer45' => array(
-						'name' => 'vbgamer45',
-						'site' => 'https://www.smfhacks.com/',
-						'desc' => 'SMF Shop Developer, for keeping his lovely mods always updated',
-					),
-					'suki' => array(
-						'name' => 'Suki',
-						'site' => 'https://www.simplemachines.org/community/index.php?action=profile;u=245528',
-						'desc' => 'Consultant',
-					),
-					'hcfwesker' => array(
-						'name' => 'hcfwesker',
-						'site' => 'https://www.simplemachines.org/community/index.php?action=profile;u=244295',
-						'desc' => 'Nice ideas and for making SA/ST Shop feel loved',
-					),
-					'gerard' => array(
-						'name' => 'Zerk',
-						'site' => 'https://www.simplemachines.org/community/index.php?action=profile;u=130323',
-						'desc' => 'Suggestions, code and cool ideas',
-					),
-					'ospina' => array(
-						'name' => 'Cristian Ospina',
-						'site' => 'https://www.simplemachines.org/community/index.php?action=profile;u=215234',
-						'desc' => 'Feedback and ideas for Shop Modules',
-					),
-				),
-			),
-		);
-
-		// Oh well, one can dream...
-		call_integration_hook('integrate_shop_credits', array(&$credits));
-
-		return $credits;
+		return !empty($pattern) ? (!empty($txt[__NAMESPACE__ . '_' . $text]) ? $txt[__NAMESPACE__ . '_' . $text] : '') : (!empty($txt[$text]) ? $txt[$text] : '');
 	}
 
 	/**
