@@ -1,0 +1,104 @@
+<?php
+
+/**
+ * @package ST Shop
+ * @version 4.0
+ * @author Diego Andrés <diegoandres_cortes@outlook.com>
+ * @copyright Copyright (c) 2020, SMF Tricks
+ * @license https://www.mozilla.org/en-US/MPL/2.0/
+ */
+
+use Shop\Helper\Format;
+
+function template_shop_inventory_search_above()
+{
+	global $context, $txt, $scripturl;
+
+	echo '
+	<div' . ($_REQUEST['action'] == 'shop' ? ' class="roundframe"' : ''). '>
+		<form method="post" action="', $scripturl, $context['form_url'], '">
+			<dl class="settings">
+				<dt>
+					', $txt['Shop_inventory_member_name'], '<br/>
+					<span class="smalltext">', $txt['Shop_inventory_member_desc'], '</span>
+				</dt>
+				<dd>
+					<input type="text" name="membername" id="membername" />
+				</dd>';
+}
+
+function template_shop_inventory_search() {}
+
+function template_shop_inventory_search_below()
+{
+	global $context, $txt;
+
+	echo '
+			</dl>
+			<input class="button floatright" type="submit" value="', $txt['go'], '" />
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
+		</form>
+	</div>
+	<script>
+		var oAddMemberSuggest = new smc_AutoSuggest({
+			sSelf: \'oAddMemberSuggest\',
+			sSessionId: \'', $context['session_id'], '\',
+			sSessionVar: \'', $context['session_var'], '\',
+			sSuggestId: \'to_suggest\',
+			sControlId: \'membername\',
+			sSearchType: \'member\',
+			sPostName: \'memberid\',
+			sURLMask: \'action=profile;u=%item_id%\',
+			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+		});
+	</script>';
+}
+
+function template_shop_inventory($inventory)
+{
+	global $scripturl, $txt;
+
+	// We got items?
+	if (empty($inventory))
+		return;
+
+	$disp = '<strong>'. $txt['Shop_posting_inventory']. '</strong>:<br />';
+
+	// Format items
+	foreach($inventory as $item)
+		$disp .= Format::image($item['image'], $item['description']);
+
+	// Show more
+	$disp .= '<br /><a href="'. $scripturl. '?action=shop;sa=invdisp;id='. $inventory[0]['userid']. '" onclick="return reqOverlayDiv(this.href, \''. $txt['Shop_posting_inventory']. '\', \'/icons/shop/top_inventories.png\');">'. $txt['Shop_posting_inventory_all']. '</a>';
+
+	return $disp;
+}
+
+function template_shop_inventory_extended()
+{
+	global $context, $txt, $modSettings, $settings;
+
+	echo '
+	<!DOCTYPE html>
+	<html', $context['right_to_left'] ? ' dir="rtl"' : '', !empty($txt['lang_locale']) ? ' lang="' . str_replace("_", "-", substr($txt['lang_locale'], 0, strcspn($txt['lang_locale'], "."))) . '"' : '', '>
+		<head>
+			<meta charset="', $context['character_set'], '">
+			<meta name="robots" content="noindex">
+			<title>', $context['page_title'], '</title>
+			<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css', $modSettings['browser_cache'] ,'">
+			<script src="', $settings['default_theme_url'], '/scripts/script.js', $modSettings['browser_cache'] ,'"></script>
+		</head>
+		<body id="shop_inventory_popup">
+			<div class="windowbg">';
+
+		// List the items...
+		foreach($context['inventory_list'] as $item)
+			echo Format::image($item['image'], $item['description']);
+
+		echo '
+				<br class="clear">
+				<a href="javascript:self.close();">', $txt['close_window'], '</a>
+			</div>
+		</body>
+	</html>';
+}
