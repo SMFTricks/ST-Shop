@@ -12,20 +12,28 @@ namespace Shop\View;
 
 use Shop\Shop;
 use Shop\Helper\Database;
-use Shop\Helper\Images;
 use Shop\Helper\Format;
+use Shop\Helper\Images;
+use Shop\Helper\Log;
+use Shop\Helper\Notify;
 
 if (!defined('SMF'))
 	die('No direct access...');
 
 class Gift
 {
+	var $notify;
 	var $tabs = [];
+	var $gift_info = [];
+	var $extra_items = [];
 
 	function __construct()
 	{
 		// Build the tabs for this section
 		$this->tabs();
+
+		// Notify
+		$this->notify = new Notify;
 	}
 
 	public function main()
@@ -84,6 +92,8 @@ class Gift
 				$membername = $memberContext[$userid]['name'];
 				$_REQUEST['membername'] = $membername;
 			}
+			else
+				$_REQUEST['membername'] = '';
 		}
 
 		// Load suggest.js
@@ -104,9 +114,9 @@ class Gift
 		];
 	}
 
-	public function Send()
+	public function send()
 	{
-		global $smcFunc, $context, $user_info, $modSettings, $scripturl, $txt, $settings;
+		global $context, $user_info, $modSettings, $scripturl, $memberContext;
 
 		// What if the Inventories are disabled?
 		if (empty($modSettings['Shop_enable_gift']))
@@ -136,210 +146,114 @@ class Gift
 		elseif (!isset($_REQUEST['membername']) || empty($_REQUEST['membername']))
 			fatal_error(Shop::getText('gift_unable_user'), false);
 
-		$member_query = array();
-		$member_parameters = array();
+		$member_query = [];
+		$member_parameters = [];
+	
+		// Got a user?
+		if (empty($_REQUEST['membername']) || !isset($_REQUEST['membername']))
+			fatal_error(Shop::getText('user_unable_tofind'), false);
 
 		// Get the member name...
-		$_REQUEST['membername'] = strtr($smcFunc['htmlspecialchars']($_REQUEST['membername'], ENT_QUOTES), array('&quot;' => '"'));
-		preg_match_all('~"([^"]+)"~', $_REQUEST['membername'], $matches);
-		$member_name = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_REQUEST['membername']))));
-
-		foreach ($member_name as $index => $name)
-		{
-			$member_name[$index] = trim($smcFunc['strtolower']($member_name[$index]));
-
-			if (strlen($member_name[$index]) == 0)
-				unset($member_name[$index]);
-		}
+		$member_name = Database::sanitize($_REQUEST['membername']);
 
 		// Construct the query
 		if (!empty($member_name))
 		{
-			$member_query[] = 'LOWER(member_name) IN ({array_string:member_name})';
-			$member_query[] = 'LOWER(real_name) IN ({array_string:member_name})';
+			$member_query[] = 'LOWER(member_name) = {string:member_name}';
+			$member_query[] = 'LOWER(real_name) = {string:member_name}';
 			$member_parameters['member_name'] = $member_name;
 		}
 
+		// Execute
 		if (!empty($member_query))
 		{
-			$request = $smcFunc['db_query']('', '
-				SELECT id_member
-				FROM {db_prefix}members
-				WHERE (' . implode(' OR ', $member_query) . ')
-				LIMIT 1',
-				$member_parameters
-			);
-			$row = $smcFunc['db_fetch_assoc']($request);
-				$memID = $row['id_member'];
-			$smcFunc['db_free_result']($request);
-		}
+			$memResult = Database::Get(0, 1000, 'id_member', 'members', ['id_member'], 'WHERE (' . implode(' OR ', $member_query) . ')', true, '', $member_parameters);
 
-		// Empty? Something went wrong
-		if (empty($row))
-			fatal_lang_error('not_a_user', false, 404);
-		// Did we find an user?
-		if (empty($memID))
-			fatal_error($txt['Shop_user_unable_tofind'], false);
-		// You cannot gift yourself DUH!
-		elseif ($memID == $user_info['id'])
-			fatal_error($txt['Shop_gift_not_yourself'], false);
-
-		// Did the user leave a message? Nice :)
-		$message = $smcFunc['htmlspecialchars']($_REQUEST['message'], ENT_QUOTES);
-
-		// Little array of info
-		$extra_items = array();
-		
-		if (!isset($_REQUEST['money']) && isset($_REQUEST['item']))
-		{
-			$itemid = (int) $_REQUEST['item'];
-			// Get the item's information
-			$result = $smcFunc['db_query']('', '
-				SELECT p.id, p.userid, p.trading, p.userid, s.status, p.itemid, s.name
-					FROM {db_prefix}shop_inventory AS p
-				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
-				WHERE p.id = {int:id} AND p.trading = 0 AND p.userid = {int:userid}',
-				array(
-					'userid' => $user_info['id'],
-					'id' => $itemid,
-				)
-			);
-			$row = $smcFunc['db_fetch_assoc']($result);
-			$smcFunc['db_free_result']($result);
-
-			// Is that id actually valid?
-			if (empty($row) || ($row['status'] == 0) || ($row['trading'] == 1))
-				fatal_error($txt['Shop_item_notfound'], false);
-			// Proceed
+			// We got a result?
+			if (empty($memResult))
+				fatal_error(Shop::getText('user_unable_tofind'), false);
 			else
 			{
-				// Add some info
-				$extra_items['item_icon'] = $settings['images_url'] . '/icons/shop/top_gifts_r.png';
-				// Send the gift and log the information
-				parent::logGift($user_info['id'], $memID, $message, 0, $row['itemid'], $row['id']);
-				// Send a PM to the user that its going to receive the item.
-				self::sendPM('item', $memID, $row['name'], '', $message);
-				// Send an alert
-				if (!empty($modSettings['Shop_noty_items']))
-					Shop::deployAlert($memID, 'items', $row['id'], '?action=shop;sa=inventory', $extra_items);
-				// Let's get out of here and later we'll show a nice message
-				redirectexit('action=shop;sa=gift3;id='. $row['id']);
+				// You cannot gift yourself DUH!
+				if ($memResult['id_member'] == $user_info['id'])
+					fatal_error(Shop::getText('gift_not_yourself'), false);
+
+				// Did the user leave a message? Nice :)
+				$message = Database::sanitize($_REQUEST['message']);
+				// The message subject
+				$subject = Shop::getText('gift_notification_subject');
+				// The actual link
+				$this->extra_items['item_href'] = '?action=shop';
+
+				// Gifting an item
+				if (!isset($_REQUEST['money']) && isset($_REQUEST['item']))
+				{
+					// Item id
+					$itemid = (int) $_REQUEST['item'];
+					// Get item info
+					$this->gift_info = Database::Get('', '', '', 'shop_inventory AS si', array_merge(Database::$inventory, Database::$items), 'WHERE si.id = {int:id} AND si.trading = 0 AND si.userid = {int:user}', true, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['id' => $itemid, 'user' => $user_info['id']]);
+
+					// We got valid information?
+					if (empty($this->gift_info) || empty($this->gift_info['status']) || !empty($this->gift_info['trading']))
+						fatal_error(Shop::getText('item_notfound'), false);
+
+					// PM body
+					$body = sprintf(Shop::getText('gift_notification_message1'), $user_info['id'], $user_info['name'], $this->gift_info['name'], $message);
+					// Icon for alert
+					$this->extra_items['item_icon'] = 'top_gifts_r';
+					// The actual link
+					$this->extra_items['item_href'] .= ';sa=inventory';
+
+					// Log the item
+					Log::items($user_info['id'], $memResult['id_member'], $itemid, $this->gift_info['id'], false, $message);
+
+					// Send PM
+					$this->notify->pm($memResult['id_member'], $subject, $body);
+					// Deploy alert?
+					if (!empty($modSettings['Shop_noty_items']))
+						$this->notify->alert($memResult['id_member'], 'items', $this->gift_info['id'], $this->extra_items);
+				}
+				// Gifting money
+				else
+				{
+					// Set the amount
+					$amount = (int) $_REQUEST['amount'];
+
+					// Can the user send this gift?
+					if (($user_info['shopMoney'] - $amount) < 0)
+						fatal_error(Shop::getText('gift_not_enough_pocket'), false);
+					// No trolls please
+					elseif ($amount <= 0)
+						fatal_error(Shop::getText('gift_not_negative_or_zero'), false);
+
+					// Find out the member credits...
+					$temp = loadMemberData($memResult['id_member'], false, 'profile');
+					if (!empty($temp))
+					{
+						loadMemberContext($memResult['id_member']);
+						$membermoney = $memberContext[$memResult['id_member']]['shopMoney'];
+					}
+					else
+						fatal_error(Shop::getText('user_unable_tofind'), false);
+
+					// PM body
+					$body = sprintf(Shop::getText('gift_notification_message2'), $user_info['id'], $user_info['name'], $modSettings['Shop_credits_suffix'], Format::cash($amount), Format::cash($membermoney + $amount), $message);
+					// Icon for alert
+					$this->extra_items['item_icon'] = 'top_money_r';
+
+					// Log the item
+					Log::credits($user_info['id'], $memResult['id_member'], $amount, false, $message);
+
+					// Send PM
+					$this->notify->pm($memResult['id_member'], $subject, $body);
+					// Deploy alert?
+					if (!empty($modSettings['Shop_noty_items']))
+						$this->notify->alert($memResult['id_member'], 'credits', $user_info['id'], $this->extra_items);
+				}
+
+				// If there are no errors, then it was a success?
+				redirectexit('action=shop;sa='. (isset($_REQUEST['money']) ? 'sendmoney' : 'gift') . ';success');
 			}
 		}
-		else
-		{
-			// Set the amount
-			$amount = (int) $_REQUEST['amount'];
-			// We need to find out the difference if there's not enough money
-			$notenough = ($user_info['shopMoney'] - $amount);
-			// Is that id actually valid?
-			if ($notenough < 0)
-				fatal_lang_error('Shop_gift_not_enough_pocket', false, array($modSettings['Shop_credits_suffix']));
-			elseif ($amount <= 0)
-				fatal_error($txt['Shop_gift_not_negative_or_zero'], false);
-			// Proceed
-			else
-			{
-				// Add some info
-				$extra_items['item_icon'] = $settings['images_url'] . '/icons/shop/top_money_r.png';
-				$extra_items['amount'] = Shop::formatCash($amount);
-				// Send the gift and log the information
-				parent::logGift($user_info['id'], $memID, $message, $amount);
-				// Send a PM to the user that its going to receive the money.
-				self::sendPM('money', $memID, '', $amount, $message);
-				// Send an alert
-				if (!empty($modSettings['Shop_noty_credits']))
-					Shop::deployAlert($memID, 'credits', $user_info['id'], '?action=shop', $extra_items);
-				// Let's get out of here and later we'll show a nice message
-				redirectexit('action=shop;sa=gift3');
-			}
-		}
-	}
-
-	public static function Send2()
-	{
-		global $context, $smcFunc, $modSettings, $scripturl, $user_info, $txt;
-
-		// What if the Gifts are disabled?
-		if (empty($modSettings['Shop_enable_gift']))
-			fatal_error($txt['Shop_currently_disabled_gift'], false);
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_canGift');
-
-		// Set all the page stuff
-		$context['page_title'] = $txt['Shop_main_button'] . ' - ' . $txt['Shop_shop_gift'];
-		$context['template_layers'][] = 'Shop_main';
-		$context['template_layers'][] = 'Shop_giftTabs';
-		$context['sub_template'] = 'Shop_giftSent';
-		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=shop;sa=gift',
-			'name' => $txt['Shop_shop_gift'],
-		);
-		// Sub-menu tabs
-		$context['gift_tabs'] = self::Tabs();
-
-		if (isset($_REQUEST['id']))
-		{
-			$itemid = (int) $_REQUEST['id'];
-
-			// Get the item's information
-			$result = $smcFunc['db_query']('', '
-				SELECT p.id, p.itemid, s.name, s.status
-					FROM {db_prefix}shop_inventory AS p
-				LEFT JOIN {db_prefix}shop_items AS s ON (p.itemid = s.itemid)
-				WHERE p.id = {int:id}',
-				array(
-					'id' => $itemid,
-				)
-			);
-			$row = $smcFunc['db_fetch_assoc']($result);
-			$smcFunc['db_free_result']($result);
-
-			// That item is not currently enabled!
-			if (!isset($_REQUEST['id']) || empty($row) || ($row['status'] == 0))
-				fatal_error($txt['Shop_item_notfound'], false);
-
-			// Let's display a nice message
-			$context['shop']['gift_sent'] = sprintf($txt['Shop_gift_item_sent'], $row['name']);
-		}
-		// Well, we just need a different message here
-		else
-			$context['shop']['gift_sent'] = sprintf($txt['Shop_gift_money_sent'], $modSettings['Shop_credits_suffix'], $modSettings['Shop_credits_prefix'], $user_info['shopMoney']);
-	}
-
-	public static function sendPM($todo, $userid, $itemname, $amount, $message)
-	{
-		global $user_info, $sourcedir, $modSettings, $memberContext, $txt;
-
-		// Who is sending the PM
-		$pmfrom = array(
-			'id' => 0,
-			'name' => $txt['Shop_trade_notification_sold_from'],
-			'username' => $txt['Shop_trade_notification_sold_from'],
-		);
-		// Who is receiving the PM		
-		$pmto = array(
-			'to' => array($userid),
-			'bcc' => array()
-		);
-		// The message subject
-		$subject = $txt['Shop_gift_notification_subject'];
-		// Find out the member credits...
-		$temp = loadMemberData($userid, false, 'profile');
-		loadMemberContext($userid);
-		$membermoney = $memberContext[$userid]['shopMoney'];
-
-		// The actual message
-		if ($todo == 'item')
-			$body = sprintf($txt['Shop_gift_notification_message1'], $user_info['id'], $user_info['name'], $itemname, $message);
-		elseif ($todo == 'money')
-			$body = sprintf($txt['Shop_gift_notification_message2'], $user_info['id'], $user_info['name'], $modSettings['Shop_credits_suffix'], Shop::formatCash($amount), Shop::formatCash($membermoney), $message);
-
-		// We need this file
-		require_once($sourcedir . '/Subs-Post.php');
-		// Send the PM
-		sendpm($pmto, $subject, $body, false, $pmfrom);
 	}
 }
