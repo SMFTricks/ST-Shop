@@ -21,11 +21,26 @@ if (!defined('SMF'))
 
 class Inventory
 {
-	var $item_module = 'Shop\\Modules\\';
-	var $tabs = [];
+	/**
+	 * @var object We will create an object for the specified item if needed.
+	 */
+	private $_item_module = 'Shop\\Modules\\';
 
-	public static $inventory_items = [];
+	/**
+	 * @var array Save the section tabs.
+	 */
+	protected $_tabs = [];
 
+	/**
+	 * @var array Store the iventory items of the user.
+	 */
+	var $_inventory_items = [];
+
+	/**
+	 * Inventory::__construct()
+	 *
+	 * Set the tabs for the section
+	 */
 	function __construct()
 	{
 		// Build the tabs for this section
@@ -66,7 +81,7 @@ class Inventory
 			'name' => (($user_info['id'] == $context['member']['id']) ? Shop::getText('inventory_myinventory') : sprintf(Shop::getText('inventory_viewing_who'), $context['member']['name'])),
 		];
 		// Sub-menu tabs
-		$context['section_tabs'] = $this->tabs;
+		$context['section_tabs'] = $this->_tabs;
 		// Images...
 		$context['items_url'] = $boardurl . Shop::$itemsdir;
 		$context['shop_images_list'] = Images::list();
@@ -111,7 +126,7 @@ class Inventory
 
 	public function tabs()
 	{
-		$this->tabs = [
+		$this->_tabs = [
 			'inventory' => [
 				'action' => ['inventory', 'invtrade', 'invtrade2', 'invuse'],
 				'label' => Shop::getText('inventory_myinventory'),
@@ -304,7 +319,7 @@ class Inventory
 			'name' => Shop::getText('inventory_search_i'),
 		);
 		// Sub-menu tabs
-		$context['section_tabs'] = $this->tabs;
+		$context['section_tabs'] = $this->_tabs;
 		// Form
 		$context['form_url'] = '?action=shop;sa=search2';
 
@@ -398,10 +413,10 @@ class Inventory
 		$context['item'] = $item;
 
 		// Store it somewhere
-		$this->item_module .= $item['file'];
+		$this->_item_module .= $item['file'];
 
 		// Is the item still there?
-		if (!class_exists($this->item_module))
+		if (!class_exists($this->_item_module))
 		{
 			// Disable this item?
 			Database::Update('shop_items', ['id' => $item['itemid']], 'status = 0,', 'WHERE itemid = {int:id}');
@@ -411,7 +426,7 @@ class Inventory
 		}
 
 		//... and the actual item.
-		$itemModel = new $this->item_module;
+		$itemModel = new $this->_item_module;
 
 		// Update values
 		$itemModel->item_info[1] = $item['info1'];
@@ -461,8 +476,8 @@ class Inventory
 		checkSession();
 
 		//... and the actual item.
-		$this->item_module .= $item['file'];
-		$itemModel = new $this->item_module;
+		$this->_item_module .= $item['file'];
+		$itemModel = new $this->_item_module;
 
 		// Update values
 		$itemModel->item_info[1] = $item['info1'];
@@ -635,9 +650,9 @@ class Inventory
 			return false;
 
 		// Load the inventory
-		self::$inventory_items = Database::Get(0, empty($modSettings['Shop_inventory_items_num']) ? 5 : $modSettings['Shop_inventory_items_num'], 'favo DESC,' . (!empty($modSettings['Shop_inventory_show_same_once']) ? 'MAX(si.date)' : 'si.date'). ' DESC', 'shop_inventory AS si', array_merge([(!empty($modSettings['Shop_inventory_show_same_once']) ? 'SUM(si.fav)' : 'si.fav'). ' AS favo'], Database::$profile_inventory), 'WHERE si.trading = 0 AND si.userid = {int:mem} AND s.status = 1' . (!empty($modSettings['Shop_inventory_show_same_once']) ? ' GROUP BY si.itemid, si.userid, si.trading, s.name, s.status, s.image, s.description' : ''), false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['mem' => $memID]);
+		$this->_inventory_items = Database::Get(0, empty($modSettings['Shop_inventory_items_num']) ? 5 : $modSettings['Shop_inventory_items_num'], 'favo DESC,' . (!empty($modSettings['Shop_inventory_show_same_once']) ? 'MAX(si.date)' : 'si.date'). ' DESC', 'shop_inventory AS si', array_merge([(!empty($modSettings['Shop_inventory_show_same_once']) ? 'SUM(si.fav)' : 'si.fav'). ' AS favo'], Database::$profile_inventory), 'WHERE si.trading = 0 AND si.userid = {int:mem} AND s.status = 1' . (!empty($modSettings['Shop_inventory_show_same_once']) ? ' GROUP BY si.itemid, si.userid, si.trading, s.name, s.status, s.image, s.description' : ''), false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['mem' => $memID]);
 
-		return self::$inventory_items;
+		return $this->_inventory_items;
 	}
 
 	public function display_extend()
@@ -726,7 +741,7 @@ class Inventory
 			'name' => sprintf($txt['Shop_item_trade_go'], $item['name'])
 		);
 		// Sub-menu tabs
-		$context['inventory_tabs'] = $this->tabs;
+		$context['inventory_tabs'] = $this->_tabs;
 
 		// No item found
 		if (empty($item))
