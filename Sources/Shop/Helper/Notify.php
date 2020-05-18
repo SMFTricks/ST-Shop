@@ -20,6 +20,11 @@ class Notify
 	var $from = [];
 	var $to = [];
 
+	function __construct()
+	{
+
+	}
+
 	public function pm($user, $subject, $body)
 	{
 		global $sourcedir;
@@ -46,6 +51,6 @@ class Notify
 
 	public function alert($user, $action, $content, $extra_items)
 	{
-
+		
 	}
 }
