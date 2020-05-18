@@ -80,7 +80,6 @@ class Home
 			'senditem' => 'Gift::main',
 			'sendmoney' => 'Gift::main',
 			'gift2' => 'Gift::send',
-			'gift3' => 'Gift::send2',
 		];
 
 		$subactions2 = [
@@ -250,74 +249,6 @@ class Home
 	}
 
 
-
-	public static function logGift($userid, $receiver, $message, $amount = 0, $itemid = 0, $invid = 0)
-	{
-		global $smcFunc;
-
-		// He sent an item
-		if ($amount == 0) {
-			// Transfer the item to the new user
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}shop_inventory
-				SET	userid = {int:receiver}
-				WHERE id = {int:invid}',
-				array(
-					'receiver' => $receiver,
-					'invid' => $invid,
-				)
-			);
-		}
-		// He sent money
-		else {
-			// Remove the money from the user pocket
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}members
-				SET	shopMoney = shopMoney - {int:amount}
-				WHERE id_member = {int:userid}',
-				array(
-					'userid' => $userid,
-					'amount' => $amount,
-				)
-			);
-			// Add the amount to the receiver pocket
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}members
-				SET	shopMoney = shopMoney + {int:amount}
-				WHERE id_member = {int:receiver}',
-				array(
-					'receiver' => $receiver,
-					'amount' => $amount,
-				)
-			);
-		}
-
-		// Insert the information in the log
-		$smcFunc['db_insert']('',
-			'{db_prefix}shop_log_gift',
-			array(
-				'userid' => 'int',
-				'receiver' => 'int',
-				'amount' => 'int',
-				'itemid' => 'int',
-				'invid' => 'int',
-				'message' => 'string',
-				'is_admin' => 'int',
-				'date' => 'int',
-			),
-			array(
-				$userid,
-				$receiver,
-				$amount,
-				$itemid,
-				$invid,
-				$message,
-				0,
-				time()
-			),
-			array()
-		);
-	}
 
 	public static function logBank($userid, $amount, $fee, $type = 0)
 	{
