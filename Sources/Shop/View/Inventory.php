@@ -357,11 +357,9 @@ class Inventory
 			// We got a result?
 			if (empty($memResult))
 				fatal_error(Shop::getText('user_unable_tofind'), false);
+			// Redirect
 			else
-			{
-				// Redirect
 				redirectexit('action=' . ($_REQUEST['action'] == 'admin' ? 'admin;area=shopinventory;sa=userinv' : 'shop;sa=inventory') . ($user_info['id'] == $memResult['id_member'] ? '' : ';u='. $memResult['id_member']));
-			}
 		}
 	}
 
