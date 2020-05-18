@@ -21,6 +21,17 @@ if (!defined('SMF'))
 
 class Buy
 {
+	/**
+	 * Buy::__construct()
+	 *
+	 * Not tabs on this section, but we still need to create instance of log
+	 */
+	function __construct()
+	{
+		// Prepare to log the purchase
+		$this->_log = new Log;
+	}
+
 	public function main()
 	{
 		global $context, $scripturl, $modSettings, $sourcedir, $boardurl;
@@ -232,7 +243,7 @@ class Buy
 
 		// Proceed
 		// Handle item purchase and money deduction and log it
-		Log::purchase($context['shop']['item_details']['itemid'], $user_info['id'], $context['shop']['item_details']['price']);
+		$this->_log->purchase($context['shop']['item_details']['itemid'], $user_info['id'], $context['shop']['item_details']['price']);
 
 		// Redirect to the inventory?
 		redirectexit('action=shop;sa=inventory;sort=item_date;purchased');
