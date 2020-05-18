@@ -206,23 +206,29 @@ class Shop
 		// Add some hooks by action
 		switch ($_REQUEST['action'])
 		{
+			// Permission lang strings
 			case 'helpadmin':
 				loadLanguage(__NAMESPACE__ . '/ShopAdmin');
 				break;
+			// Shop Admin
 			case 'admin':
 				add_integration_function('integrate_admin_areas', __NAMESPACE__ . '\Manage\Dashboard::hookAreas#', false);
 				break;
+			// Give points/credits on posting
 			case 'post':
 			case 'post2':
-				add_integration_function('integrate_after_create_post', __NAMESPACE__ . '\Integration\Posting::after_create_post', false);
+				add_integration_function('integrate_after_create_post', __NAMESPACE__ . '\Integration\Posting::after_create_post#', false);
 				break;
+			// Who actions
 			case 'who':
 				add_integration_function('who_allowed', __NAMESPACE__ . '\Integration\Who::who_allowed', false);
 				add_integration_function('integrate_whos_online', __NAMESPACE__ . '\Integration\Who::whos_online', false);
 				break;
+			// Profile
 			case 'profile':
-				add_integration_function('integrate_pre_profile_areas', __NAMESPACE__ . '\Integration\Profile::hookAreas', false);
+				add_integration_function('integrate_pre_profile_areas', __NAMESPACE__ . '\Integration\Profile::hookAreas#', false);
 				break;
+			// Register
 			case 'signup':
 			case 'signup2':
 				add_integration_function('integrate_register', __NAMESPACE__ . '\Integration\Signup::register', false);
@@ -247,7 +253,7 @@ class Shop
 			'fetch_alerts',
 		);
 		foreach ($hooks as $hook)
-			add_integration_function('integrate_' . $hook, __NAMESPACE__ . '\Integration\User::' . $hook, false);
+			add_integration_function('integrate_' . $hook, __NAMESPACE__ . '\Integration\User::' . $hook.'#', false);
 	}
 
 	/**
