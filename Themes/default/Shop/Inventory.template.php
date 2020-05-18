@@ -14,6 +14,11 @@ function template_shop_inventory_search_above()
 {
 	global $context, $txt, $scripturl;
 
+	// Success messahe on gifts
+	if (isset($_REQUEST['success']))
+		echo '
+		<div class="infobox">', $txt['Shop_gift_' . ($_REQUEST['sa'] == 'sendmoney' ? 'money' : 'item') . '_sent'], '</div>';
+
 	echo '
 	<div' . ($_REQUEST['action'] == 'shop' ? ' class="roundframe"' : ''). '>
 		<form method="post" action="', $scripturl, $context['form_url'], '">

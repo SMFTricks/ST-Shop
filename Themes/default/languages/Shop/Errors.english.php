@@ -8,7 +8,7 @@
  * @license https://www.mozilla.org/en-US/MPL/2.0/
  */
 
-global  $scripturl;
+global $scripturl, $modSettings;
 
 // Errors
 $txt['cannot_shop_canAccess'] = ' You\'re not allowed to access the forum shop.';
@@ -65,7 +65,7 @@ $txt['Shop_no_categories'] = 'There are no categories created!';
 $txt['Shop_cat_name_blank'] = 'You need to enter a name for the category.';
 
 $txt['Shop_buy_item_nostock'] = 'Sorry, we don\'t have any remaining \'%s\' items in stock';
-$txt['Shop_buy_item_notenough'] = 'You don\'t have enough %1$s to buy the item \'%2$s\'. You need %4$s%3$d %1$s more to buy that item.';
+$txt['Shop_buy_item_notenough'] = 'You don\'t have enough ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' to buy the item \'%1$s\'. You need %3$s%2$d %1$s more to buy that item.';
 $txt['Shop_buy_item_bought_error'] = 'You probably came here for a mistake, because you have not bought any item before coming to this section.';
 
 $txt['Shop_user_empty'] = 'Please type a member name.';
@@ -78,7 +78,7 @@ $txt['Shop_gift_no_item_found'] = 'You did not select any item to send.';
 $txt['Shop_gift_no_items'] = 'You do not have any items to send';
 $txt['Shop_gift_no_amount'] = 'You did not set any amount to send';
 $txt['Shop_gift_not_yourself'] = 'You cannot send gifts to yourself, don\'t be selfish.';
-$txt['Shop_gift_not_enough_pocket'] = 'You do not have enough %s in your pocket for this gift.';
+$txt['Shop_gift_not_enough_pocket'] = 'You do not have enough ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' in your pocket for this gift.';
 $txt['Shop_gift_not_negative_or_zero'] = 'The amount to send cannot be negative nor zero.';
 
 $txt['Shop_restock_error_noitems'] = 'You didn\'t select any items.';

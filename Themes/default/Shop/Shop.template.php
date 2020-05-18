@@ -252,7 +252,7 @@ function template_gift($message = true)
 	global $context, $txt, $scripturl, $modSettings;
 
 	// If we are sending money, we need a different input
-	if (isset($_REQUEST['sa']) && ($_REQUEST['sa'] == 'sendmoney'))
+	if ($_REQUEST['sa'] == 'sendmoney')
 	{
 		echo '
 				<dt>

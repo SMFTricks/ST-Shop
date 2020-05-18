@@ -143,11 +143,12 @@ $txt['Shop_inventory_show_same_once'] = 'Show the same item only once';
 // Notifications
 $txt['Shop_settings_notifications'] = 'Notificacions';
 $txt['Shop_settings_notifications_desc'] = 'In this area to you activate alerts for the users on certain actions.';
-$txt['Shop_noty_credits'] = 'Notify credits received';
-$txt['Shop_noty_credits_desc'] = 'Send an alert when the user received credits as a gift or admin action.';
+$txt['Shop_noty_credits'] = 'Notify ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' received';
+$txt['Shop_noty_credits_desc'] = 'Send an alert when the user received credits or and item as a gift or admin action.';
 $txt['Shop_noty_trade'] = 'Notify successfull trade';
-$txt['Shop_noty_trade_desc'] = 'Send an alert to the seller when his item on trade was bought by someone.';
+$txt['Shop_noty_trade_desc'] = 'Send an alert to the seller when the item on trade is purchased by someone.';
 $txt['Shop_noty_items'] = 'Notify item/gift received';
+$txt['Shop_noty_items_desc'] = 'Send an alert when the user receives an item as a gift or admin action.';
 
 // Admin Items
 $txt['Shop_tab_items'] = 'Shop Items';
@@ -281,7 +282,7 @@ $txt['Shop_inventory_userinv'] = 'Browse inventory';
 $txt['Shop_inventory_search'] = 'Search inventory';
 $txt['Shop_inventory_groupcredits'] = 'Group credits';
 $txt['Shop_inventory_groupcredits_desc'] = 'Send credits to specific membergroups.';
-$txt['Shop_inventory_groupcredits_success'] = $modSettings['Shop_credits_suffix'] . ' were successfully sent to the selected groups.';
+$txt['Shop_inventory_groupcredits_success'] = (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' were successfully sent to the selected groups.';
 
 $txt['Shop_inventory_usercredits'] = 'Send credits';
 $txt['Shop_inventory_usercredits_desc'] = 'Send credits to specific members in the forum.';
@@ -293,7 +294,7 @@ $txt['Shop_inventory_restock'] = 'Restock items';
 $txt['Shop_inventory_restock_desc'] = 'Here you can reset the stock of specific items, or all of them.';
 $txt['Shop_user_credits_updated'] = 'The credits of %s were successfully updated';
 $txt['Shop_inventory_items_deleted'] = 'The selected items were successfully deleted from %s\'s profile';
-$txt['Shop_groupcredits_sent'] = $modSettings['Shop_credits_suffix'] . ' were successfully sent';
+$txt['Shop_groupcredits_sent'] = (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' were successfully sent';
 $txt['Shop_membergroup'] = 'Membergroup';
 $txt['Shop_groupcredits_action'] = 'Action:';
 $txt['Shop_groupcredits_add'] = 'Add';
@@ -320,3 +321,7 @@ $txt['Shop_file_error_empty'] = 'Please select something to upload.';
 $txt['Shop_file_error_type1'] = 'Sorry, only JPG, JPEG, PNG & GIF files are allowed.';
 $txt['Shop_file_error_type2'] = 'Sorry, only PHP files are allowed.';
 $txt['Shop_file_too_large'] = 'Sorry, your file is too large.';
+
+// Scheduled tasks
+$txt['scheduled_task_shop_bank_interest'] = 'Shop Bank interest';
+$txt['scheduled_task_desc_shop_bank_interest'] = 'The magic task that will create bank ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' out of nowhere for the users.';

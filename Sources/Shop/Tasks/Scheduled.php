@@ -10,12 +10,10 @@
 
 namespace Shop\Tasks;
 
-use Shop\Shop;
 use Shop\Helper\Database;
 
 class Scheduled
 {
-
 	/**
 	 * @var int Will help us to figure out if the user has logged in.
 	 * @author Zerk
@@ -43,5 +41,3 @@ class Scheduled
 			Database::Update('members', ['interest' => ($modSettings['Shop_bank_interest'] / 100), 'yesterday' => $this->login], 'shopBank = shopBank + (shopBank * {float:interest}),', !empty($modSettings['Shop_bank_interest_yesterday']) ? 'WHERE last_login > {int:yesterday}' : '');
 	}
 }
-
-?>

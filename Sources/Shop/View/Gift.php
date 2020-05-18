@@ -240,6 +240,8 @@ class Gift
 					$body = sprintf(Shop::getText('gift_notification_message2'), $user_info['id'], $user_info['name'], $modSettings['Shop_credits_suffix'], Format::cash($amount), Format::cash($membermoney + $amount), $message);
 					// Icon for alert
 					$this->extra_items['item_icon'] = 'top_money_r';
+					// Amount for the alert
+					$this->extra_items['amount'] = Format::cash($amount);
 
 					// Log the item
 					Log::credits($user_info['id'], $memResult['id_member'], $amount, false, $message);
@@ -247,7 +249,7 @@ class Gift
 					// Send PM
 					$this->notify->pm($memResult['id_member'], $subject, $body);
 					// Deploy alert?
-					if (!empty($modSettings['Shop_noty_items']))
+					if (!empty($modSettings['Shop_noty_credits']))
 						$this->notify->alert($memResult['id_member'], 'credits', $user_info['id'], $this->extra_items);
 				}
 

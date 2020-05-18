@@ -258,7 +258,7 @@ class Settings
 		if (!empty($modSettings['Shop_enable_shop']))
 			self::$shop_vars = [
 				['check', 'Shop_noty_trade', 'subtext' => Shop::getText('noty_trade_desc')],
-				['check', 'Shop_noty_items'],
+				['check', 'Shop_noty_items', 'subtext' => Shop::getText('noty_items_desc')],
 			];
 		$config_vars = array_merge($config_vars, self::$shop_vars);
 
