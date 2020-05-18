@@ -18,21 +18,35 @@ if (!defined('SMF'))
 class Dashboard
 {
 	/**
+	 * @var array Subactions array for each section/area of the shop.
+	 */
+	protected $_subactions = [];
+
+	/**
+	 * @var array Subactions array for each section/area of the shop.
+	 */
+	protected $_sa;
+
+	protected $_fields_data = [];
+	protected $_fields_type = [];
+
+	/**
 	 * Dashboard::__construct()
 	 *
-	 * Call certain administrative hooks
+	 * Call certain administrative hooks and load the language file
 	 */
 	function __construct()
 	{
+		// Load languages
+		loadLanguage('Shop/ShopAdmin');
+		loadLanguage('Shop/Errors');
+
 		// Permissions
-		add_integration_function('integrate_load_permissions', 'Shop\Integration\Permissions::load_permissions#', false);
-		add_integration_function('integrate_load_illegal_guest_permissions', 'Shop\Integration\Permissions::illegal_guest#', false);
+		$this->permissions();
+
 		// Boards settings
-		add_integration_function('integrate_pre_boardtree', 'Shop\Integration\Boards::pre_boardtree#', false);
-		add_integration_function('integrate_boardtree_board', 'Shop\Integration\Boards::boardtree_board#', false);
-		add_integration_function('integrate_edit_board', 'Shop\Integration\Boards::edit_board#', false);
-		add_integration_function('integrate_create_board', 'Shop\Integration\Boards::create_board#', false);
-		add_integration_function('integrate_modify_board', 'Shop\Integration\Boards::modify_board', false);
+		if (isset($_REQUEST['area']) && $_REQUEST['area'] == 'manageboards')
+			$this->manageboards();
 	}
 
 	 /**
@@ -46,8 +60,6 @@ class Dashboard
 	{
 		global $modSettings;
 
-		loadLanguage('Shop/ShopAdmin');
-
 		$admin_areas['shop'] = [
 			'title' => Shop::getText('admin_button'),
 			'permission' => ['shop_canManage'],
@@ -55,12 +67,12 @@ class Dashboard
 				'shopinfo' => [
 					'label' => Shop::getText('tab_info'),
 					'icon' => 'administration',
-					'function' => __NAMESPACE__ . '\Dashboard::main',
+					'function' => __NAMESPACE__ . '\Dashboard::main#',
 				],
 				'shopsettings' => [
 					'label' => Shop::getText('tab_settings'),
 					'icon' => 'features',
-					'function' => __NAMESPACE__ . '\Settings::main',
+					'function' => __NAMESPACE__ . '\Settings::main#',
 					'permission' => ['admin_forum'],
 					'subsections' => [
 						'general' => [Shop::getText('settings_general')],
@@ -76,7 +88,7 @@ class Dashboard
 				'shopitems' => [
 					'label' => Shop::getText('tab_items'),
 					'icon' => 'smiley',
-					'function' => __NAMESPACE__ . '\Items::main',
+					'function' => __NAMESPACE__ . '\Items::main#',
 					'permission' => ['shop_canManage'],
 					'enabled' => !empty($modSettings['Shop_enable_shop']),
 					'subsections' => [
@@ -88,7 +100,7 @@ class Dashboard
 				'shopmodules' => [
 					'label' => Shop::getText('tab_modules'),
 					'icon' => 'modifications',
-					'function' => __NAMESPACE__ . '\Modules::main',
+					'function' => __NAMESPACE__ . '\Modules::main#',
 					'permission' => ['admin_forum'],
 					'enabled' => !empty($modSettings['Shop_enable_shop']),
 					'subsections' => [
@@ -99,7 +111,7 @@ class Dashboard
 				'shopcategories' => [
 					'label' => Shop::getText('tab_cats'),
 					'icon' => 'boards',
-					'function' => __NAMESPACE__ . '\Categories::main',
+					'function' => __NAMESPACE__ . '\Categories::main#',
 					'permission' => ['shop_canManage'],
 					'enabled' => !empty($modSettings['Shop_enable_shop']),
 					'subsections' => [
@@ -127,8 +139,8 @@ class Dashboard
 					'function' =>  __NAMESPACE__ . '\Inventory::main#',
 					'permission' => ['shop_canManage'],
 					'subsections' => [
-						'groupcredits' => [Shop::getText('inventory_groupcredits')],
 						'usercredits' => [Shop::getText('inventory_usercredits')],
+						'groupcredits' => [Shop::getText('inventory_groupcredits')],
 						'useritems' => [
 							Shop::getText('inventory_useritems'),
 							'enabled' => !empty($modSettings['Shop_enable_shop']),
@@ -206,7 +218,7 @@ class Dashboard
 
 		$context['Shop']['version'] = Shop::$version;
 		$context['Shop']['support'] = Shop::$supportSite;
-		$context['Shop']['credits'] = self::credits();
+		$context['Shop']['credits'] = $this->credits();
 
 		// Feed news
 		addInlineJavascript('
@@ -243,12 +255,39 @@ class Dashboard
 	}
 
 	/**
+	 * Dashboard::permissions()
+	 *
+	 * Loads hooks to include shop permissions
+	 * @return void
+	 */
+	public function permissions()
+	{
+		add_integration_function('integrate_load_permissions', 'Shop\Integration\Permissions::load_permissions#', false);
+		add_integration_function('integrate_load_illegal_guest_permissions', 'Shop\Integration\Permissions::illegal_guest#', false);
+	}
+
+	/**
+	 * Dashboard::manageboards()
+	 *
+	 * Loads hooks for boards settings
+	 * @return void
+	 */
+	public function manageboards()
+	{
+		add_integration_function('integrate_pre_boardtree', 'Shop\Integration\Boards::pre_boardtree#', false);
+		add_integration_function('integrate_boardtree_board', 'Shop\Integration\Boards::boardtree_board#', false);
+		add_integration_function('integrate_edit_board', 'Shop\Integration\Boards::edit_board#', false);
+		add_integration_function('integrate_create_board', 'Shop\Integration\Boards::create_board#', false);
+		add_integration_function('integrate_modify_board', 'Shop\Integration\Boards::modify_board', false);
+	}
+
+	/**
 	 * Dashboard::credits()
 	 *
 	 * Includes a list of contributors, developers and third party scripts that helped build this MOD
 	 * @return array The list of credits
 	 */
-	public static function credits()
+	public function credits()
 	{
 		$credits = [
 			'dev' => [

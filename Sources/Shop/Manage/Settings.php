@@ -16,23 +16,26 @@ use Shop\Helper\Database;
 if (!defined('SMF'))
 	die('No direct access...');
 
-class Settings
+class Settings extends Dashboard
 {
-	private static $shop_vars = [];
+	var $_shop_vars = [];
 
-	public function main()
+	function __construct()
 	{
-		global $context;
-
-		$subactions = [
+		// Array of sections
+		$this->_subactions = [
 			'general' => 'general',
 			'credits' => 'credits',
 			'permissions' => 'permissions',
 			'profile' => 'profile',
 			'notifications' => 'notifications',
 		];
+		$this->_sa = isset($_GET['sa'], $this->_subactions[$_GET['sa']]) ? $_GET['sa'] : 'general';
+	}
 
-		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'general';
+	public function main()
+	{
+		global $context;
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = [
@@ -46,7 +49,7 @@ class Settings
 				'notifications' => ['description' => Shop::getText('settings_notifications_desc')],
 			],
 		];
-		call_helper(__CLASS__ . '::' . $subactions[$sa]);
+		call_helper(__CLASS__ . '::' . $this->_subactions[$this->_sa].'#');
 	}
 
 	public function general($return_config = false)
@@ -63,7 +66,7 @@ class Settings
 		
 		// Shop enabled? Show more options
 		if (!empty($modSettings['Shop_enable_shop']))
-			self::$shop_vars = [
+			$this->_shop_vars = [
 				['check', 'Shop_enable_games'],
 				['check', 'Shop_enable_bank'],
 				['check', 'Shop_enable_gift'],
@@ -74,7 +77,7 @@ class Settings
 				'',
 				['check', 'Shop_enable_maintenance', 'subtext' => Shop::getText('enable_maintenance_desc')]
 			];
-		$config_vars = array_merge($config_vars, self::$shop_vars);
+		$config_vars = array_merge($config_vars, $this->_shop_vars);
 
 		Database::Save($config_vars, $return_config, 'general');
 	}
@@ -103,7 +106,7 @@ class Settings
 
 		// Shop enabled? Show more options
 		if (!empty($modSettings['Shop_enable_shop']))
-			self::$shop_vars = [
+			$this->_shop_vars = [
 				['title', 'Shop_bank_settings', 'disabled' => empty($modSettings['Shop_enable_bank'])],
 				['float', 'Shop_bank_interest', 'subtext' => Shop::getText('bank_interest_desc'), 'min' => '', 'disabled' => empty($modSettings['Shop_enable_bank'])],
 				['check', 'Shop_bank_interest_yesterday', 'subtext' => Shop::getText('bank_interest_yesterday_desc'), 'disabled' => empty($modSettings['Shop_enable_bank'])],
@@ -120,7 +123,7 @@ class Settings
 				['int', 'Shop_items_perpage', 'subtext' => Shop::getText('items_perpage_desc')],
 				
 			];
-		$config_vars = array_merge($config_vars, self::$shop_vars);
+		$config_vars = array_merge($config_vars, $this->_shop_vars);
 
 		Database::Save($config_vars, $return_config, 'credits');
 	}
@@ -192,7 +195,7 @@ class Settings
 
 		// Shop enabled? Show more options
 		if (!empty($modSettings['Shop_enable_shop']))
-			self::$shop_vars = [
+			$this->_shop_vars = [
 				['select', 'Shop_display_bank',
 					[
 						Shop::getText('items_none_select'),
@@ -236,7 +239,7 @@ class Settings
 				],
 				['check', 'Shop_inventory_allow_hide', 'subtext' => Shop::getText('inventory_allow_hide_desc')],
 			];
-		$config_vars = array_merge($config_vars, self::$shop_vars);
+		$config_vars = array_merge($config_vars, $this->_shop_vars);
 
 		Database::Save($config_vars, $return_config, 'profile');
 	}
@@ -256,11 +259,11 @@ class Settings
 		
 		// Shop enabled? Show more options
 		if (!empty($modSettings['Shop_enable_shop']))
-			self::$shop_vars = [
+			$this->_shop_vars = [
 				['check', 'Shop_noty_trade', 'subtext' => Shop::getText('noty_trade_desc')],
 				['check', 'Shop_noty_items', 'subtext' => Shop::getText('noty_items_desc')],
 			];
-		$config_vars = array_merge($config_vars, self::$shop_vars);
+		$config_vars = array_merge($config_vars, $this->_shop_vars);
 
 		Database::Save($config_vars, $return_config, 'notifications');
 	}

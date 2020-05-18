@@ -11,24 +11,23 @@
 namespace Shop\Manage;
 
 use Shop\Shop;
-use Shop\Helper;
+use Shop\Helper\Database;
+use Shop\Helper\Delete;
+use Shop\Helper\Format;
+use Shop\Helper\Images;
 
 if (!defined('SMF'))
 	die('No direct access...');
 
-class Categories
+class Categories extends Dashboard
 {
-	private static $fields_data = [];
-	private static $fields_type = [];
-
-	public function main()
+	function __construct()
 	{
-		global $context;
-
-		loadLanguage('Shop/Errors');
+		// Required languages
 		loadLanguage('Shop/Shop');
 
-		$subactions = [
+		// Array of sections
+		$this->_subactions = [
 			'index' => 'index',
 			'add' => 'set_cat',
 			'edit' => 'set_cat',
@@ -36,7 +35,12 @@ class Categories
 			'delete' => 'delete',
 			'delete2' => 'delete2',
 		];
-		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'index';
+		$this->_sa = isset($_GET['sa'], $this->_subactions[$_GET['sa']]) ? $_GET['sa'] : 'index';
+	}
+
+	public function main()
+	{
+		global $context;
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = [
@@ -47,7 +51,7 @@ class Categories
 				'add' => ['description' => Shop::getText('cats_add_desc')],
 			],
 		];
-		call_helper(__CLASS__ . '::' . $subactions[$sa]);
+		call_helper(__CLASS__ . '::' . $this->_subactions[$this->_sa].'#');
 	}
 
 	public function index()
@@ -68,11 +72,11 @@ class Categories
 			'default_sort_col' => 'modify',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_categories AS sc', Helper\Database::$categories],
+				'params' => ['shop_categories AS sc', Database::$categories],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_categories AS sc', Helper\Database::$categories],
+				'params' => ['shop_categories AS sc', Database::$categories],
 			],
 			'no_items_label' => Shop::getText('no_cats'),
 			'no_items_align' => 'center',
@@ -85,7 +89,7 @@ class Categories
 					'data' => [
 						'function' => function($row)
 						{
-							return Helper\Format::image($row['image']);
+							return Format::image($row['image']);
 						},
 						'style' => 'width: 4%',
 						'class' => 'centertext',
@@ -125,7 +129,7 @@ class Categories
 						'data' => [
 							'function' => function($row)
 							{
-								return Helper\Database::Count('shop_items AS s', Helper\Database::$items, 'WHERE s.catid = ' . $row['catid']);
+								return Database::Count('shop_items AS s', Database::$items, 'WHERE s.catid = ' . $row['catid']);
 							},
 							'style' => 'width: 3%',
 							'class' => 'centertext',
@@ -214,17 +218,17 @@ class Categories
 		$context['shop_cat'] = [];
 		// Images...
 		$context['items_url'] = $boardurl . Shop::$itemsdir;
-		$context['shop_images_list'] = Helper\Images::list();
+		$context['shop_images_list'] = Images::list();
 
 		// Edit, or Add?
 		if ($_REQUEST['sa'] == 'edit')
 		{
 			// Try to find this item
-			if (empty(Helper\Database::Find('shop_categories AS sc', 'sc.catid', (int) $_REQUEST['id'])))
+			if (empty(Database::Find('shop_categories AS sc', 'sc.catid', (int) $_REQUEST['id'])))
 				fatal_error(Shop::getText('cat_notfound'), false);
 
 			// Get category
-			$context['shop_category'] = Helper\Database::Get('', '', '', 'shop_categories AS sc', Helper\Database::$categories, 'WHERE sc.catid = {int:catid}', true, '', ['catid' => (int) (isset($_REQUEST['id']) ? $_REQUEST['id'] : 0)]);
+			$context['shop_category'] = Database::Get('', '', '', 'shop_categories AS sc', Database::$categories, 'WHERE sc.catid = {int:catid}', true, '', ['catid' => (int) (isset($_REQUEST['id']) ? $_REQUEST['id'] : 0)]);
 
 			// Index?
 			$context[$context['admin_menu_name']]['current_subsection'] = 'index';
@@ -243,44 +247,44 @@ class Categories
 		global $context;
 
 		// Data
-		self::$fields_data = [
+		$this->_fields_data = [
 			'catid' => (int) isset($_REQUEST['id']) && !empty($_REQUEST['id']) ? $_REQUEST['id'] : 0,
-			'name' => (string) isset($_REQUEST['catname']) ? Helper\Database::sanitize($_REQUEST['catname']) : '',
-			'image' => (string) isset($_REQUEST['caticon']) ? Helper\Database::sanitize($_REQUEST['caticon']) : '',
-			'description' => (string) isset($_REQUEST['catdesc']) ? Helper\Database::sanitize($_REQUEST['catdesc']) : '',
+			'name' => (string) isset($_REQUEST['catname']) ? Database::sanitize($_REQUEST['catname']) : '',
+			'image' => (string) isset($_REQUEST['caticon']) ? Database::sanitize($_REQUEST['caticon']) : '',
+			'description' => (string) isset($_REQUEST['catdesc']) ? Database::sanitize($_REQUEST['catdesc']) : '',
 		];
 
 		// Info in case of error
-		$context[$context['admin_menu_name']]['current_subsection'] = empty(self::$fields_data['catid']) ? 'add' : 'edit';
+		$context[$context['admin_menu_name']]['current_subsection'] = empty($this->_fields_data['catid']) ? 'add' : 'edit';
 
 		// You need to at least set a name!
-		if (empty(self::$fields_data['name']))
+		if (empty($this->_fields_data['name']))
 			fatal_error(Shop::getText('cat_name_blank'), false);
 
 		checkSession();
 		$status = 'updated';
 
 		// Add the item to the shop
-		if (empty(self::$fields_data['catid']))
+		if (empty($this->_fields_data['catid']))
 		{
 			// Type
-			foreach(self::$fields_data as $column => $type)
-				self::$fields_type[$column] = str_replace('integer', 'int', gettype($type));
+			foreach($this->_fields_data as $column => $type)
+				$this->_fields_type[$column] = str_replace('integer', 'int', gettype($type));
 
 			// Insert
-			Helper\Database::Insert('shop_categories', self::$fields_data, self::$fields_type);
+			Database::Insert('shop_categories', $this->_fields_data, $this->_fields_type);
 			$status = 'added';
 		}
 
 		else
 		{
-			self::$fields_type = '';
+			$this->_fields_type = '';
 			// Type
-			foreach(self::$fields_data as $column => $type)
-				self::$fields_type .= $column . ' = {'.str_replace('integer', 'int', gettype($type)).':'.$column.'}, ';
+			foreach($this->_fields_data as $column => $type)
+				$this->_fields_type .= $column . ' = {'.str_replace('integer', 'int', gettype($type)).':'.$column.'}, ';
 
 			// Update
-			Helper\Database::Update('shop_categories', self::$fields_data, self::$fields_type, 'WHERE catid = ' . self::$fields_data['catid']);
+			Database::Update('shop_categories', $this->_fields_data, $this->_fields_type, 'WHERE catid = ' . $this->_fields_data['catid']);
 		}
 		redirectexit('action=admin;area=shopcategories;sa=index;'.$status);
 	}
@@ -312,7 +316,7 @@ class Categories
 			$_REQUEST['delete'][$key] = (int) $value;
 
 		// We want to delete these items?
-		$context['shop_delete'] = Helper\Database::Get(0, 1000, 'sc.name', 'shop_categories AS sc', Helper\Database::$categories, 'WHERE sc.catid IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['delete']]);
+		$context['shop_delete'] = Database::Get(0, 1000, 'sc.name', 'shop_categories AS sc', Database::$categories, 'WHERE sc.catid IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['delete']]);
 
 		// Set the format
 		foreach ($context['shop_delete'] as $id => $var)
@@ -336,9 +340,9 @@ class Categories
 
 		// Collect the item ids
 		if (isset($_REQUEST['deleteitems']) && !empty($_REQUEST['deleteitems']))
-			$_REQUEST['deleteitems'] = Helper\Database::Get(0, 100000, 's.itemid', 'shop_items AS s', ['s.itemid', 's.catid'], 'WHERE s.catid IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['deleteitems']]);
+			$_REQUEST['deleteitems'] = Database::Get(0, 100000, 's.itemid', 'shop_items AS s', ['s.itemid', 's.catid'], 'WHERE s.catid IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['deleteitems']]);
 
 		// Items using this module are... no longer using it
-		Helper\Delete::cats($_REQUEST['delete'], 'action=admin;area=shopcategories;sa=index;deleted', $_REQUEST['deleteitems']);
+		Delete::cats($_REQUEST['delete'], 'action=admin;area=shopcategories;sa=index;deleted', $_REQUEST['deleteitems']);
 	}
 }

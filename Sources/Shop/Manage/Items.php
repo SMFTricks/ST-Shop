@@ -11,32 +11,36 @@
 namespace Shop\Manage;
 
 use Shop\Shop;
-use Shop\Helper;
+use Shop\Helper\Database;
+use Shop\Helper\Delete;
+use Shop\Helper\Format;
+use Shop\Helper\Images;
 use Shop\Modules;
 
 if (!defined('SMF'))
 	die('No direct access...');
 
-class Items
+class Items extends Dashboard
 {
-	private static $item_info = [
+	protected $_item_info = [
 		1 => '',
 		2 => '',
 		3 => '', 
 		4 => '',
 	];
-	private static $item_module = 'Shop\\Modules\\';
-	private static $fields_data = [];
-	private static $fields_type = [];
 
-	public function main()
+	/**
+	 * @var object We will create an object for the specified item if needed.
+	 */
+	private $_item_module = 'Shop\\Modules\\';
+
+	function __construct()
 	{
-		global $context;
-
-		loadLanguage('Shop/Errors');
+		// Required languages
 		loadLanguage('Shop/Shop');
 
-		$subactions = [
+		// Array of sections
+		$this->_subactions = [
 			'index' => 'index',
 			'add' => 'add',
 			'add2' => 'set_item',
@@ -47,8 +51,12 @@ class Items
 			'upload' => 'upload',
 			'upload2' => 'upload2',
 		];
+		$this->_sa = isset($_GET['sa'], $this->_subactions[$_GET['sa']]) ? $_GET['sa'] : 'index';
+	}
 
-		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'index';
+	public function main()
+	{
+		global $context;
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = [
@@ -60,7 +68,7 @@ class Items
 				'upload' => ['description' => Shop::getText('items_upload_desc')],
 			],
 		];
-		call_helper(__CLASS__ . '::' . $subactions[$sa]);
+		call_helper(__CLASS__ . '::' . $this->_subactions[$this->_sa].'#');
 	}
 
 	public function index()
@@ -81,11 +89,11 @@ class Items
 			'default_sort_col' => 'modify',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_items AS s', array_merge(Helper\Database::$items, ['sc.name AS category, sm.file']), '', false, 'LEFT JOIN {db_prefix}shop_categories AS sc ON (sc.catid = s.catid) LEFT JOIN {db_prefix}shop_modules AS sm ON (sm.id = s.module)'],
+				'params' => ['shop_items AS s', array_merge(Database::$items, ['sc.name AS category, sm.file']), '', false, 'LEFT JOIN {db_prefix}shop_categories AS sc ON (sc.catid = s.catid) LEFT JOIN {db_prefix}shop_modules AS sm ON (sm.id = s.module)'],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_items AS s', Helper\Database::$items],
+				'params' => ['shop_items AS s', Database::$items],
 			],
 			'no_items_label' => Shop::getText('no_items'),
 			'no_items_align' => 'center',
@@ -98,7 +106,7 @@ class Items
 					'data' => [
 						'function' => function($row)
 						{
-							return Helper\Format::image($row['image'], $row['description']);
+							return Format::image($row['image'], $row['description']);
 						},
 						'style' => 'width: 4%',
 						'class' => 'centertext',
@@ -274,7 +282,7 @@ class Items
 		$context[$context['admin_menu_name']]['tab_data']['title'] = $context['page_title'];
 		loadTemplate('Shop/ShopAdmin');
 		$context['sub_template'] = 'items_add';
-		$context['shop_modules'] = Helper\Database::Get(0, 1000, 'sm.name', 'shop_modules AS sm', Helper\Database::$modules);
+		$context['shop_modules'] = Database::Get(0, 1000, 'sm.name', 'shop_modules AS sm', Database::$modules);
 	}
 
 	public function set_item()
@@ -295,15 +303,15 @@ class Items
 		$context['shop_item'] = [];
 		// Images...
 		$context['items_url'] = $boardurl . Shop::$itemsdir;
-		$context['shop_images_list'] = Helper\Images::list();
+		$context['shop_images_list'] = Images::list();
 		// ... and categories
-		$context['shop_categories_list'] = Helper\Database::Get(0, 1000, 'sc.name', 'shop_categories AS sc', Helper\Database::$categories);
+		$context['shop_categories_list'] = Database::Get(0, 1000, 'sc.name', 'shop_categories AS sc', Database::$categories);
 
 		// Edit, or Add?
 		if ($_REQUEST['sa'] == 'edit')
 		{
 			// Get item
-			$context['shop_item'] = Helper\Database::Get('', '', '', 'shop_items AS s', array_merge(Helper\Database::$items, ['sm.file']), 'WHERE s.itemid = {int:itemid}', true, 'LEFT JOIN {db_prefix}shop_modules AS sm ON (sm.id = s.module)', ['itemid' => (int) (isset($_REQUEST['id']) ? $_REQUEST['id'] : 0)]);
+			$context['shop_item'] = Database::Get('', '', '', 'shop_items AS s', array_merge(Database::$items, ['sm.file']), 'WHERE s.itemid = {int:itemid}', true, 'LEFT JOIN {db_prefix}shop_modules AS sm ON (sm.id = s.module)', ['itemid' => (int) (isset($_REQUEST['id']) ? $_REQUEST['id'] : 0)]);
 
 			// No item
 			if (empty($context['shop_item']))
@@ -311,7 +319,7 @@ class Items
 
 			// We need to grab the extra input required by this item.
 			// The actual information.
-			self::$item_info = [
+			$this->_item_info = [
 				1 => $context['shop_item']['info1'],
 				2 => $context['shop_item']['info2'],
 				3 => $context['shop_item']['info3'], 
@@ -333,7 +341,7 @@ class Items
 			$module = isset($_REQUEST['module']) ? (isset($_REQUEST['item']) ? $_REQUEST['item'] : 0) : 0;
 
 			// Get some info on the item
-			$context['shop_item'] = Helper\Database::Get('', '', '', 'shop_modules AS sm', Helper\Database::$modules, 'WHERE sm.id = {int:module}', true, '', ['module' => (int) $module]);
+			$context['shop_item'] = Database::Get('', '', '', 'shop_modules AS sm', Database::$modules, 'WHERE sm.id = {int:module}', true, '', ['module' => (int) $module]);
 			$context['shop_item']['module'] = $module;
 
 			// Change description
@@ -348,14 +356,14 @@ class Items
 		if (!empty($context['shop_item']['module']))
 		{
 			// Store it somewhere
-			self::$item_module .= $context['shop_item']['file'];
+			$this->_item_module .= $context['shop_item']['file'];
 
 			// Is the item still there?
-			if (!class_exists(self::$item_module))
+			if (!class_exists($this->_item_module))
 				fatal_error(sprintf(Shop::getText('item_no_module'), Shop::$modulesdir . $context['shop_item']['file']), false);
 
 			// Create a new object
-			$itemModel = new self::$item_module;
+			$itemModel = new $this->_item_module;
 
 			// Success?
 			if ($itemModel === NULL)
@@ -363,7 +371,7 @@ class Items
 
 			// Adding?
 			if ($_REQUEST['sa'] === 'edit')
-				$itemModel->item_info = self::$item_info;
+				$itemModel->item_info = $this->_item_info;
 
 			// Can we edit the getAddInput() info?
 			if ($itemModel->addInput_editable == true)
@@ -381,11 +389,11 @@ class Items
 		global $context;
 
 		// Data
-		self::$fields_data = [
+		$this->_fields_data = [
 			'itemid' => (int) isset($_REQUEST['id']) && !empty($_REQUEST['id']) ? $_REQUEST['id'] : 0,
-			'name' => (string) isset($_REQUEST['itemname']) ? Helper\Database::sanitize($_REQUEST['itemname']) : '',
-			'image' => (string) isset($_REQUEST['icon']) ? Helper\Database::sanitize($_REQUEST['icon']) : '',
-			'description' => (string) isset($_REQUEST['itemdesc']) ? Helper\Database::sanitize($_REQUEST['itemdesc']) : '',
+			'name' => (string) isset($_REQUEST['itemname']) ? Database::sanitize($_REQUEST['itemname']) : '',
+			'image' => (string) isset($_REQUEST['icon']) ? Database::sanitize($_REQUEST['icon']) : '',
+			'description' => (string) isset($_REQUEST['itemdesc']) ? Database::sanitize($_REQUEST['itemdesc']) : '',
 			'price' => (int) isset($_REQUEST['itemprice']) && !empty($_REQUEST['itemprice']) ? $_REQUEST['itemprice'] : 0,
 			'stock' => (int) isset($_REQUEST['itemstock']) && !empty($_REQUEST['itemstock']) ? $_REQUEST['itemstock'] : 0,
 			'module' => (int) isset($_REQUEST['module']) ? $_REQUEST['module'] : 0,
@@ -402,42 +410,42 @@ class Items
 		];
 
 		// Info in case of error
-		$context[$context['admin_menu_name']]['current_subsection'] = empty(self::$fields_data['itemid']) ? 'add' : 'edit';
+		$context[$context['admin_menu_name']]['current_subsection'] = empty($this->_fields_data['itemid']) ? 'add' : 'edit';
 
 		// You need to at least set a name!
-		if (empty(self::$fields_data['name']))
+		if (empty($this->_fields_data['name']))
 			fatal_error(Shop::getText('item_name_blank'), false);
 
 		checkSession();
 		$status = 'updated';
 
 		// Add the item to the shop
-		if (empty(self::$fields_data['itemid']))
+		if (empty($this->_fields_data['itemid']))
 		{
 			// Type
-			foreach(self::$fields_data as $column => $type)
-				self::$fields_type[$column] = str_replace('integer', 'int', gettype($type));
+			foreach($this->_fields_data as $column => $type)
+				$this->_fields_type[$column] = str_replace('integer', 'int', gettype($type));
 
 			// Insert
-			Helper\Database::Insert('shop_items', self::$fields_data, self::$fields_type);
+			Database::Insert('shop_items', $this->_fields_data, $this->_fields_type);
 			$status = 'added';
 		}
 
 		else
 		{
-			self::$fields_type = '';
+			$this->_fields_type = '';
 			// Remove those that don't require updating
-			unset(self::$fields_data['input_needed']);
-			unset(self::$fields_data['can_use_item']);
-			unset(self::$fields_data['module']);
-			unset(self::$fields_data['function']);
+			unset($this->_fields_data['input_needed']);
+			unset($this->_fields_data['can_use_item']);
+			unset($this->_fields_data['module']);
+			unset($this->_fields_data['function']);
 
 			// Type
-			foreach(self::$fields_data as $column => $type)
-				self::$fields_type .= $column . ' = {'.str_replace('integer', 'int', gettype($type)).':'.$column.'}, ';
+			foreach($this->_fields_data as $column => $type)
+				$this->_fields_type .= $column . ' = {'.str_replace('integer', 'int', gettype($type)).':'.$column.'}, ';
 
 			// Update
-			Helper\Database::Update('shop_items', self::$fields_data, self::$fields_type, 'WHERE itemid = ' . self::$fields_data['itemid']);
+			Database::Update('shop_items', $this->_fields_data, $this->_fields_type, 'WHERE itemid = ' . $this->_fields_data['itemid']);
 		}
 
 		redirectexit('action=admin;area=shopitems;sa=index;'.$status);
@@ -470,7 +478,7 @@ class Items
 			$_REQUEST['delete'][$key] = (int) $value;
 
 		// We want to delete these items?
-		$context['shop_delete'] = Helper\Database::Get(0, 1000, 's.name', 'shop_items AS s', Helper\Database::$items, 'WHERE s.itemid IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['delete']]);
+		$context['shop_delete'] = Database::Get(0, 1000, 's.name', 'shop_items AS s', Database::$items, 'WHERE s.itemid IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['delete']]);
 	}
 
 	public function delete2()
@@ -486,7 +494,7 @@ class Items
 			fatal_error(Shop::getText('item_delete_error'), false);
 
 		// Remove all entries of this item from the logs and redirect
-		Helper\Delete::items($_REQUEST['delete'], 'action=admin;area=shopitems;sa=index;deleted');
+		Delete::items($_REQUEST['delete'], 'action=admin;area=shopitems;sa=index;deleted');
 	}
 
 	public function upload()

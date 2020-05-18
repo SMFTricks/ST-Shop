@@ -11,34 +11,36 @@
 namespace Shop\Manage;
 
 use Shop\Shop;
-use Shop\Helper;
+use Shop\Helper\Database;
+use Shop\Helper\Delete;
 use Shop\Modules as Module_Template;
 
 if (!defined('SMF'))
 	die('No direct access...');
 
-class Modules
+class Modules extends Dashboard
 {
-	private static $item_module = 'Shop\\Modules\\';
-	private static $fields_data = [];
-	private static $fields_type = [];
+	private $_item_module = 'Shop\\Modules\\';
 
-	public function main()
+	function __construct()
 	{
-		global $context;
-
-		loadLanguage('Shop/Errors');
+		// Required languages
 		loadLanguage('Shop/Shop');
 
-		$subactions = [
+		// Array of sections
+		$this->_subactions = [
 			'index' => 'index',
 			'upload' => 'upload',
 			'upload2' => 'upload2',
 			'delete' => 'delete',
 			'delete2' => 'delete2',
 		];
+		$this->_sa = isset($_GET['sa'], $this->_subactions[$_GET['sa']]) ? $_GET['sa'] : 'index';
+	}
 
-		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'index';
+	public function main()
+	{
+		global $context;
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = [
@@ -49,7 +51,7 @@ class Modules
 				'upload' => ['description' => Shop::getText('modules_upload_desc')],
 			],
 		];
-		call_helper(__CLASS__ . '::' . $subactions[$sa]);
+		call_helper(__CLASS__ . '::' . $this->_subactions[$this->_sa].'#');
 	}
 
 	public function index()
@@ -70,11 +72,11 @@ class Modules
 			'default_sort_col' => 'item_name',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_modules AS sm', Helper\Database::$modules],
+				'params' => ['shop_modules AS sm', Database::$modules],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_modules AS sm', Helper\Database::$modules],
+				'params' => ['shop_modules AS sm', Database::$modules],
 			],
 			'no_items_label' => Shop::getText('no_modules'),
 			'no_items_align' => 'center',
@@ -233,10 +235,10 @@ class Modules
 			{
 				if (move_uploaded_file($_FILES['newitem']['tmp_name'], $target_file))
 				{
-					self::$item_module .= $filename;
+					$this->_item_module .= $filename;
 
 					// Did we get the module in place?
-					if (!class_exists(self::$item_module))
+					if (!class_exists($this->_item_module))
 					{
 						unlink($sourcedir . Shop::$modulesdir . basename($filename. '.php'));
 						fatal_error(sprintf(Shop::getText('module_cant_instance'), Shop::$modulesdir . $filename), false);
@@ -245,27 +247,27 @@ class Modules
 					else
 					{
 						// Create the instance
-						$itemModel = new self::$item_module;
+						$itemModel = new $this->_item_module;
 
 						// Data
-						self::$fields_data = [
-							'name' => (string) Helper\Database::sanitize($itemModel->name),
-							'description' => (string) Helper\Database::sanitize($itemModel->desc),
+						$this->_fields_data = [
+							'name' => (string) Database::sanitize($itemModel->name),
+							'description' => (string) Database::sanitize($itemModel->desc),
 							'price' => (int) $itemModel->price,
-							'author' => (string) Helper\Database::sanitize($itemModel->authorName),
-							'email' => (string) Helper\Database::sanitize($itemModel->authorEmail),
-							'web' => (string) Helper\Database::sanitize($itemModel->authorWeb),
+							'author' => (string) Database::sanitize($itemModel->authorName),
+							'email' => (string) Database::sanitize($itemModel->authorEmail),
+							'web' => (string) Database::sanitize($itemModel->authorWeb),
 							'require_input' => (int) $itemModel->require_input,
 							'can_use_item' => (int) $itemModel->can_use_item,
 							'editable_input' => (int) $itemModel->addInput_editable,
-							'file' => (string) Helper\Database::sanitize($filename),
+							'file' => (string) Database::sanitize($filename),
 						];
 						// Type
-						foreach(self::$fields_data as $column => $type)
-							self::$fields_type[$column] = str_replace('integer', 'int', gettype($type));
+						foreach($this->_fields_data as $column => $type)
+							$this->_fields_type[$column] = str_replace('integer', 'int', gettype($type));
 
 						// Insert the module in the database
-						Helper\Database::Insert('shop_modules', self::$fields_data, self::$fields_type);
+						Database::Insert('shop_modules', $this->_fields_data, $this->_fields_type);
 					
 						// Get me out of here
 						redirectexit('action=admin;area=shopmodules;sa=upload;success');
@@ -304,7 +306,7 @@ class Modules
 			$_REQUEST['delete'][$key] = (int) $value;
 
 		// We want to delete these items?
-		$context['shop_delete'] = Helper\Database::Get(0, 1000, 'sm.name', 'shop_modules AS sm', Helper\Database::$modules, 'WHERE sm.id IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['delete']]);
+		$context['shop_delete'] = Database::Get(0, 1000, 'sm.name', 'shop_modules AS sm', Database::$modules, 'WHERE sm.id IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['delete']]);
 
 		// Set the format
 		foreach ($context['shop_delete'] as $id => $var)
@@ -324,6 +326,6 @@ class Modules
 			fatal_error(Shop::getText('item_delete_error'), false);
 
 		// Items using this module are... no longer using it
-		Helper\Delete::modules($_REQUEST['delete'], 'action=admin;area=shopmodules;sa=index;deleted');
+		Delete::modules($_REQUEST['delete'], 'action=admin;area=shopmodules;sa=index;deleted');
 	}
 }

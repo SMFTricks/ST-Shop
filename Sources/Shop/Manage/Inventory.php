@@ -15,29 +15,37 @@ use Shop\Helper\Database;
 use Shop\Helper\Format;
 use Shop\Helper\Log;
 use Shop\Helper\Notify;
-use Shop\View\Inventory as Search;
 
 if (!defined('SMF'))
 	die('No direct access...');
 
-class Inventory
+class Inventory extends Dashboard
 {
-	var $notify;
-	var $extra_items = [];
+	/**
+	 * @var object Send notifications to the user receiving gifts.
+	 */
+	private $_notify;
+
+	/**
+	 * @var object Log any information regading gifts.
+	 */
+	private $_log;
+
+	/**
+	 * @var array Additional information for alerts
+	 */
+	private $_extra_items = [];
 
 	function __construct()
 	{
 		// Notify
-		$this->notify = new Notify;
-	}
+		$this->_notify = new Notify;
 
-	public function main()
-	{
-		global $context;
+		// Prepare to log this information
+		$this->_log = new Log;
 
-		loadLanguage('Shop/Errors');
-
-		$subactions = [
+		// Array of sections
+		$this->_subactions = [
 			'usercredits' => 'credits',
 			'usercredits2' => 'credits2',
 			'groupcredits' => 'group',
@@ -51,21 +59,26 @@ class Inventory
 			'userinv' => 'view_inventory',
 			'delete' => 'delete',
 		];
-		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'groupcredits';
+		$this->_sa = isset($_GET['sa'], $this->_subactions[$_GET['sa']]) ? $_GET['sa'] : 'usercredits';
+	}
+
+	public function main()
+	{
+		global $context;
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = [
-			'title' => Shop::getText('tab_items'),
-			'description' => Shop::getText('tab_items_desc'),
+			'title' => Shop::getText('tab_inventory'),
+			'description' => Shop::getText('tab_inventory_desc'),
 			'tabs' => [
-				'groupcredits' => ['description' => Shop::getText('inventory_groupcredits_desc')],
 				'usercredits' => ['description' => Shop::getText('inventory_usercredits_desc')],
+				'groupcredits' => ['description' => Shop::getText('inventory_groupcredits_desc')],
 				'useritems' => ['description' => Shop::getText('inventory_useritems_desc')],
 				'restock' => ['description' => Shop::getText('inventory_restock_desc')],
 				'search' => ['description' => Shop::getText('tab_inventory_desc')],
 			],
 		];
-		call_helper(__CLASS__ . '::' . $subactions[$sa].'#');
+		call_helper(__CLASS__ . '::' . $this->_subactions[$this->_sa].'#');
 	}
 
 	public function credits()
@@ -163,20 +176,20 @@ class Inventory
 					$members[$key] = $memID['id_member'];
 
 				// Handle everything
-				Log::credits($user_info['id'], $members, $amount, true);
+				$this->_log->credits($user_info['id'], $members, $amount, true);
 
 				// Deploy alert?
 				if (!empty($modSettings['Shop_noty_credits']))
 				{
 					// The actual link
-					$this->extra_items['item_href'] = '?action=shop';
+					$this->_extra_items['item_href'] = '?action=shop';
 					// Icon for alert
-					$this->extra_items['item_icon'] = 'top_money_r';
+					$this->_extra_items['item_icon'] = 'top_money_r';
 					// Amount for the alert
-					$this->extra_items['amount'] = Format::cash($amount);
+					$this->_extra_items['amount'] = Format::cash($amount);
 
 					// Send alert
-					$this->notify->alert($members, 'credits', $user_info['id'], $this->extra_items);
+					$this->_notify->alert($members, 'credits', $user_info['id'], $this->_extra_items);
 				}
 
 				// Redirect to a nice message of success
@@ -242,20 +255,20 @@ class Inventory
 				$members[$key] = $memID['id_member'];
 
 			// Handle  everything and save it in the log
-			Log::credits($user_info['id'], $members, $amount, true);
+			$this->_log->credits($user_info['id'], $members, $amount, true);
 
 			// Deploy alert?
 			if (!empty($modSettings['Shop_noty_credits']))
 			{
 				// The actual link
-				$this->extra_items['item_href'] = '?action=shop';
+				$this->_extra_items['item_href'] = '?action=shop';
 				// Icon for alert
-				$this->extra_items['item_icon'] = 'top_money_r';
+				$this->_extra_items['item_icon'] = 'top_money_r';
 				// Amount for the alert
-				$this->extra_items['amount'] = Format::cash($amount);
+				$this->_extra_items['amount'] = Format::cash($amount);
 
 				// Send alert
-				$this->notify->alert($members, 'credits', $user_info['id'], $this->extra_items);
+				$this->_notify->alert($members, 'credits', $user_info['id'], $this->_extra_items);
 			}
 
 			// Redirect to a nice message of successful
