@@ -21,12 +21,12 @@ class Boards
 	/**
 	 * @var array Will provide the board columns if needed.
 	 */
-	protected $columns;
+	var $_columns;
 
 	/**
 	 * @var array Will provide the board columns with prefix if needed.
 	 */
-	protected $columns_db;
+	protected $_columns_db;
 
 	/**
 	 * Boards::__construct()
@@ -36,13 +36,13 @@ class Boards
 	function __construct()
 	{
 		// Add the columns when needed
-		$this->columns = ['Shop_credits_count', 'Shop_credits_topic', 'Shop_credits_post', 'Shop_credits_bonus'];
-		$this->columns_db = ['b.Shop_credits_count', 'b.Shop_credits_topic', 'b.Shop_credits_post', 'b.Shop_credits_bonus'];
+		$this->_columns = ['Shop_credits_count', 'Shop_credits_topic', 'Shop_credits_post', 'Shop_credits_bonus'];
+		$this->_columns_db = ['b.Shop_credits_count', 'b.Shop_credits_topic', 'b.Shop_credits_post', 'b.Shop_credits_bonus'];
 	}
 
 	public function pre_boardtree(&$boardColumns, &$boardParameters, &$boardJoins, &$boardWhere, &$boardOrder)
 	{
-		$boardColumns = array_merge($boardColumns, $this->columns_db);
+		$boardColumns = array_merge($boardColumns, $this->_columns_db);
 	}
 
 	public function boardtree_board($row)
@@ -50,7 +50,7 @@ class Boards
 		global $boards;
 
 		if (!empty($row['id_board']))
-			foreach ($this->columns as $setting)
+			foreach ($this->_columns as $setting)
 				$boards[$row['id_board']][$setting] = $row[$setting];
 	}
 
@@ -59,7 +59,7 @@ class Boards
 		global $context, $modSettings;
 
 		if (isset($context['board']['is_new']) && $context['board']['is_new'] === true) {
-			foreach ($this->columns as $setting)
+			foreach ($this->_columns as $setting)
 				$context['board'][$setting] = 0;
 			$context['board']['Shop_credits_count'] = 1;
 		}
@@ -84,7 +84,7 @@ class Boards
 
 	public function create_board(&$boardOptions, &$board_columns, &$board_parameters)
 	{
-		foreach ($this->columns as $setting)
+		foreach ($this->_columns as $setting)
 			$boardOptions[$setting] = 0;
 		$boardOptions['Shop_credits_count'] = 1;
 	}

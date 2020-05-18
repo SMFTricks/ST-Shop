@@ -17,37 +17,49 @@ if (!defined('SMF'))
 
 class Log
 {
-	private static $gifts = [
-		'userid' => 'int',
-		'receiver' => 'int',
-		'amount' => 'int',
-		'itemid' => 'int',
-		'invid' => 'int',
-		'message' => 'string',
-		'is_admin' => 'int',
-		'date' => 'int',
-	];
-	private static $buy = [
-		'itemid' => 'int',
-		'invid' => 'int',
-		'userid' => 'int',
-		'sellerid' => 'int',
-		'amount' => 'int',
-		'fee' => 'int',
-		'date' => 'int',
-	];
-	private static $inventory = [
-		'userid' => 'int',
-		'itemid' => 'int',
-		'trading' => 'int',
-		'tradecost' => 'int',
-		'date' => 'int',
-		'tradedate' => 'int',
-		'fav' => 'int',
-	];
-	private static $types = [];
+	private $_gift;
+	private $_buy;
+	private $_inventory;
 
-	private static $insert_rows = [];
+	
+	private $types = [];
+
+	private $insert_rows = [];
+
+	function __construct()
+	{
+		// Gift
+		$this->_gift = [
+			'userid' => 'int',
+			'receiver' => 'int',
+			'amount' => 'int',
+			'itemid' => 'int',
+			'invid' => 'int',
+			'message' => 'string',
+			'is_admin' => 'int',
+			'date' => 'int',
+		];
+		// Buy
+		$this->_buy = [
+			'itemid' => 'int',
+			'invid' => 'int',
+			'userid' => 'int',
+			'sellerid' => 'int',
+			'amount' => 'int',
+			'fee' => 'int',
+			'date' => 'int',
+		];
+		// Inventory
+		$this->_inventory = [
+			'userid' => 'int',
+			'itemid' => 'int',
+			'trading' => 'int',
+			'tradecost' => 'int',
+			'date' => 'int',
+			'tradedate' => 'int',
+			'fav' => 'int',
+		];
+	}
 
 	public function credits($sender, $users, $amount, $admin = false, $message = '')
 	{
@@ -58,7 +70,7 @@ class Log
 		$users = is_array($users) ? $users : [$users];
 		foreach ($users as $memID)
 		{
-			self::$insert_rows[] = [
+			$this->_insert_rows[] = [
 				$sender,
 				$memID,
 				$amount,
@@ -69,7 +81,7 @@ class Log
 				time()
 			];
 		}
-		Database::Insert('shop_log_gift', self::$insert_rows, self::$gifts);
+		Database::Insert('shop_log_gift', $this->_insert_rows, $this->_gift);
 
 		// Regular user? Deduct these credits
 		if (empty($admin))
@@ -82,7 +94,7 @@ class Log
 		$users = is_array($users) ? $users : [$users];
 		foreach ($users as $memID)
 		{
-			self::$insert_rows[] = [
+			$this->_insert_rows[] = [
 				$sender,
 				$memID,
 				0,
@@ -93,7 +105,7 @@ class Log
 				time()
 			];
 		}
-		Database::Insert('shop_log_gift', self::$insert_rows, self::$gifts);
+		Database::Insert('shop_log_gift', $this->_insert_rows, $this->_gift);
 
 		// Regular user? Just switch the item from one inventory to another
 		if (empty($admin))
@@ -111,7 +123,7 @@ class Log
 					time(),
 					0,
 					0
-				], self::$inventory);
+				], $this->_inventory);
 				Database::Update('shop_items', ['stock' => 1, 'itemid' => $item], 'stock = {int:stock}', 'WHERE itemid = {int:itemid}');
 			}
 		}
@@ -134,7 +146,7 @@ class Log
 				time(),
 				0,
 				0
-			], self::$inventory);
+			], $this->_inventory);
 
 			// Discount stock
 			Database::Update('shop_items', ['count' => 1, 'itemid' => $itemid], 'stock = stock - {int:count},', 'WHERE itemid = {int:itemid}');
@@ -158,6 +170,6 @@ class Log
 			$amount,
 			$fee,
 			time()
-		], self::$buy);
+		], $this->_buy);
 	}
 }
