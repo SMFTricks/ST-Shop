@@ -15,17 +15,27 @@ if (!defined('SMF'))
 
 class Permissions
 {
-	public static $shop_permissions = [
-		'shop_canAccess',
-		'shop_canBuy',
-		'shop_viewInventory',
-		'shop_canGift',
-		'shop_canTrade',
-		'shop_canBank',
-		'shop_viewStats',
-		'shop_playGames',
-		'shop_canManage'
-	];
+	var $shop_permissions;
+
+	/**
+	 * Permissions::__construct()
+	 *
+	 * Insert our permissions in the array
+	 */
+	function __construct()
+	{
+		$this->shop_permissions = [
+			'shop_canAccess',
+			'shop_canBuy',
+			'shop_viewInventory',
+			'shop_canGift',
+			'shop_canTrade',
+			'shop_canBank',
+			'shop_viewStats',
+			'shop_playGames',
+			'shop_canManage'
+		];
+	}
 
 	/**
 	 * Permissions::load_permissions()
@@ -41,12 +51,12 @@ class Permissions
 
 		// Shop permissions
 		$permissionGroups['membergroup'] = array_merge($permissionGroups['membergroup'], ['shop']);
-		foreach (self::$shop_permissions as $p)
+		foreach ($this->shop_permissions as $p)
 			$permissionList['membergroup'][$p] = [false,'shop'];
 
 		// Shop disabled? No permissions then
 		if (empty($modSettings['Shop_enable_shop']))
-			$hiddenPermissions = array_merge($hiddenPermissions, self::$shop_permissions);
+			$hiddenPermissions = array_merge($hiddenPermissions, $this->shop_permissions);
 	}
 
 	/**
@@ -60,6 +70,6 @@ class Permissions
 		global $context;
 
 		// Guests do not play nicely with this mod
-		$context['non_guest_permissions'] = array_merge($context['non_guest_permissions'], self::$shop_permissions);
+		$context['non_guest_permissions'] = array_merge($context['non_guest_permissions'], $this->shop_permissions);
 	}
 }
