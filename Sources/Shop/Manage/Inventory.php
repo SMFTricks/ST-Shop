@@ -11,7 +11,10 @@
 namespace Shop\Manage;
 
 use Shop\Shop;
-use Shop\Helper;
+use Shop\Helper\Database;
+use Shop\Helper\Format;
+use Shop\Helper\Log;
+use Shop\Helper\Notify;
 use Shop\View\Inventory as Search;
 
 if (!defined('SMF'))
@@ -19,6 +22,15 @@ if (!defined('SMF'))
 
 class Inventory
 {
+	var $notify;
+	var $extra_items = [];
+
+	function __construct()
+	{
+		// Notify
+		$this->notify = new Notify;
+	}
+
 	public function main()
 	{
 		global $context;
@@ -39,7 +51,7 @@ class Inventory
 			'userinv' => 'view_inventory',
 			'delete' => 'delete',
 		];
-		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'usercredits';
+		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'groupcredits';
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = [
@@ -53,7 +65,7 @@ class Inventory
 				'search' => ['description' => Shop::getText('tab_inventory_desc')],
 			],
 		];
-		call_helper(__CLASS__ . '::' . $subactions[$sa]);
+		call_helper(__CLASS__ . '::' . $subactions[$sa].'#');
 	}
 
 	public function credits()
@@ -79,7 +91,7 @@ class Inventory
 
 	public function credits2()
 	{
-		global $context, $user_info;
+		global $context, $user_info, $modSettings;
 
 		// Set all the page stuff
 		$context['page_title'] =  Shop::getText('tab_inventory') . ' - '. Shop::getText('inventory_usercredits');
@@ -100,13 +112,13 @@ class Inventory
 		$member_parameters = [];
 
 		// Get all the members to be added... taking into account names can be quoted ;)
-		$_REQUEST['membername'] = strtr(Helper\Database::sanitize($_REQUEST['membername']), ['&quot;' => '"']);
+		$_REQUEST['membername'] = strtr(Database::sanitize($_REQUEST['membername']), ['&quot;' => '"']);
 		preg_match_all('~"([^"]+)"~', $_REQUEST['membername'], $matches);
 		$member_names = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_REQUEST['membername']))));
 
 		foreach ($member_names as $index => $member_name)
 		{
-			$member_names[$index] = trim(Helper\Database::strtolower($member_names[$index]));
+			$member_names[$index] = trim(Database::strtolower($member_names[$index]));
 
 			if (strlen($member_names[$index]) == 0)
 				unset($member_names[$index]);
@@ -137,7 +149,7 @@ class Inventory
 		if (!empty($member_query))
 		{
 			// List of users
-			$receivers = Helper\Database::Get(0, 1000, 'id_member', 'members', ['id_member'], 'WHERE (' . implode(' OR ', $member_query) . ')', false, '', $member_parameters);
+			$receivers = Database::Get(0, 1000, 'id_member', 'members', ['id_member'], 'WHERE (' . implode(' OR ', $member_query) . ')', false, '', $member_parameters);
 
 			// Nothing...
 			if (empty($receivers))
@@ -151,7 +163,21 @@ class Inventory
 					$members[$key] = $memID['id_member'];
 
 				// Handle everything
-				Helper\Log::credits($user_info['id'], $members, $amount, true);
+				Log::credits($user_info['id'], $members, $amount, true);
+
+				// Deploy alert?
+				if (!empty($modSettings['Shop_noty_credits']))
+				{
+					// The actual link
+					$this->extra_items['item_href'] = '?action=shop';
+					// Icon for alert
+					$this->extra_items['item_icon'] = 'top_money_r';
+					// Amount for the alert
+					$this->extra_items['amount'] = Format::cash($amount);
+
+					// Send alert
+					$this->notify->alert($members, 'credits', $user_info['id'], $this->extra_items);
+				}
 
 				// Redirect to a nice message of success
 				redirectexit('action=admin;area=shopinventory;sa=usercredits;updated');
@@ -174,12 +200,12 @@ class Inventory
 		$context['template_layers'][] = 'send';
 
 		// Get all non post-based membergroups
-		$context['shop_usergroups'] = Helper\Database::Get(0, 10000, 'group_name', 'membergroups', ['id_group AS id', 'group_name AS name'], 'WHERE min_posts = -1 AND id_group <> 3');
+		$context['shop_usergroups'] = Database::Get(0, 10000, 'group_name', 'membergroups', ['id_group AS id', 'group_name AS name'], 'WHERE min_posts = -1 AND id_group <> 3');
 	}
 
 	public function group2()
 	{
-		global $context, $user_info;
+		global $context, $user_info, $modSettings;
 
 		// Keep the tab active
 		$context[$context['admin_menu_name']]['current_subsection'] = 'groupcredits';
@@ -203,7 +229,7 @@ class Inventory
 		$receivers = [];
 		$members = [];
 		// Get the list of members
-		$receivers = Helper\Database::Get(0, 1000, 'id_member', 'members', ['id_member'], 'WHERE id_group IN ({array_int:usergroup}) OR additional_groups IN ({array_int:usergroup})', false, '', ['usergroup' => $_REQUEST['usergroup']]);
+		$receivers = Database::Get(0, 1000, 'id_member', 'members', ['id_member'], 'WHERE id_group IN ({array_int:usergroup}) OR additional_groups IN ({array_int:usergroup})', false, '', ['usergroup' => $_REQUEST['usergroup']]);
 
 		// No members?
 		if (empty($receivers))
@@ -216,7 +242,21 @@ class Inventory
 				$members[$key] = $memID['id_member'];
 
 			// Handle  everything and save it in the log
-			Helper\Log::credits($user_info['id'], $members, $amount, true);
+			Log::credits($user_info['id'], $members, $amount, true);
+
+			// Deploy alert?
+			if (!empty($modSettings['Shop_noty_credits']))
+			{
+				// The actual link
+				$this->extra_items['item_href'] = '?action=shop';
+				// Icon for alert
+				$this->extra_items['item_icon'] = 'top_money_r';
+				// Amount for the alert
+				$this->extra_items['amount'] = Format::cash($amount);
+
+				// Send alert
+				$this->notify->alert($members, 'credits', $user_info['id'], $this->extra_items);
+			}
 
 			// Redirect to a nice message of successful
 			redirectexit('action=admin;area=shopinventory;sa=groupcredits;success');
@@ -360,7 +400,7 @@ class Inventory
 			$_REQUEST['delete'][$key] = (int) $value;
 
 		// Delete selected items
-		Helper\Database::Delete('shop_inventory', 'id', $_REQUEST['delete'], ' AND userid = ' .$_REQUEST['u']);
+		Database::Delete('shop_inventory', 'id', $_REQUEST['delete'], ' AND userid = ' .$_REQUEST['u']);
 
 		// Send the user to the items list with a message
 		redirectexit('action=admin;area=shopinventory;sa=userinv' . ($user_info['id'] == $_REQUEST['u'] ? '' : ';u='.$_REQUEST['u']) . ';deleted');

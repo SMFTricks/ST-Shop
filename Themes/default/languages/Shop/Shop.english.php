@@ -37,12 +37,13 @@ $txt['Shop_user_count'] = 'Count';
 
 // Notifications and alerts
 $txt['alert_group_shop'] = 'Shop alerts';
-$txt['alert_shop_usercredits'] = 'When I receive ' . $modSettings['Shop_credits_suffix'] . ' from someone';
+$txt['alert_shop_usercredits'] = 'When I receive ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' from someone';
 $txt['alert_shop_useritems'] = 'When I receive a shop gift from someone';
 $txt['alert_shop_usertraded'] = 'When someone purchased an item from my trades list';
 $txt['alert_shop_traded'] = '{member_link} has purchased your item {item_name} listed on the Trade Center';
 $txt['alert_shop_credits'] = '{member_link} has sent you {amount}';
 $txt['alert_shop_items'] = '{member_link} has sent you a gift';
+$txt['Shop_notification_sold_from'] = 'Forum Shop';
 
 // Shop buy
 $txt['Shop_buy_date'] = 'Newest';
@@ -130,8 +131,6 @@ $txt['Shop_bank_notbt_withdrawal'] = 'Your amount has to be between the minimum 
 $txt['Shop_bank_notmin_withdrawal'] = 'Your amount has to be a minimum withdrawal of %d';
 $txt['Shop_bank_notmax_withdrawal'] = 'Your amount has to be a maximum withdrawal of %d';
 $txt['Shop_bank_withdraw_successfull'] = 'The withdrawal was successful.';
-$txt['scheduled_task_bank_interest'] = 'Bank interest';
-$txt['scheduled_task_desc_bank_interest'] = 'The magic task that will get money from nowhere.';
 
 // Trade center
 $txt['Shop_trade_main'] = 'Trade center';
@@ -140,7 +139,6 @@ $txt['Shop_trade_list_desc'] = 'Here you will find every item that users have pu
 $txt['Shop_trade_desc'] = '<strong>Welcome %1$s to the Trade Center.</strong><br /> Here, you can trade and buy items from other users, check on your current items listed and find out more about the more active users in terms of sales, profit and purchases.';
 $txt['Shop_item_remove_ftrade'] = 'Remove item from Trade';
 $txt['Shop_item_trade_removed'] = 'Your item was succesfully removed from the trade center.<br> You can now find it back in your inventory.';
-$txt['Shop_trade_notification_sold_from'] = 'Forum Shop';
 $txt['Shop_trade_notification_sold_subject'] = 'Your item on trade was sold successfully.';
 $txt['Shop_trade_notification_sold_message1'] = 'Congratulations!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has purchased your item \'%3$s\' for [i]%4$s[/i]. All the %5$s from the purchase have been added to your pocket.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
 $txt['Shop_trade_notification_sold_message2'] = 'Congratulations!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has purchased your item \'%3$s\' for [i]%4$s[/i], but has been taken away a fee of [i]%5$s[/i]. The other [i]%6$s[/i] from the purchase have been added to your pocket.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
@@ -162,8 +160,8 @@ $txt['Shop_gift_send_item'] = 'Send item';
 $txt['Shop_gift_send_money'] = 'Send %s';
 $txt['Shop_gift_amount'] = 'Amount to send';
 $txt['Shop_gift_item_select'] = 'Select an item';
-$txt['Shop_gift_item_sent'] = 'The item \'%s\' was sent successfully.';
-$txt['Shop_gift_money_sent'] = 'The %1$s were sent successfully.<br />You now have %2$s%3$d %1$s in your pocket.';
+$txt['Shop_gift_item_sent'] = 'The item was sent successfully.';
+$txt['Shop_gift_money_sent'] = 'The ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' were sent successfully.';
 $txt['Shop_gift_message'] = 'Message to send to the member';
 $txt['Shop_gift_message_desc'] = 'User will still receive a notification, but you can leave the box blank.';
 $txt['Shop_gift_notification_subject'] = 'You have received a gift.';

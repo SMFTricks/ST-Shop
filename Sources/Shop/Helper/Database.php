@@ -21,7 +21,7 @@ class Database
 	public static $inventory = ['si.id', 'si.userid', 'si.itemid', 'si.trading', 'si.tradecost', 'si.date', 'si.tradedate', 'si.fav'];
 	public static $profile_inventory = ['si.userid', 'si.itemid', 'si.trading', 's.name', 's.image', 's.description', 's.status'];
 
-	public static function Save($config_vars, $return_config, $sa)
+	public function Save($config_vars, $return_config, $sa)
 	{
 		global $context, $scripturl;
 
@@ -39,28 +39,35 @@ class Database
 		prepareDBSettingContext($config_vars);
 	}
 
-	public static function sanitize($string)
+	public function sanitize($string)
 	{
 		global $smcFunc;
 
 		return $smcFunc['htmlspecialchars']($string, ENT_QUOTES);
 	}
 
-	public static function strtolower($value)
+	public function strtolower($value)
 	{
 		global $smcFunc;
 
 		return $smcFunc['strtolower']($value);
 	}
 
-	public static function strlen($string)
+	public function strlen($string)
 	{
 		global $smcFunc;
 
 		return $smcFunc['strlen']($string);
 	}
 
-	public static function Count($table, $columns, $additional_query = '', $additional_columns = '', $more_values = [])
+	public function json_encode($add = [])
+	{
+		global $smcFunc;
+
+		return $smcFunc['json_encode']($add);
+	}
+
+	public function Count($table, $columns, $additional_query = '', $additional_columns = '', $more_values = [])
 	{
 		global $smcFunc;
 
@@ -84,7 +91,7 @@ class Database
 		return $rows;
 	}
 
-	public static function Get($start, $items_per_page, $sort, $table, $columns, $additional_query = '', $single = false, $additional_columns = '', $more_values = [], $attachments = [])
+	public function Get($start, $items_per_page, $sort, $table, $columns, $additional_query = '', $single = false, $additional_columns = '', $more_values = [], $attachments = [])
 	{
 		global $smcFunc;
 
@@ -123,7 +130,7 @@ class Database
 		return $items;
 	}
 
-	public static function Nested($table, $sort, $column_main, $column_sec, $query_member, $additional_query = '', $additional_columns = '', $more_values = [], $attachments = [], $attach_main = false)
+	public function Nested($table, $sort, $column_main, $column_sec, $query_member, $additional_query = '', $additional_columns = '', $more_values = [], $attachments = [], $attach_main = false)
 	{
 		global $smcFunc;
 
@@ -183,7 +190,7 @@ class Database
 		return $items;
 	}
 
-	public static function Attachments($row)
+	public function Attachments($row)
 	{
 		global $modSettings, $scripturl;
 
@@ -198,7 +205,7 @@ class Database
 		return $set_attachments;
 	}
 
-	public static function Find($table, $column, $search = '', $additional_query = '')
+	public function Find($table, $column, $search = '', $additional_query = '')
 	{
 		global $smcFunc;
 
@@ -218,7 +225,7 @@ class Database
 		return $result;
 	}
 
-	public static function Delete($table, $column, $search, $additional_query = '')
+	public function Delete($table, $column, $search, $additional_query = '')
 	{
 		global $smcFunc;
 
@@ -232,7 +239,7 @@ class Database
 		);
 	}
 
-	public static function Insert($table, $columns, $types)
+	public function Insert($table, $columns, $types, $indexes = [])
 	{
 		global $smcFunc;
 
@@ -240,11 +247,11 @@ class Database
 			'{db_prefix}'.$table,
 			$types,
 			$columns,
-			[]
+			$indexes
 		);
 	}
 
-	public static function Update($table, $columns, $types, $query)
+	public function Update($table, $columns, $types, $query)
 	{
 		global $smcFunc;
 
