@@ -17,6 +17,24 @@ if (!defined('SMF'))
 
 class Dashboard
 {
+	/**
+	 * Dashboard::__construct()
+	 *
+	 * Call certain administrative hooks
+	 */
+	function __construct()
+	{
+		// Permissions
+		add_integration_function('integrate_load_permissions', 'Shop\Integration\Permissions::load_permissions#', false);
+		add_integration_function('integrate_load_illegal_guest_permissions', 'Shop\Integration\Permissions::illegal_guest#', false);
+		// Boards settings
+		add_integration_function('integrate_pre_boardtree', 'Shop\Integration\Boards::pre_boardtree#', false);
+		add_integration_function('integrate_boardtree_board', 'Shop\Integration\Boards::boardtree_board#', false);
+		add_integration_function('integrate_edit_board', 'Shop\Integration\Boards::edit_board#', false);
+		add_integration_function('integrate_create_board', 'Shop\Integration\Boards::create_board#', false);
+		add_integration_function('integrate_modify_board', 'Shop\Integration\Boards::modify_board', false);
+	}
+
 	 /**
 	 * Dashboard::hookAreas()
 	 *
@@ -167,18 +185,8 @@ class Dashboard
 				],
 			],
 		];
-		// Add more items?
+		// Add more sections?
 		call_integration_hook('integrate_shop_admin_areas', array(&$admin_areas['shop']['areas']));
-
-		// Permissions
-		add_integration_function('integrate_load_permissions', 'Shop\Integration\Permissions::load_permissions', false);
-		add_integration_function('integrate_load_illegal_guest_permissions', 'Shop\Integration\Permissions::illegal_guest', false);
-		// Boards settings
-		add_integration_function('integrate_pre_boardtree', 'Shop\Integration\Boards::pre_boardtree', false);
-		add_integration_function('integrate_boardtree_board', 'Shop\Integration\Boards::boardtree_board', false);
-		add_integration_function('integrate_edit_board', 'Shop\Integration\Boards::edit_board', false);
-		add_integration_function('integrate_create_board', 'Shop\Integration\Boards::create_board', false);
-		add_integration_function('integrate_modify_board', 'Shop\Integration\Boards::modify_board', false);
 	}
 
 	public function main()
