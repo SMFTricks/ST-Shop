@@ -118,4 +118,13 @@ class User
 			);
 		}
 	}
+
+	public function fetch_alerts(&$alerts, &$formats)
+	{
+		global $settings, $scripturl;
+
+		foreach ($alerts as $alert_id => $alert)
+			if ($alert['content_type'] == 'shop')
+				$alerts[$alert_id]['icon'] = '<img class="alert_icon" src="' . $settings['images_url'] . '/icons/shop/'.$alert['extra']['item_icon'].'.png">';
+	}
 }
