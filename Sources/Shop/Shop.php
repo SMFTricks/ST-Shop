@@ -210,7 +210,7 @@ class Shop
 				loadLanguage(__NAMESPACE__ . '/ShopAdmin');
 				break;
 			case 'admin':
-				add_integration_function('integrate_admin_areas', __NAMESPACE__ . '\Manage\Dashboard::hookAreas', false);
+				add_integration_function('integrate_admin_areas', __NAMESPACE__ . '\Manage\Dashboard::hookAreas#', false);
 				break;
 			case 'post':
 			case 'post2':
@@ -238,17 +238,16 @@ class Shop
 	 */
 	public static function userHooks()
 	{
-		global $sourcedir;
-
-		// Load our Profile file
+		// Load user and alerts hooks
 		$hooks = array(
-			'load_member_data' => 'load_member_data',
-			'user_info' => 'user_info',
-			'simple_actions' => 'simple_actions',
-			'member_context' => 'member_context',
+			'load_member_data',
+			'user_info',
+			'simple_actions',
+			'member_context',
+			'fetch_alerts',
 		);
-		foreach ($hooks as $point => $callable)
-			add_integration_function('integrate_' . $point, __NAMESPACE__ . '\Integration\User::' . $callable, false);
+		foreach ($hooks as $hook)
+			add_integration_function('integrate_' . $hook, __NAMESPACE__ . '\Integration\User::' . $hook, false);
 	}
 
 	/**
@@ -272,22 +271,22 @@ class Shop
 		}
 
 		$before = 'mlist';
-		$temp_buttons = array();
+		$temp_buttons = [];
 		foreach ($buttons as $k => $v) {
 			if ($k == $before) {
-				$temp_buttons['shop'] = array(
+				$temp_buttons['shop'] = [
 					'title' => self::getText('main_button'),
 					'href' => $scripturl . '?action=shop',
 					'icon' => 'icons/shop.png',
 					'show' => (allowedTo('shop_canAccess') || allowedTo('shop_canManage')) && !empty($modSettings['Shop_enable_shop']),
-					'sub_buttons' => array(
-						'shopadmin' => array(
+					'sub_buttons' => [
+						'shopadmin' => [
 							'title' => self::getText('admin_button'),
 							'href' => $scripturl . '?action=admin;area=shopinfo',
 							'show' => allowedTo('shop_canManage'),
-						),
-					),
-				);
+						],
+					],
+				];
 			}
 			$temp_buttons[$k] = $v;
 		}
@@ -474,49 +473,6 @@ class Shop
 
 		updateMemberData($author, array('alerts' => '+'));
 	}
-
-	public static function showAlerts(&$alert, &$link)
-	{		
-		if (isset($alert['extra']['shop_link']))
-			$link = $alert['extra']['shop_link'];
-	}
-
-	public static function fetchAlerts(&$alerts, &$formats)
-	{
-		foreach ($alerts as $alert_id => $alert)
-			if ($alert['content_type'] == 'shop' && isset($alert['extra']['item_icon']))
-				$alerts[$alert_id]['icon'] = '<img class="alert_icon" src="'.$alert['extra']['item_icon'].'">';
-	}
-
-	/**
-	 * Shop::scheduled_shopBank()
-	 *
-	 * Creates a scheduled task for making money in the bank of every user
-	 * @return void
-	 */
-	public static function scheduled_shopBank()
-	{
-		global $smcFunc, $modSettings;
-
-		// Create some cash out of nowhere. How? By magical means, of course!
-		if (!empty($modSettings['Shop_enable_shop']) && !empty($modSettings['Shop_enable_bank']) && $modSettings['Shop_bank_interest'] > 0)
-		{
-			// Thanks to Zerk for the idea
-			$yesterday = mktime(0, 0, 0, date('m'), date('d')-1, date('Y'));
-
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}members
-				SET shopBank = shopBank + (shopBank * {float:interest})' . (!empty($modSettings['Shop_bank_interest_yesterday']) ?
-				'WHERE last_login > {int:yesterday}' : ''),
-				array(
-					'interest' => ($modSettings['Shop_bank_interest'] / 100),
-					'yesterday' => $yesterday,
-				)
-			);
-		}
-	}
-
-
 
 
 	
