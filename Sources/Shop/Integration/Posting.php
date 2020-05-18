@@ -10,7 +10,6 @@
 
 namespace Shop\Integration;
 
-use Shop\Shop;
 use Shop\Helper\Database;
 
 if (!defined('SMF'))
@@ -18,11 +17,37 @@ if (!defined('SMF'))
 
 class Posting
 {
-	public static $post_shop = [
-		'credits' => 0,
-		'bonus' => 0,
-		'user' => 0
-	];
+	/**
+	 * @var array Will set default values for credits, bonuses and the user id.
+	 */
+	private $_post_shop = [];
+
+	/**
+	 * @var array It will save the board information with the provided details.
+	 */
+	private $_shop_info;
+
+	/**
+	 * @var object Need to create a new instance of Boards.
+	 */
+	private $_boards;
+
+	/**
+	 * Posting::__construct()
+	 *
+	 * Add default values for the posting values, and create a new instance of Boards
+	 */
+	function __construct()
+	{
+		// Some defaults for fallback
+		$this->_post_shop = [
+			'credits' => 0,
+			'bonus' => 0,
+			'user' => 0
+		];
+		// Create instance of boards..
+		$this->_boards = new Boards;
+	}
 
 	/**
 	 * Posting::after_create_post()
@@ -41,19 +66,19 @@ class Posting
 		global $modSettings;
 
 		// Get the board info
-		$shop_info = Database::Get('', '', '', 'boards', Boards::$columns, 'WHERE id_board = {int:board}', true, '', ['board' => $topicOptions['board']]);
+		$this->_shop_info = Database::Get('', '', '', 'boards', $this->_boards->_columns, 'WHERE id_board = {int:board}', true, '', ['board' => $topicOptions['board']]);
 
 		// Is it even enabled?
-		if (!empty($shop_info['Shop_credits_count']) && !empty($posterOptions['id']))
+		if (!empty($this->_shop_info['Shop_credits_count']) && !empty($posterOptions['id']))
 		{
 			// Set the user
-			self::$post_shop['user'] = $posterOptions['id'];
+			$this->_post_shop['user'] = $posterOptions['id'];
 
 			// Figure out the correct initial amount
-			self::$post_shop['credits'] = (empty($topicOptions['id']) ? (!empty($shop_info['Shop_credits_topic']) ? $shop_info['Shop_credits_topic'] : $modSettings['Shop_credits_topic']) : (!empty($shop_info['Shop_credits_post']) ? $shop_info['Shop_credits_post'] : $modSettings['Shop_credits_post']));
+			$this->_post_shop['credits'] = (empty($topicOptions['id']) ? (!empty($this->_shop_info['Shop_credits_topic']) ? $this->_shop_info['Shop_credits_topic'] : $modSettings['Shop_credits_topic']) : (!empty($this->_shop_info['Shop_credits_post']) ? $this->_shop_info['Shop_credits_post'] : $modSettings['Shop_credits_post']));
 			
 			// Bonus
-			if (!empty($shop_info['Shop_credits_bonus']) && (($modSettings['Shop_credits_word'] > 0) || ($modSettings['Shop_credits_character'] > 0)))
+			if (!empty($this->_shop_info['Shop_credits_bonus']) && (($modSettings['Shop_credits_word'] > 0) || ($modSettings['Shop_credits_character'] > 0)))
 			{
 				// no, BBCCode won't count
 				$plaintext = preg_replace('[\[(.*?)\]]', ' ', $_POST['message']);
@@ -62,17 +87,17 @@ class Posting
 				// convert multiple spaces into one
 				$plaintext = preg_replace('/\s+/', ' ', $plaintext);
 				// bonus for each word
-				self::$post_shop['bonus'] += ($modSettings['Shop_credits_word'] * str_word_count($plaintext));
+				$this->_post_shop['bonus'] += ($modSettings['Shop_credits_word'] * str_word_count($plaintext));
 				// and for each letter
-				self::$post_shop['bonus'] += ($modSettings['Shop_credits_character'] * strlen($plaintext));
+				$this->_post_shop['bonus'] += ($modSettings['Shop_credits_character'] * strlen($plaintext));
 
 				// Limit?
-				if (isset($modSettings['Shop_credits_limit']) && $modSettings['Shop_credits_limit'] != 0 && self::$post_shop['bonus'] > $modSettings['Shop_credits_limit'])
-					self::$post_shop['bonus'] = $modSettings['Shop_credits_limit'];
+				if (isset($modSettings['Shop_credits_limit']) && $modSettings['Shop_credits_limit'] != 0 && $this->_post_shop['bonus'] > $modSettings['Shop_credits_limit'])
+					$this->_post_shop['bonus'] = $modSettings['Shop_credits_limit'];
 			}
 
 			// and finally, give credits
-			Database::Update('members', self::$post_shop, 'shopMoney = shopMoney + {int:credits} + {int:bonus}', 'WHERE id_member = {int:user}');
+			Database::Update('members', $this->_post_shop, 'shopMoney = shopMoney + {int:credits} + {int:bonus}', 'WHERE id_member = {int:user}');
 		}
 	}
 
