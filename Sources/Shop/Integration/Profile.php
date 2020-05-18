@@ -186,18 +186,6 @@ class Profile
 		}
 	}
 
-	public function alert_types(&$alert_types, &$group_options)
-	{
-		global $modSettings;
-
-		if (!empty($modSettings['Shop_noty_credits']))
-			$alert_types['shop']['shop_usercredits'] = array('alert' => 'yes', 'email' => 'never');
-		if (!empty($modSettings['Shop_noty_items']))
-			$alert_types['shop']['shop_useritems'] = array('alert' => 'yes', 'email' => 'never');
-		if (!empty($modSettings['Shop_noty_trade']))
-			$alert_types['shop']{'shop_usertraded'} = array('alert' => 'yes', 'email' => 'never');
-	}
-
 	public function custom_profile_fields($memID, $area)
 	{
 		global $context, $modSettings;
@@ -235,5 +223,17 @@ class Profile
 				'placement' => 2,
 			);
 		}
+	}
+
+	public function alert_types(&$alert_types, &$group_options)
+	{
+		global $modSettings;
+
+		if (!empty($modSettings['Shop_noty_credits']))
+			$alert_types['shop']['shop_usercredits'] = array('alert' => 'yes', 'email' => 'never');
+		if (!empty($modSettings['Shop_noty_items']))
+			$alert_types['shop']['shop_useritems'] = array('alert' => 'yes', 'email' => 'never');
+		if (!empty($modSettings['Shop_noty_trade']))
+			$alert_types['shop']{'shop_usertraded'} = array('alert' => 'yes', 'email' => 'never');
 	}
 }
