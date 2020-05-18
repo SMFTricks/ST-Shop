@@ -65,7 +65,7 @@ class Log
 					!empty($admin) ? 1 : 0,
 					time()
 				], self::$gifts);
-		// single user
+		// Single user
 		else
 			Database::Insert('shop_log_gift', [
 				$sender,
@@ -78,9 +78,59 @@ class Log
 				time()
 			], self::$gifts);
 
-		// Regular user?
+		// Regular user? Deduct these credits
 		if (empty($admin))
 			Database::Update('members', ['user' => $sender, 'credits' => $amount], 'shopMoney = shopMoney - {int:credits}', 'WHERE id_member = {int:user}');
+	}
+
+	public function items($sender, $users, $item, $invid = 0, $admin = false, $message = '')
+	{
+		// Log the information
+		if (is_array($users))
+			foreach ($users as $memID)
+				Database::Insert('shop_log_gift', [
+					$sender,
+					$memID,
+					0,
+					$item,
+					$invid,
+					$message,
+					!empty($admin) ? 1 : 0,
+					time()
+				], self::$gifts);
+		// Single user
+		else
+			Database::Insert('shop_log_gift', [
+				$sender,
+				$users,
+				0,
+				$item,
+				$invid,
+				$message,
+				!empty($admin) ? 1 : 0,
+				time()
+			], self::$gifts);
+
+		// Regular user? Just switch the item from one inventory to another
+		if (empty($admin))
+			Database::Update('shop_inventory', ['user' => $users, 'invid' => $invid], 'userid = {int:user}', 'WHERE id = {int:invid}');
+		// Admin? Insert a new item on each inventory, and reduce stock?
+		else
+		{
+			foreach ($users as $memID)
+			{
+				Database::Insert('shop_inventory', [
+					$memID,
+					$item,
+					0,
+					0,
+					time(),
+					0,
+					0
+				], self::$inventory);
+				Database::Update('shop_items', ['stock' => 1, 'itemid' => $item], 'stock = {int:stock}', 'WHERE itemid = {int:itemid}');
+			}
+		}
 	}
 
 	public function purchase($itemid, $userid, $amount, $seller = 0, $fee = 0, $invid = 0)
