@@ -228,7 +228,7 @@ class Buy
 			fatal_error(sprintf(Shop::getText('buy_item_nostock'), $context['shop']['item_details']['name']), false);
 		// Fine... Does the user have enough money to buy this?
 		elseif ($user_info['shopMoney'] < $context['shop']['item_details']['price'])
-			fatal_error(sprintf(Shop::getText('buy_item_notenough'), $modSettings['Shop_credits_suffix'], $context['shop']['item_details']['name'], $notenough, $modSettings['Shop_credits_prefix']), false);
+			fatal_error(sprintf(Shop::getText('buy_item_notenough'), $context['shop']['item_details']['name'], $notenough, $modSettings['Shop_credits_prefix']), false);
 
 		// Proceed
 		// Handle item purchase and money deduction and log it
