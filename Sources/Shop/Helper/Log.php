@@ -47,36 +47,29 @@ class Log
 	];
 	private static $types = [];
 
+	private static $insert_rows = [];
+
 	public function credits($sender, $users, $amount, $admin = false, $message = '')
 	{
 		// Send credits over to the user
 		Database::Update('members', ['users' => $users, 'credits' => $amount], 'shopMoney = shopMoney + {int:credits},', 'WHERE id_member' . (is_array($users) ? ' IN ({array_int:users})' : ' = {int:users}'));
 
 		// Log the information
-		if (is_array($users))
-			foreach ($users as $memID)
-				Database::Insert('shop_log_gift', [
-					$sender,
-					$memID,
-					$amount,
-					0,
-					0,
-					$message,
-					!empty($admin) ? 1 : 0,
-					time()
-				], self::$gifts);
-		// Single user
-		else
-			Database::Insert('shop_log_gift', [
+		$users = is_array($users) ? $users : [$users];
+		foreach ($users as $memID)
+		{
+			self::$insert_rows[] = [
 				$sender,
-				$users,
+				$memID,
 				$amount,
 				0,
 				0,
 				$message,
 				!empty($admin) ? 1 : 0,
 				time()
-			], self::$gifts);
+			];
+		}
+		Database::Insert('shop_log_gift', self::$insert_rows, self::$gifts);
 
 		// Regular user? Deduct these credits
 		if (empty($admin))
@@ -86,30 +79,21 @@ class Log
 	public function items($sender, $users, $item, $invid = 0, $admin = false, $message = '')
 	{
 		// Log the information
-		if (is_array($users))
-			foreach ($users as $memID)
-				Database::Insert('shop_log_gift', [
-					$sender,
-					$memID,
-					0,
-					$item,
-					$invid,
-					$message,
-					!empty($admin) ? 1 : 0,
-					time()
-				], self::$gifts);
-		// Single user
-		else
-			Database::Insert('shop_log_gift', [
+		$users = is_array($users) ? $users : [$users];
+		foreach ($users as $memID)
+		{
+			self::$insert_rows[] = [
 				$sender,
-				$users,
+				$memID,
 				0,
 				$item,
 				$invid,
 				$message,
 				!empty($admin) ? 1 : 0,
 				time()
-			], self::$gifts);
+			];
+		}
+		Database::Insert('shop_log_gift', self::$insert_rows, self::$gifts);
 
 		// Regular user? Just switch the item from one inventory to another
 		if (empty($admin))
