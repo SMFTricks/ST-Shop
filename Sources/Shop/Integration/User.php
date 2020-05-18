@@ -19,6 +19,48 @@ if (!defined('SMF'))
 
 class User
 {
+	/**
+	 * @var object We will create an object for the specified item if needed.
+	 */
+	private $_inventory;
+
+	/**
+	 * @var array Save some user/profile information.
+	 */
+	private $_profile;
+
+	/**
+	 * User::__construct()
+	 *
+	 * Need to load some stuff first
+	 */
+	function __construct()
+	{
+		global $topic;
+
+		// We only need/want these on topics really
+		if (!empty($topic))
+		{
+			// Create new instance of inventory
+			$this->_inventory = new Inventory;
+			// Load template
+			loadTemplate('Shop/Inventory');
+		}
+
+		// Load language just in case
+		loadLanguage('Shop/Shop');
+	}
+
+	 /**
+	 * User::load_member_data()
+	 *
+	 * Include our shop columns in loadMemberData
+	 * 
+	 * @param string $columns The member columns
+	 * @param string $tablws Any additional tables
+	 * @param string $set What kind of data to load (normal, profile, minimal)
+	 * @return void
+	 */
 	public function load_member_data(&$columns, &$tables, &$set)
 	{
 		switch ($set)
@@ -37,6 +79,13 @@ class User
 		}
 	}
 
+	 /**
+	 * User::user_info()
+	 *
+	 * Used for adding new elements to the $user_info array
+	 * 
+	 * @return void
+	 */
 	public function user_info()
 	{
 		global $user_info, $user_settings;
@@ -49,76 +98,98 @@ class User
 		]);
 	}
 
-	public function simple_actions()
+	 /**
+	 * User::simple_actions()
+	 *
+	 * Load new elements to $context['user'] array in case we want to handle stuff from templates
+	 * 
+	 * @param array $simpleActions Simple actions
+	 * @param array $simpleAreas Simple areas
+	 * @param array $simpleSubActions Simple sub-actions
+	 * @param array $extraParams Additional parameters
+	 * @param array $xmlActions XML actions
+	 * @return void
+	 */
+	public function simple_actions(&$simpleActions, &$simpleAreas, &$simpleSubActions, &$extraParams, &$xmlActions)
 	{
 		global $context, $user_info;
 
 		if (!empty($user_info))
-			if (!$context['user']['is_guest']) {
-
+			if (!$context['user']['is_guest'])
+			{
 				$context['user']['shopMoney'] = $user_info['shopMoney'];
 				$context['user']['shopBank'] = $user_info['shopBank'];
 				$context['user']['gamesPass'] = $user_info['gamesPass'];
 			}
-			else {
+			else
+			{
 				$context['user']['shopMoney'] = 0;
 				$context['user']['shopBank'] = 0;
 				$context['user']['gamesPass'] = 0;
 			}
 	}
 
+	 /**
+	 * User::member_context()
+	 *
+	 * Shop custom profile fields
+	 * 
+	 * @param array $data The monstrous array of user information
+	 * @param int $user The ID of a user previously loaded by {@link loadMemberData()}
+	 * @param bool $display_custom_fields Whether or not to display custom profile fields
+	 * @return void
+	 */
 	public function member_context(&$data, $user, $display_custom_fields)
 	{
-		global $user_profile, $modSettings;
+		global $user_profile, $modSettings, $topic;
 
 		// Set the data
-		$profile = $user_profile[$user];
+		$this->_profile = $user_profile[$user];
 
 		$data = array_merge($data, [
-			'shopMoney' => $profile['shopMoney'],
-			'shopBank' => $profile['shopBank'],
-			'shopInventory_hide' => $profile['shopInventory_hide'],
-			'gamesPass' => $profile['gamesPass'],
+			'shopMoney' => $this->_profile['shopMoney'],
+			'shopBank' => $this->_profile['shopBank'],
+			'shopInventory_hide' => $this->_profile['shopInventory_hide'],
+			'gamesPass' => $this->_profile['gamesPass'],
 		]);
 
 		// Pocket credits
 		if ($modSettings['Shop_display_pocket'] == 1 || $modSettings['Shop_display_pocket'] == 3)
-		{
-			$data['custom_fields']['shopMoney'] = array(
+			$data['custom_fields']['shopMoney'] = [
 				'title' => Shop::getText('posting_credits_pocket'),
 				'col_name' => 'Shop_pocket',
-				'value' => Format::cash($profile['shopMoney'], $modSettings['Shop_display_pocket_placement'] == 0),
+				'value' => Format::cash($this->_profile['shopMoney'], $modSettings['Shop_display_pocket_placement'] == 0),
 				'placement' => $modSettings['Shop_display_pocket_placement'],
-			);
-		}
+			];
+
 		// Bank credits
 		if (($modSettings['Shop_display_bank'] == 1) || ($modSettings['Shop_display_bank'] == 3) && !empty($modSettings['Shop_enable_shop']) && !empty($modSettings['Shop_enable_bank']))
-		{
-			$data['custom_fields']['shopBank'] = array(
+			$data['custom_fields']['shopBank'] = [
 				'title' => Shop::getText('posting_credits_bank'),
 				'col_name' => 'Shop_bank',
-				'value' => Format::cash($profile['shopBank'], $modSettings['Shop_display_bank_placement'] == 0),
+				'value' => Format::cash($this->_profile['shopBank'], $modSettings['Shop_display_bank_placement'] == 0),
 				'placement' => $modSettings['Shop_display_bank_placement'],
-			);
-		}
+			];
+
 		// Inventory
-		if (empty($profile['shopInventory_hide']) && !empty($modSettings['Shop_inventory_enable']) && !empty($modSettings['Shop_enable_shop']))
-		{
-			// Load template
-			loadTemplate('Shop/Inventory');
-
-			// Load language just in case
-			loadLanguage('Shop/Shop');
-
-			$data['custom_fields']['shop_inventory'] = array(
+		if (empty($this->_profile['shopInventory_hide']) && !empty($modSettings['Shop_inventory_enable']) && !empty($modSettings['Shop_enable_shop']) && !empty($topic))
+			$data['custom_fields']['shop_inventory'] = [
 				'title' => Shop::getText('posting_inventory'),
 				'col_name' => 'Shop_inventory',
-				'value' => template_shop_inventory(Inventory::display($user)),
+				'value' => template_shop_inventory($this->_inventory->display($user)),
 				'placement' => $modSettings['Shop_inventory_placement'],
-			);
-		}
+			];
 	}
 
+	 /**
+	 * User::fetch_alerts()
+	 *
+	 * Tweaks the final alert sent by a shop action
+	 * 
+	 * @param array $alerts The array containing the alerts
+	 * @param array $formats Some sprintf formats for generating links/strings.
+	 * @return void
+	 */
 	public function fetch_alerts(&$alerts, &$formats)
 	{
 		global $settings;

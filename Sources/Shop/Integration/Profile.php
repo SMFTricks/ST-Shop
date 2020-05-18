@@ -19,18 +19,42 @@ if (!defined('SMF'))
 
 class Profile
 {
+	/**
+	 * @var object We will create an object for the specified item if needed.
+	 */
+	private $_inventory;
+
+	/**
+	 * Profile::__construct()
+	 *
+	 * Need to load some stuff first
+	 */
+	function __construct()
+	{
+		// Create new instance of inventory
+		$this->_inventory = new Inventory;
+
+		// Load template only on topics
+		loadTemplate('Shop/Inventory');
+
+		// Load language just in case
+		loadLanguage('Shop/Shop');
+
+		// Load more hooks yea
+		$this->integrate();
+	}
+
 	 /**
 	 * Profile::hookAreas()
 	 *
 	 * Adding some more links to the profile menu
+	 * 
 	 * @param array $profile_areas An array with all the profile areas
-	 * @return
+	 * @return void
 	 */
 	public function hookAreas(&$profile_areas)
 	{
 		global $context, $scripturl, $modSettings;
-
-		loadLanguage('Shop/Shop');
 
 		// Profile information
 		$before = 'statistics';
@@ -93,14 +117,31 @@ class Profile
 			$temp_buttons[$k] = $v;
 		}
 		$profile_areas['profile_action']['areas'] = $temp_buttons;
-
-		// More profile stuff
-		add_integration_function('integrate_load_profile_fields', __CLASS__ . '::load_profile_fields', false);
-		add_integration_function('integrate_setup_profile_context', __CLASS__ . '::setup_profile_context', false);
-		add_integration_function('integrate_alert_types', __CLASS__ . '::alert_types', false);
-		add_integration_function('integrate_load_custom_profile_fields', __CLASS__ . '::custom_profile_fields', false);
 	}
 
+	 /**
+	 * Profile::integrate()
+	 *
+	 * Load some more hooks for alerts and custom fields
+	 * @return void
+	 */
+	public function integrate()
+	{
+		// More profile stuff
+		add_integration_function('integrate_load_profile_fields', __CLASS__ . '::load_profile_fields#', false);
+		add_integration_function('integrate_setup_profile_context', __CLASS__ . '::setup_profile_context#', false);
+		add_integration_function('integrate_alert_types', __CLASS__ . '::alert_types#', false);
+		add_integration_function('integrate_load_custom_profile_fields', __CLASS__ . '::custom_profile_fields#', false);
+	}
+
+	 /**
+	 * Profile::load_profile_fields()
+	 *
+	 * Adds shop account and profile options
+	 * 
+	 * @param array $profile_fields An array containing the profile fields and inputs
+	 * @return void
+	 */
 	public function load_profile_fields(&$profile_fields)
 	{
 		global $modSettings;
@@ -151,6 +192,14 @@ class Profile
 		$profile_fields = $temp_buttons;
 	}
 
+	 /**
+	 * Profile::setup_profile_context()
+	 *
+	 * Actually include our new shop fields into a specific section
+	 * 
+	 * @param array $fields An array containing the profile fields that are actually loaded
+	 * @return void
+	 */
 	public function setup_profile_context(&$fields)
 	{
 		global $modSettings;
@@ -186,45 +235,56 @@ class Profile
 		}
 	}
 
+	 /**
+	 * Profile::custom_profile_fields()
+	 *
+	 * Shop custom profile fields for profile
+	 * 
+	 * @param int $memID The ID of a user previously loaded by {@link loadMemberData()}
+	 * @param array $area An array containing the profile areas
+	 * @return void
+	 */
 	public function custom_profile_fields($memID, $area)
 	{
 		global $context, $modSettings;
 
 		// Pocket
 		if (($area == 'summary') && (($modSettings['Shop_display_pocket'] == 2) || ($modSettings['Shop_display_pocket'] == 3)))
-		{
-			$context['custom_fields']['shopMoney'] = array(
+			$context['custom_fields']['shopMoney'] = [
 				'name' => Shop::getText('posting_credits_pocket'),
 				'colname' => 'Shop_pocket',
 				'output_html' => Format::cash($context['member']['shopMoney']),
 				'placement' => 0,
-			);
-		}
+			];
+
 		// Bank
 		if (($area == 'summary') && (($modSettings['Shop_display_bank'] == 2) || ($modSettings['Shop_display_bank'] == 3)) && !empty($modSettings['Shop_enable_shop']) && !empty($modSettings['Shop_enable_bank']))
-		{
-			$context['custom_fields']['shopBank'] = array(
+			$context['custom_fields']['shopBank'] = [
 				'name' => Shop::getText('posting_credits_bank'),
 				'colname' => 'Shop_bank',
 				'output_html' => Format::cash($context['member']['shopBank']),
 				'placement' => 0,
-			);
-		}
+			];
+
 		// Inventory
 		if ($area == 'summary' && !empty($modSettings['Shop_inventory_enable']) && !empty($modSettings['Shop_enable_shop']) && empty($context['member']['shopInventory_hide']))
-		{
-			// Load template
-			loadTemplate('Shop/Inventory');
-
-			$context['custom_fields']['shop_inventory'] = array(
+			$context['custom_fields']['shop_inventory'] = [
 				'name' => Shop::getText('posting_inventory'),
 				'colname' => 'Shop_inventory',
-				'output_html' => template_shop_inventory(Inventory::display($context['member']['id'])),
+				'output_html' => template_shop_inventory($this->_inventory->display($context['member']['id'])),
 				'placement' => 2,
-			);
-		}
+			];
 	}
 
+	 /**
+	 * Profile::alert_types()
+	 *
+	 * Add our specific alerts to the profile so user can enable/disable them
+	 * 
+	 * @param array $alert_types An array containing the types or groups each alert belongs to
+	 * @param array $group_options Additional options for group
+	 * @return void
+	 */
 	public function alert_types(&$alert_types, &$group_options)
 	{
 		global $modSettings;
