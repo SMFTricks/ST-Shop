@@ -67,8 +67,8 @@
 					'1',
 					'd',
 					'0',
-					'bank_interest',
-					'Shop::scheduled_shopBank',
+					'shop_bank_interest',
+					'Shop\Tasks\Scheduled::bank_interest#',
 				),
 			),
 			array('')
