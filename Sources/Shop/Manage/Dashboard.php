@@ -124,7 +124,7 @@ class Dashboard
 				'shopinventory' => [
 					'label' => Shop::getText('tab_inventory'),
 					'icon' => 'maintain',
-					'function' =>  __NAMESPACE__ . '\Inventory::main',
+					'function' =>  __NAMESPACE__ . '\Inventory::main#',
 					'permission' => ['shop_canManage'],
 					'subsections' => [
 						'groupcredits' => [Shop::getText('inventory_groupcredits')],
