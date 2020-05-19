@@ -28,7 +28,7 @@ class Gift
 	private $_notify;
 
 	/**
-	 * @var object Log any information regading gifts.
+	 * @var object Log any information regarding gifts.
 	 */
 	private $_log;
 	
@@ -67,7 +67,7 @@ class Gift
 		if (empty($modSettings['Shop_enable_gift']))
 			fatal_error(Shop::getText('currently_disabled_gift'), false);
 
-		// Check if he is allowed to access this section
+		// Check if user is allowed to access this section
 		if (!allowedTo('shop_canManage'))
 			isAllowedTo('shop_canGift');
 
@@ -116,7 +116,7 @@ class Gift
 				$_REQUEST['membername'] = $membername;
 			}
 			else
-				$_REQUEST['membername'] = '';
+				unset($_REQUEST['membername']);
 		}
 
 		// Load suggest.js
