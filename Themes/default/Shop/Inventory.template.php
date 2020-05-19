@@ -28,7 +28,7 @@ function template_shop_inventory_search_above()
 					<span class="smalltext">', $txt['Shop_inventory_member_desc'], '</span>
 				</dt>
 				<dd>
-					<input type="text" name="membername" id="membername" />
+					<input type="text" name="membername" id="membername"', (isset($_REQUEST['membername']) ? ' value="'.$_REQUEST['membername'].'"' : ''), ' />
 				</dd>';
 }
 
