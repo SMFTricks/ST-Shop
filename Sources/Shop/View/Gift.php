@@ -38,14 +38,9 @@ class Gift
 	protected $_tabs = [];
 
 	/**
-	 * @var array Information regarding a gift.
+	 * @var array Information regarding the gift.
 	 */
 	private $_gift_info = [];
-
-	/**
-	 * @var array Additional information for alerts
-	 */
-	private $_extra_items = [];
 
 	/**
 	 * Gift::__construct()
@@ -89,7 +84,7 @@ class Gift
 			'name' => Shop::getText('main_gift'),
 		];
 		// Sub-menu tabs
-		$context['section_tabs'] = $this->tabs;
+		$context['section_tabs'] = $this->_tabs;
 		// Form
 		$context['form_url'] = '?action=shop;sa=gift2'.(isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'sendmoney' ? ';money' : '');
 
@@ -210,8 +205,6 @@ class Gift
 				$message = Database::sanitize($_REQUEST['message']);
 				// The message subject
 				$subject = Shop::getText('gift_notification_subject');
-				// The actual link
-				$this->_extra_items['item_href'] = '?action=shop';
 
 				// Gifting an item
 				if (!isset($_REQUEST['money']) && isset($_REQUEST['item']))
@@ -227,10 +220,6 @@ class Gift
 
 					// PM body
 					$body = sprintf(Shop::getText('gift_notification_message1'), $user_info['id'], $user_info['name'], $this->_gift_info['name'], $message);
-					// Icon for alert
-					$this->_extra_items['item_icon'] = 'top_gifts_r';
-					// The actual link
-					$this->_extra_items['item_href'] .= ';sa=inventory';
 
 					// Log the item
 					$this->_log->items($user_info['id'], $memResult['id_member'], $itemid, $this->_gift_info['id'], false, $message);
@@ -239,7 +228,7 @@ class Gift
 					$this->_notify->pm($memResult['id_member'], $subject, $body);
 					// Deploy alert?
 					if (!empty($modSettings['Shop_noty_items']))
-						$this->_notify->alert($memResult['id_member'], 'items', $this->_gift_info['id'], $this->_extra_items);
+						$this->_notify->alert($memResult['id_member'], 'items', $this->_gift_info['id'], ['shop_href' => ';sa=inventory', 'item_icon' => 'top_gifts_r']);
 				}
 				// Gifting money
 				else
@@ -266,10 +255,6 @@ class Gift
 
 					// PM body
 					$body = sprintf(Shop::getText('gift_notification_message2'), $user_info['id'], $user_info['name'], $modSettings['Shop_credits_suffix'], Format::cash($amount), Format::cash($membermoney + $amount), $message);
-					// Icon for alert
-					$this->extra_items['item_icon'] = 'top_money_r';
-					// Amount for the alert
-					$this->extra_items['amount'] = Format::cash($amount);
 
 					// Log the item
 					$this->_log->credits($user_info['id'], $memResult['id_member'], $amount, false, $message);
@@ -278,7 +263,7 @@ class Gift
 					$this->_notify->pm($memResult['id_member'], $subject, $body);
 					// Deploy alert?
 					if (!empty($modSettings['Shop_noty_credits']))
-						$this->_notify->alert($memResult['id_member'], 'credits', $user_info['id'], $this->extra_items);
+						$this->_notify->alert($memResult['id_member'], 'credits', $user_info['id'], ['item_icon' => 'top_money_r', 'amount' => Format::cash($amount)]);
 				}
 
 				// If there are no errors, then it was a success?
