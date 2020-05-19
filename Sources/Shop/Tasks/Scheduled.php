@@ -20,6 +20,11 @@ class Scheduled
 	 */
 	var $login;
 
+	/**
+	 * Scheduled::__construct()
+	 *
+	 * Defines properties with initial values
+	 */
 	function __construct()
 	{
 		// Did the user login today? :P

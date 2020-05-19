@@ -539,6 +539,11 @@
 					'null' => false,
 				),
 				array(
+					'name' => 'action',
+					'type' => 'tinytext',
+					'null' => false,
+				),
+				array(
 					'name' => 'type',
 					'type' => 'smallint',
 					'size' => 10,
