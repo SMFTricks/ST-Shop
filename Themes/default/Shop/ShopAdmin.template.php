@@ -16,11 +16,7 @@ function template_dashboard()
 
 	// Welcome message for the admin.
 	echo '
-	<div id="admincenter">';
-
-	// Is there an update available?
-	echo '
-		<div id="update_section"></div>
+	<div id="admincenter">
 		<div id="admin_main_section">';
 
 	// Display the "live news" from smftricks.com.
@@ -51,10 +47,7 @@ function template_dashboard()
 						<div id="version_details">
 							<strong>', $txt['support_versions'], ':</strong><br />
 							', $txt['Shop_version'] , ':
-							<em id="yourVersion" style="white-space: nowrap;">', $context['Shop']['version'] , '</em><br />';
-
-	// Some more stuff will be here... eventually
-	echo '
+							<em id="yourVersion" style="white-space: nowrap;">', $context['Shop']['version'] , '</em><br />
 						</div>
 					</div>
 					<div class="title_bar">
@@ -598,7 +591,7 @@ function template_send_items()
 
 function template_restock()
 {
-	global $context, $txt, $modSettings, $scripturl;
+	global $context, $txt;
 
 	echo '
 			<dl class="settings">
