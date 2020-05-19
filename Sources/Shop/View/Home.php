@@ -18,8 +18,20 @@ if (!defined('SMF'))
 
 class Home
 {
-	var $shop_tabs = [];
-	var $subactions = [];
+	/**
+	 * @var array Tabs array with the navegation of the shop.
+	 */
+	var $_shop_tabs = [];
+
+	/**
+	 * @var array Actions array for each section/area of the shop.
+	 */
+	protected $_actions = [];
+
+	/**
+	 * @var string The current area/action.
+	 */
+	protected $_sa;
 
 	function __construct()
 	{
@@ -29,42 +41,18 @@ class Home
 
 		// Load template file
 		loadTemplate('Shop/Shop');
+
+		// Build the array of actions
+		$this->actions();
+
+		// Shop tabs
+		$this->tabs();
 	}
 
-	public function main()
+	public function actions()
 	{
-		global $context, $scripturl, $modSettings, $user_info;
-
-		// Set all the page stuff
-		$context['page_title'] = Shop::getText('main_button');
-		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=shop',
-			'name' => Shop::getText('main_button'),
-		);
-
-		// What if the Shop is disabled? User shouldn't be able to access the Shop
-		if (empty($modSettings['Shop_enable_shop']))
-			fatal_error(Shop::getText('currently_disabled'), false);
-
-		// Last but not less important. Are they actually allowed to Access the Shop? If not.. YOU SHALL NOT PASS. 
-		// Anyway if he can Manage the Shop, there's no problem.
-		if (!empty($modSettings['Shop_enable_shop']) && !allowedTo('shop_canAccess') && !allowedTo('shop_canManage'))
-			isAllowedTo('shop_canAccess');
-
-		// Maintenance. Only Shop admins can access if the shop it's enabled
-		if (!empty($modSettings['Shop_enable_shop']) && !empty($modSettings['Shop_enable_maintenance']) && allowedTo('shop_canAccess') && !allowedTo('shop_canManage'))
-			fatal_error(Shop::getText('currently_maintenance'), false);
-
-		// Games Pass, get the days!
-		$context['user']['gamedays'] = ($user_info['gamesPass'] <= time() || empty($user_info['gamesPass']) ? 0 : Format::gamespass($user_info['gamesPass']));
-
-		// Lovely copyright in shop pages
-		$context['shop']['copyright'] = $this->copyright();
-		// Shop tabs
-		$context['shop']['tabs'] = $this->tabs();
-		
 		// Big array of actions
-		$this->subactions = [
+		$this->_actions = [
 			'home' =>  'Home::portal',
 			'buy' => 'Buy::main',
 			'buy2' => 'Buy::purchase',
@@ -80,7 +68,10 @@ class Home
 			'senditem' => 'Gift::main',
 			'sendmoney' => 'Gift::main',
 			'gift2' => 'Gift::send',
+			'bank' => 'Bank::main',
+			'bank2' => 'Bank::trans',
 		];
+		$this->_sa = isset($_GET['sa'], $this->_actions[$_GET['sa']]) ? $_GET['sa'] : 'home';
 
 		$subactions2 = [
 			'invtrade' => array(
@@ -89,13 +80,7 @@ class Home
 			'invtrade2' => array(
 				'function' => 'ShopInventory::Trade2',
 			),
-			
-			'bank' => array(
-				'function' => 'ShopBank::Main',
-			),
-			'bank2' => array(
-				'function' => 'ShopBank::Trans',
-			),
+		
 			'trade' => array(
 				'function' => 'ShopTrade::Main',
 			),
@@ -127,17 +112,14 @@ class Home
 				'function' => 'ShopGames::Main',
 			),
 		];
-		// More sections?
-		call_integration_hook('integrate_shop_home_actions', array(&$this->subactions));
 
-		// Invoke the function
-		$sa = isset($_GET['sa'], $this->subactions[$_GET['sa']]) ? $_GET['sa'] : 'home';
-		call_helper(__NAMESPACE__ . '\\' . $this->subactions[$sa] . '#');
+		// More sections?
+		call_integration_hook('integrate_shop_home_actions', array(&$this->_actions, &$this->_sa));
 	}
 
 	public function tabs()
 	{
-		$this->shop_tabs = [
+		$this->_shop_tabs = [
 			'home' => [
 				'action' => ['home'],
 				'label' => Shop::getText('main_home'),
@@ -188,9 +170,43 @@ class Home
 			],
 		];
 		// Magic tabs?
-		call_integration_hook('integrate_shop_home_tabs', [&$this->shop_tabs]);
+		call_integration_hook('integrate_shop_home_tabs', [&$this->_shop_tabs]);
+	}
 
-		return $this->shop_tabs;
+	public function main()
+	{
+		global $context, $scripturl, $modSettings, $user_info;
+
+		// Set all the page stuff
+		$context['page_title'] = Shop::getText('main_button');
+		$context['linktree'][] = array(
+			'url' => $scripturl . '?action=shop',
+			'name' => Shop::getText('main_button'),
+		);
+
+		// What if the Shop is disabled? User shouldn't be able to access the Shop
+		if (empty($modSettings['Shop_enable_shop']))
+			fatal_error(Shop::getText('currently_disabled'), false);
+
+		// Last but not less important. Are they actually allowed to Access the Shop? If not.. YOU SHALL NOT PASS. 
+		// Anyway if user can Manage the Shop, there's no problem :).
+		if (!empty($modSettings['Shop_enable_shop']) && !allowedTo('shop_canAccess') && !allowedTo('shop_canManage'))
+			isAllowedTo('shop_canAccess');
+
+		// Maintenance. Only Shop admins can access.
+		if (!empty($modSettings['Shop_enable_shop']) && !empty($modSettings['Shop_enable_maintenance']) && allowedTo('shop_canAccess') && !allowedTo('shop_canManage'))
+			fatal_error(Shop::getText('currently_maintenance'), false);
+
+		// Games Pass, get the days!
+		$context['user']['gamedays'] = ($user_info['gamesPass'] <= time() || empty($user_info['gamesPass']) ? 0 : Format::gamespass($user_info['gamesPass']));
+
+		// Lovely copyright in shop pages
+		$context['shop']['copyright'] = $this->copyright();
+		// Shop tabs
+		$context['shop']['tabs'] = $this->_shop_tabs;
+
+		// Invoke the function
+		call_helper(__NAMESPACE__ . '\\' . $this->_actions[$this->_sa] . '#');
 	}
 
 	public function portal()
@@ -250,68 +266,6 @@ class Home
 
 
 
-	public static function logBank($userid, $amount, $fee, $type = 0)
-	{
-		global $smcFunc;
-
-		// It's a deposit
-		if ($type == 0 || $type == 1)
-		{
-			// Add the amount to the user's bank and remove it from pocket
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}members
-				SET ' . ($type == 0 ? '
-					shopBank = shopBank + {int:amount},
-					shopMoney = shopMoney - {int:amount} - {int:fee}' : '
-					shopBank = shopBank + {int:amount} - {int:fee},
-					shopMoney = shopMoney - {int:amount}'). '
-				WHERE id_member = {int:userid}',
-				array(
-					'amount' => $amount,
-					'fee' => $fee,
-					'userid' => $userid,
-				)
-			);
-		}
-		// Withdraw then
-		else {
-			// Add the amount to the user's pocket and remove it from bank
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}members
-				SET  ' . ($type == 2 ? '
-					shopMoney = shopMoney + {int:amount} - {int:fee},
-					shopBank = shopBank - {int:amount}' : '
-					shopMoney = shopMoney + {int:amount},
-					shopBank = shopBank - {int:amount} - {int:fee}'). '
-				WHERE id_member = {int:userid}',
-				array(
-					'amount' => $amount,
-					'fee' => $fee,
-					'userid' => $userid,
-				)
-			);
-		}
-
-		// Insert the information in the log
-		$smcFunc['db_insert']('',
-			'{db_prefix}shop_log_bank',
-			array(
-				'userid' => 'int',
-				'amount' => 'int',
-				'fee' => 'int',
-				'type' => 'int',
-				'date' => 'int',
-			),
-			array(
-				$userid,
-				$amount,
-				$fee,
-				$type,
-				time()
-			),
-			array()
-		);
-	}
 
 	public static function logGames($userid, $amount, $game = 'slots')
 	{
