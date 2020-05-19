@@ -106,6 +106,7 @@ class Log
 			];
 		}
 		Database::Insert('shop_log_gift', $this->_insert_rows, $this->_gift);
+		unset($this->_insert_rows);
 
 		// Regular user? Just switch the item from one inventory to another
 		if (empty($admin))
@@ -115,7 +116,7 @@ class Log
 		{
 			foreach ($users as $memID)
 			{
-				Database::Insert('shop_inventory', [
+				$this->_insert_rows[] = [
 					$memID,
 					$item,
 					0,
@@ -123,9 +124,10 @@ class Log
 					time(),
 					0,
 					0
-				], $this->_inventory);
-				Database::Update('shop_items', ['stock' => 1, 'itemid' => $item], 'stock = {int:stock}', 'WHERE itemid = {int:itemid}');
+				];
 			}
+			Database::Insert('shop_inventory', $this->_insert_rows, $this->_inventory);
+			Database::Update('shop_items', ['stock' => count($users), 'itemid' => $item], 'stock = stock - {int:stock}', 'WHERE itemid = {int:itemid}');
 		}
 	}
 
