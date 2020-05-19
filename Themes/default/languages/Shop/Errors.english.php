@@ -52,7 +52,7 @@ $txt['Shop_item_limit_reached'] = 'Sorry, you already reached the limit of this 
 $txt['Shop_inventory_no_items'] = 'You don\'t have any items!';
 $txt['Shop_inventory_no_owners'] = 'No users have this item on their inventory.';
 $txt['Shop_inventory_other_no_items'] = 'This user doesn\'t have any items yet!';
-$txt['Shop_inventory_useritems_nostock'] = 'No enough stock of this item for the number of selected users';
+$txt['Shop_inventory_useritems_nostock'] = 'Not enough stock of this item for the number of selected users';
 
 $txt['Shop_module_notfound'] = 'Unable to find that module';
 $txt['Shop_no_modules'] = 'There are no modules added!';
