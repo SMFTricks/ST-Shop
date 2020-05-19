@@ -59,6 +59,15 @@ class Log
 			'tradedate' => 'int',
 			'fav' => 'int',
 		];
+		// Bank
+		$this->_bank = [
+			'userid' => 'int',
+			'amount' => 'int',
+			'fee' => 'int',
+			'action' => 'string',
+			'type' => 'int',
+			'date' => 'int',
+		];
 	}
 
 	public function credits($sender, $users, $amount, $admin = false, $message = '')
@@ -173,5 +182,21 @@ class Log
 			$fee,
 			time()
 		], $this->_buy);
+	}
+
+	public function bank($userid, $amount, $trans, $fee = 0, $type)
+	{
+		// Move forward with the transaction
+		Database::Update('members', ['user' => $userid, 'amount' => $amount, 'fee' => $fee], 'shopMoney = shopMoney '. ($trans == 'deposit' ? '-' : '+') .' {int:amount}' .(!empty($fee) && empty($type) ? ' - {int:fee}' : '') . ', shopBank = shopBank '. ($trans == 'withdrawal' ? '-' : '+') .' {int:amount}' .(!empty($fee) && !empty($type) ? ' - {int:fee}' : '') . ',', 'WHERE id_member = {int:user}');
+
+		// Insert information in the log
+		Database::Insert('shop_log_bank', [
+			$userid,
+			$amount,
+			$fee,
+			$trans,
+			$type,
+			time(),
+		], $this->_bank);
 	}
 }

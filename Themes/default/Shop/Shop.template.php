@@ -310,6 +310,60 @@ function template_gift($message = true)
 				</dd>';
 }
 
+function template_bank()
+{
+	global $context, $txt, $scripturl, $modSettings;
+
+	// Welcome message
+	echo '
+		<div class="title_bar">
+			<h4 class="titlebg">
+				', $txt['Shop_bank_welcome'], '
+			</h4>
+		</div>
+		<div class="information">
+			', $context['page_description'], '
+		</div>';
+
+	if (isset($_REQUEST['deposit']) || isset($_REQUEST['withdrawal']))
+		echo '
+		<div class="infobox">', $context['Shop']['bank']['success'], '</div>';
+
+	echo '
+		<div class="roundframe">
+			', empty($modSettings['Shop_bank_withdrawal_fee']) ? '' : '<strong>' . $txt['Shop_bank_withdrawal_fee'] . ':</strong> ' . Format::cash($modSettings['Shop_bank_withdrawal_fee']) . '<br />', '
+			', empty($modSettings['Shop_bank_deposit_fee']) ? '' : '<strong>' . $txt['Shop_bank_deposit_fee'] . ':</strong> ' . Format::cash($modSettings['Shop_bank_deposit_fee']) . '<br />', '
+			', empty($modSettings['Shop_bank_withdrawal_min']) ? '' : '<strong>' . $txt['Shop_bank_withdrawal_min'] . ':</strong> ' . Format::cash($modSettings['Shop_bank_withdrawal_min']) . '<br />', '
+			', empty($modSettings['Shop_bank_withdrawal_max']) ? '' : '<strong>' . $txt['Shop_bank_withdrawal_max'] . ':</strong> ' . Format::cash($modSettings['Shop_bank_withdrawal_max']) . '<br />', '
+			', empty($modSettings['Shop_bank_deposit_min']) ? '' : '<strong>' . $txt['Shop_bank_deposit_min'] . ':</strong> ' . Format::cash($modSettings['Shop_bank_deposit_min']) . '<br />', '
+			', empty($modSettings['Shop_bank_deposit_max']) ? '' : '<strong>' . $txt['Shop_bank_deposit_max'] . ':</strong> ' . Format::cash($modSettings['Shop_bank_deposit_max']) . '<br />', '
+			<hr />
+			<form method="post" action="', $scripturl,'?action=shop;sa=bank2">
+				<div class="windowbg">
+					', $context['bank']['message'], '
+				</div>
+				<dl class="settings">
+					<dt>
+						', $txt['Shop_bank_action'], '
+					</dt>
+					<dd>
+						<input class="input_radio" type="radio" name="type" value="deposit" id="deposit" checked /> <label for="deposit">', $txt['Shop_bank_deposit'], '</label><br />
+						<input class="input_radio" type="radio" name="type" value="withdraw" id="withdraw" /> <label for="withdraw">', $txt['Shop_bank_withdraw'], '</label>
+					</dd>
+					<dt>
+						', $txt['Shop_bank_amount'], ':
+					</dt>
+					<dd>
+						', Format::cash('<input class="input_text" type="number" min="1" name="amount" />'), '
+					</dd>
+				</dl>
+				<input class="button floatright" type="submit" value="', $txt['go'], '" />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
+			</form>
+		</div>';
+}
+
+
 
 
 
@@ -342,55 +396,6 @@ function template_Shop_invTradeItem()
 		<div class="windowbg">
 			', $context['shop']['tradewhat'], '
 		</div>';
-}
-
-function template_Shop_mainBank()
-{
-	global $context, $txt, $scripturl, $modSettings;
-
-	echo '
-		<div class="windowbg">';
-
-		if (isset($_REQUEST['deposit']) || isset($_REQUEST['withdraw']))
-		echo '
-			<div class="infobox">', $context['Shop']['bank']['success'], '</div>';
-
-		echo '
-			', empty($context['bank']['wdFee']) ? '' : $context['bank']['wdFee'] . '<br />', '
-			', empty($context['bank']['dpFee']) ? '' : $context['bank']['dpFee'] . '<br />', '
-			', empty($context['bank']['wdMin']) ? '' : $context['bank']['wdMin'] . '<br />', '
-			', empty($context['bank']['wdMax']) ? '' : $context['bank']['wdMax'] . '<br />', '
-			', empty($context['bank']['dpMin']) ? '' : $context['bank']['dpMin'] . '<br />', '
-			', empty($context['bank']['dpMax']) ? '' : $context['bank']['dpMax'] . '<br />', '
-			<hr />
-			<form method="post" action="', $scripturl,'?action=shop;sa=bank2">
-				', $context['bank']['message'], '<br /><br />
-				
-				<input class="input_radio" type="radio" name="type" value="deposit" id="deposit" checked />
-				<label for="deposit">', $txt['Shop_bank_deposit'], '</label>
-
-				<input class="input_radio" type="radio" name="type" value="withdraw" id="withdraw" />
-				<label for="withdraw">', $txt['Shop_bank_withdraw'], '</label><br /><br />
-
-				', $txt['Shop_bank_amount'], ':&nbsp;
-				', $modSettings['Shop_credits_prefix'], '&nbsp;<input class="input_text" type="number" min="1" name="amount" size="10" />&nbsp;', $modSettings['Shop_credits_suffix'], '
-
-				<br /><br />
-				<input class="button floatleft" type="submit" value="', $txt['go'], '" />
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
-			</form>
-		</div>';
-}
-
-
-function template_Shop_giftSent()
-{
-	global $context;
-
-	echo '
-	<div class="windowbg">
-		', $context['shop']['gift_sent'], '
-	</div>';
 }
 
 
