@@ -23,7 +23,7 @@ class Dashboard
 	protected $_subactions = [];
 
 	/**
-	 * @var array Subactions array for each section/area of the shop.
+	 * @var string The current area.
 	 */
 	protected $_sa;
 
