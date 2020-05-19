@@ -15,6 +15,7 @@ use Shop\Helper\Database;
 use Shop\Helper\Format;
 use Shop\Helper\Log;
 use Shop\Helper\Notify;
+use Shop\View\Inventory as Search;
 
 if (!defined('SMF'))
 	die('No direct access...');
@@ -31,11 +32,6 @@ class Inventory extends Dashboard
 	 */
 	private $_log;
 
-	/**
-	 * @var array Additional information for alerts
-	 */
-	private $_extra_items = [];
-
 	function __construct()
 	{
 		// Notify
@@ -50,14 +46,14 @@ class Inventory extends Dashboard
 			'usercredits2' => 'credits2',
 			'groupcredits' => 'group',
 			'groupcredits2' => 'group2',
-			//'useritems' => 'AdminShopInventory::Items',
-			//'useritems2' => 'AdminShopInventory::Items2',
-			//'restock' => 'AdminShopInventory::Restock',
-			//'restock2' => 'AdminShopInventory::Restock2',
+			'useritems' => 'items',
+			'useritems2' => 'items2',
 			'search' => 'search',
 			'search2' => 'search2',
 			'userinv' => 'view_inventory',
 			'delete' => 'delete',
+			'restock' => 'restock',
+			'restock2' => 'restock2',
 		];
 		$this->_sa = isset($_GET['sa'], $this->_subactions[$_GET['sa']]) ? $_GET['sa'] : 'usercredits';
 	}
@@ -74,8 +70,8 @@ class Inventory extends Dashboard
 				'usercredits' => ['description' => Shop::getText('inventory_usercredits_desc')],
 				'groupcredits' => ['description' => Shop::getText('inventory_groupcredits_desc')],
 				'useritems' => ['description' => Shop::getText('inventory_useritems_desc')],
-				'restock' => ['description' => Shop::getText('inventory_restock_desc')],
 				'search' => ['description' => Shop::getText('tab_inventory_desc')],
+				'restock' => ['description' => Shop::getText('inventory_restock_desc')],
 			],
 		];
 		call_helper(__CLASS__ . '::' . $this->_subactions[$this->_sa].'#');
@@ -85,21 +81,18 @@ class Inventory extends Dashboard
 	{
 		global $context;
 
-		// Inventory template
-		loadTemplate('Shop/Inventory');
-
 		// Set all the page stuff
 		$context['page_title'] =  Shop::getText('tab_inventory') . ' - '. Shop::getText('inventory_usercredits');
-		$context[$context['admin_menu_name']]['tab_data'] = array(
+		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => $context['page_title'],
 			'description' => Shop::getText('inventory_usercredits_desc'),
-		);
+		];
 		loadTemplate('Shop/ShopAdmin');
 		$context['sub_template'] = 'send_credits';
 		$context['template_layers'][] = 'send';
 
 		// Load suggest.js
-		loadJavaScriptFile('suggest.js', array('default_theme' => true, 'defer' => false, 'minimize' => true), 'smf_suggest');
+		loadJavaScriptFile('suggest.js', ['default_theme' => true, 'defer' => false, 'minimize' => true], 'smf_suggest');
 	}
 
 	public function credits2()
@@ -180,17 +173,7 @@ class Inventory extends Dashboard
 
 				// Deploy alert?
 				if (!empty($modSettings['Shop_noty_credits']))
-				{
-					// The actual link
-					$this->_extra_items['item_href'] = '?action=shop';
-					// Icon for alert
-					$this->_extra_items['item_icon'] = 'top_money_r';
-					// Amount for the alert
-					$this->_extra_items['amount'] = Format::cash($amount);
-
-					// Send alert
-					$this->_notify->alert($members, 'credits', $user_info['id'], $this->_extra_items);
-				}
+					$this->_notify->alert($members, 'credits', $user_info['id'], ['item_icon' => 'top_money_r', 'amount' => Format::cash($amount)]);
 
 				// Redirect to a nice message of success
 				redirectexit('action=admin;area=shopinventory;sa=usercredits;updated');
@@ -204,10 +187,10 @@ class Inventory extends Dashboard
 
 		// Set all the page stuff
 		$context['page_title'] = Shop::getText('tab_inventory') . ' - '. Shop::getText('inventory_groupcredits');
-		$context[$context['admin_menu_name']]['tab_data'] = array(
+		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => $context['page_title'],
 			'description' => Shop::getText('inventory_groupcredits_desc'),
-		);
+		];
 		loadTemplate('Shop/ShopAdmin');
 		$context['sub_template'] = 'groups';
 		$context['template_layers'][] = 'send';
@@ -259,17 +242,7 @@ class Inventory extends Dashboard
 
 			// Deploy alert?
 			if (!empty($modSettings['Shop_noty_credits']))
-			{
-				// The actual link
-				$this->_extra_items['item_href'] = '?action=shop';
-				// Icon for alert
-				$this->_extra_items['item_icon'] = 'top_money_r';
-				// Amount for the alert
-				$this->_extra_items['amount'] = Format::cash($amount);
-
-				// Send alert
-				$this->_notify->alert($members, 'credits', $user_info['id'], $this->_extra_items);
-			}
+				$this->_notify->alert($members, 'credits', $user_info['id'], ['item_icon' => 'top_money_r', 'amount' => Format::cash($amount)]);
 
 			// Redirect to a nice message of successful
 			redirectexit('action=admin;area=shopinventory;sa=groupcredits;success');
@@ -278,7 +251,7 @@ class Inventory extends Dashboard
 
 	public function search()
 	{
-		global $context, $scripturl;
+		global $context;
 
 		// Check if he is allowed to access this section
 		if (!allowedTo('shop_canManage'))
@@ -290,10 +263,10 @@ class Inventory extends Dashboard
 
 		// Set all the page stuff
 		$context['page_title'] = Shop::getText('tab_inventory') . ' - ' . Shop::getText('inventory_search');
-		$context[$context['admin_menu_name']]['tab_data'] = array(
+		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => $context['page_title'],
 			'description' => Shop::getText('tab_inventory_desc'),
-		);
+		];
 		$context['template_layers'][] = 'send';
 		$context['template_layers'][] = 'shop_inventory_search';
 		$context['sub_template'] = 'shop_inventory_search';
@@ -301,18 +274,18 @@ class Inventory extends Dashboard
 		$context['form_url'] = '?action=admin;area=shopinventory;sa=search2';
 
 		// Load suggest.js
-		loadJavaScriptFile('suggest.js', array('default_theme' => true, 'defer' => false, 'minimize' => true), 'smf_suggest');
+		loadJavaScriptFile('suggest.js', ['default_theme' => true, 'defer' => false, 'minimize' => true], 'smf_suggest');
 	}
 
-	public function Search2()
+	public function search2()
 	{
-		// This is a nasty hack
+		// This is a nasty and lazy hack
 		Search::search_inventory();
 	}
 
 	public function view_inventory()
 	{
-		global $boardurl, $context, $scripturl, $modSettings, $user_info, $memberContext, $sourcedir;
+		global $context, $modSettings, $user_info, $memberContext, $sourcedir;
 
 		// Keep the tab active
 		$context[$context['admin_menu_name']]['current_subsection'] = 'search';
@@ -339,10 +312,10 @@ class Inventory extends Dashboard
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'inventory';
 		$context['page_title'] = Shop::getText('tab_inventory') . ' - ' . Shop::getText('inventory_userinv');
-		$context[$context['admin_menu_name']]['tab_data'] = array(
+		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => $context['page_title'],
 			'description' => Shop::getText('tab_inventory_desc'),
-		);
+		];
 		loadTemplate('Shop/ShopAdmin');
 		$context['template_layers'][] = 'send';
 		$context['form_url'] = '?action=admin;area=shopinventory;sa=userinv'. (!empty($context['user']['is_owner']) ? '' : ';u='. $context['member']['id']);
@@ -391,16 +364,16 @@ class Inventory extends Dashboard
 		createList($listOptions);
 	}
 
-	public static function delete()
+	public function delete()
 	{
 		global $context, $user_info;
 
 		// Set all the page stuff
 		$context['page_title'] = Shop::getText('tab_inventory') . ' - '. Shop::getText('items_delete');
-		$context[$context['admin_menu_name']]['tab_data'] = array(
+		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => $context['page_title'],
 			'description' => Shop::getText('items_delete'),
-		);
+		];
 
 		checkSession();
 
@@ -418,194 +391,166 @@ class Inventory extends Dashboard
 		// Send the user to the items list with a message
 		redirectexit('action=admin;area=shopinventory;sa=userinv' . ($user_info['id'] == $_REQUEST['u'] ? '' : ';u='.$_REQUEST['u']) . ';deleted');
 	}
-
-	public static function Restock()
+	
+	public function items()
 	{
-		global $context, $txt, $smcFunc;
+		global $context;
 
 		// Set all the page stuff
-		$context['page_title'] = $txt['Shop_tab_inventory'] . ' - '. $txt['Shop_inventory_restock'];
-		$context[$context['admin_menu_name']]['tab_data'] = array(
+		$context['page_title'] =  Shop::getText('tab_inventory') . ' - '. Shop::getText('inventory_useritems');
+		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => $context['page_title'],
-			'description' => $txt['Shop_inventory_restock_desc'],
-		);
-		$context['sub_template'] = 'Shop_invRestock';
+			'description' => Shop::getText('inventory_useritems_desc'),
+		];
+		loadTemplate('Shop/ShopAdmin');
+		$context['sub_template'] = 'send_items';
+		$context['template_layers'][] = 'send';
 
-
-		// Start with an empty list
-		$context['shop_select_items'] = array();
-			
-		// Get all non post-based membergroups
-		$result = $smcFunc['db_query']('', '
-			SELECT itemid, name, status, image
-			FROM {db_prefix}shop_items
-			WHERE status = 1
-			ORDER by name ASC',
-			array()
-		);
-		
-		// For each membergroup, add it to the list
-		while ($row = $smcFunc['db_fetch_assoc']($result))
-			$context['shop_select_items'][] = array(
-				'id' => $row['itemid'],
-				'name' => $row['name'],
-				'image' => Shop::ShopImageFormat($row['image']),
-			);
-		$smcFunc['db_free_result']($result);
-	}
-
-	public static function Restock2()
-	{
-		global $smcFunc, $txt;
-
-		// If he selected some specific items, we should have at least one...
-		if (($_REQUEST['whatitems'] == 'selected') && (!isset($_REQUEST['restockitem']) || empty($_REQUEST['restockitem'])))
-			fatal_error($txt['Shop_restock_error_noitems'], false);
-
-		$stock = !empty($_REQUEST['stock']) ? (int) $_REQUEST['stock'] : 0;
-		$restock = !empty($_REQUEST['add']) ? (int) $_REQUEST['add'] : 0;
-
-		if ($_REQUEST['whatitems'] == 'selected')
-			// Make sure all IDs are numeric
-			foreach ($_REQUEST['restockitem'] as $key => $value)
-				$_REQUEST['restockitem'][$key] = (int) $value;
-		
-		// Update the stock
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}shop_items
-				SET
-					count = count + {int:restock}
-				WHERE'. (($_REQUEST['whatitems'] == 'all') ? ' count <= {int:limit}' : ' itemid IN ({array_int:ids})'),
-			array(
-				'restock' => $restock,
-				'limit' => $stock,
-				'ids' => $_REQUEST['restockitem'],
-			)
-		);
-
-		// Get out of here...
-		redirectexit('action=admin;area=shopinventory;sa=restock;success');
-	}
-
-	public static function Items()
-	{
-		global $context, $txt, $smcFunc;
-
-		// Set all the page stuff
-		$context['page_title'] = $txt['Shop_tab_inventory'] . ' - '. $txt['Shop_inventory_useritems'];
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $context['page_title'],
-			'description' => $txt['Shop_inventory_useritems_desc'],
-		);
-		$context['sub_template'] = 'Shop_invItems';
-
-		// Items list
-		$context['shop_items_list'] = Shop::getShopItemsList(1);
+		// List of items
+		$context['shop_items_list'] = Database::Get(0, 100000, 's.name', 'shop_items AS s', Database::$items, 'WHERE s.status = 1 AND s.stock > 0');
 
 		// Load suggest.js
-		loadJavaScriptFile('suggest.js', array('default_theme' => true, 'defer' => false, 'minimize' => true), 'smf_suggest');
+		loadJavaScriptFile('suggest.js', ['default_theme' => true, 'defer' => false, 'minimize' => true], 'smf_suggest');
 	}
 
-	public static function Items2()
+	public function items2()
 	{
-		global $context, $txt, $user_info, $sourcedir, $smcFunc;
+		global $context, $user_info, $modSettings;
 
 		// Set all the page stuff
-		$context['page_title'] = $txt['Shop_tab_settings'] . ' - '. $txt['Shop_inventory_useritems'];
+		$context['page_title'] =  Shop::getText('tab_inventory') . ' - '. Shop::getText('inventory_useritems');
 		$context[$context['admin_menu_name']]['current_subsection'] = 'useritems';
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $context['page_title'],
-			'description' => $txt['Shop_tab_inventory_desc'],
-		);
-
-		checkSession();
 
 		// Did we get a member?
 		if (empty($_REQUEST['membername']) && empty($_REQUEST['memberid']))
-			fatal_error($txt['Shop_user_unable_tofind'], false);
+			fatal_error(Shop::getText('user_unable_tofind'), false);
+
 		// You need to send an item...
-		elseif(empty($_REQUEST['item']))
-			fatal_error($txt['Shop_gift_no_item'], false);
+		elseif (empty($_REQUEST['item']))
+			fatal_error(Shop::getText('gift_no_item'), false);
+
+		checkSession();
 
 		$item = (int) $_REQUEST['item'];
-		$member_query = array();
-		$member_parameters = array();
-		$member_parameters['member_ids'] = array();
+		$member_query = [];
+		$member_parameters = [];
 
-		// Get the member name...
-		$_REQUEST['membername'] = strtr($smcFunc['htmlspecialchars']($_REQUEST['membername'], ENT_QUOTES), array('&quot;' => '"'));
+		// Get item info
+		$item_info = Database::Get('', '', '', 'shop_items AS s', Database::$items, 'WHERE s.itemid = {int:id} AND s.stock > 0', true, '', ['id' => $item]);
+
+		// That item available and didn't empty it's stock?
+		if (empty($item_info))
+			fatal_error(Shop::getText('item_notfound'), false);
+
+		// Get all the members to be added... taking into account names can be quoted ;)
+		$_REQUEST['membername'] = strtr(Database::sanitize($_REQUEST['membername']), ['&quot;' => '"']);
 		preg_match_all('~"([^"]+)"~', $_REQUEST['membername'], $matches);
-		$member_name = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_REQUEST['membername']))));
+		$member_names = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_REQUEST['membername']))));
 
-		foreach ($member_name as $index => $name)
+		foreach ($member_names as $index => $member_name)
 		{
-			$member_name[$index] = trim($smcFunc['strtolower']($member_name[$index]));
+			$member_names[$index] = trim(Database::strtolower($member_names[$index]));
 
-			if (strlen($member_name[$index]) == 0)
-				unset($member_name[$index]);
+			if (strlen($member_names[$index]) == 0)
+				unset($member_names[$index]);
 		}
 
 		// Any passed by ID?
-		$member_ids = array();
+		$member_ids = [];
 		if (!empty($_REQUEST['memberid']))
 			foreach ($_REQUEST['memberid'] as $id)
 				if ($id > 0)
 					$member_ids[] = (int) $id;
 
-		// Construct the query pelements.
+		// Construct the query elements.
 		if (!empty($member_ids))
 		{
-			$member_query = 'id_member IN ({array_int:member_ids})';
+			$member_query[] = 'id_member IN ({array_int:member_ids})';
 			$member_parameters['member_ids'] = $member_ids;
 		}
-		// I want only ID's
-		if (!empty($member_name))
+		if (!empty($member_names))
 		{
-			$result = $smcFunc['db_query']('', '
-				SELECT id_member
-				FROM {db_prefix}members
-				WHERE LOWER(member_name) IN ({array_string:member_name}) OR LOWER(real_name) IN ({array_string:member_name})',
-				array(
-					'member_name' => $member_name,
-				)
-			);
-			while ($row = $smcFunc['db_fetch_row']($result))
-				$member_parameters['ids'][] = $row;
-			$smcFunc['db_free_result']($result);
-
-			// Make this array less complicated for the log to read it
-			$member_parameters['member_ids'] = array();
-			foreach ($member_parameters['ids'] as $key => $id)
-				$member_parameters['member_ids'] = array_merge($member_parameters['member_ids'], $id);
-			$member_query = 'id_member IN ({array_int:member_ids})';
+			$member_query[] = 'LOWER(member_name) IN ({array_string:member_names})';
+			$member_query[] = 'LOWER(real_name) IN ({array_string:member_names})';
+			$member_parameters['member_names'] = $member_names;
 		}
 
-		// Count the items for the stock...
-		$stock = count($member_parameters['member_ids']);
-		$item_query = $smcFunc['db_query']('', '
-			SELECT count
-			FROM {db_prefix}shop_items
-			WHERE itemid = {int:id}',
-			array(
-				'id' => $item,
-			)
-		);
-		$count = $smcFunc['db_fetch_assoc']($item_query)['count'];
-		$smcFunc['db_free_result']($item_query);
-
-		// Enough stock?
-		if ($stock > $count)
-			fatal_error($txt['Shop_inventory_useritems_nostock'], false);
-		// No members?
-		elseif (empty($member_parameters) || empty($member_query))
-			fatal_error($txt['Shop_user_unable_tofind'], false);
-		// Handle  everything and save it in the log
-		else
+		$receivers = [];
+		$members = [];
+		if (!empty($member_query))
 		{
-			parent::logInventory($user_info['id'], $member_parameters['member_ids'], $member_query, '', 0, $item);
+			// List of users
+			$receivers = Database::Get(0, 1000, 'id_member', 'members', ['id_member'], 'WHERE (' . implode(' OR ', $member_query) . ')', false, '', $member_parameters);
 
-			// Redirect to a nice message of success
-			redirectexit('action=admin;area=shopinventory;sa=useritems;updated');
+			// Nothing...
+			if (empty($receivers))
+				fatal_error(Shop::getText('user_unable_tofind'), false);
+
+			// Handle the action
+			else
+			{
+				// Tidy up
+				foreach ($receivers as $key => $memID)
+					$members[$key] = $memID['id_member'];
+
+				// Check the item info
+				if ($item_info['stock'] < count($members))
+					fatal_error(Shop::getText('inventory_useritems_nostock'), false);
+
+				// Handle everything
+				$this->_log->items($user_info['id'], $members, $item_info['itemid'], 0, true);
+
+				// Deploy alert?
+				if (!empty($modSettings['Shop_noty_items']))
+					$this->_notify->alert($members, 'items', $user_info['id'], ['shop_href' => '?action=shop;sa=inventory', 'item_icon' => 'top_gifts_r']);
+
+				// Redirect to a nice message of success
+				redirectexit('action=admin;area=shopinventory;sa=useritems;updated');
+			}
 		}
+	}
+
+	public function restock()
+	{
+		global $context;
+
+		// Set all the page stuff
+		$context['page_title'] =  Shop::getText('tab_inventory') . ' - '. Shop::getText('inventory_restock');
+		$context[$context['admin_menu_name']]['tab_data'] = [
+			'title' => $context['page_title'],
+			'description' => Shop::getText('inventory_restock_desc'),
+		];
+		loadTemplate('Shop/ShopAdmin');
+		$context['sub_template'] = 'restock';
+		$context['template_layers'][] = 'send';
+
+		// List of items
+		$context['shop_items_list'] = Database::Get(0, 100000, 's.name', 'shop_items AS s', Database::$items, 'WHERE s.status = 1');
+	}
+
+	public function restock2()
+	{
+		global $context;
+
+		// Set all the page stuff
+		$context['page_title'] =  Shop::getText('tab_inventory') . ' - '. Shop::getText('inventory_restock');
+		$context[$context['admin_menu_name']]['current_subsection'] = 'restock';
+
+		// If he selected some specific items, we should have at least one...
+		if (($_REQUEST['whatitems'] == 'selected') && (!isset($_REQUEST['restockitem']) || empty($_REQUEST['restockitem'])))
+			fatal_error(Shop::getText('restock_error_noitems'), false);
+
+		$stock = !empty($_REQUEST['stock']) ? (int) $_REQUEST['stock'] : 0;
+		$restock = !empty($_REQUEST['add']) ? (int) $_REQUEST['add'] : 0;
+
+		if ($_REQUEST['whatitems'] == 'selected')
+			foreach ($_REQUEST['restockitem'] as $key => $value)
+				$_REQUEST['restockitem'][$key] = (int) $value;
+		
+		// Update the stock
+		Database::Update('shop_items', ['restock' => $restock, 'limit' => $stock, 'ids' => $_REQUEST['restockitem']], 'stock = stock + {int:restock},', 'WHERE'. ($_REQUEST['whatitems'] == 'all' ? ' stock <= {int:limit}' : ' itemid IN ({array_int:ids})'));
+
+		// Success!
+		redirectexit('action=admin;area=shopinventory;sa=restock;success');
 	}
 }
