@@ -459,285 +459,219 @@ function template_categories()
 
 function template_send_above()
 {
-	global $txt;
+	global $txt, $scripturl;
 
 	$_REQUEST['sa'] = isset($_REQUEST['sa']) && !empty($_REQUEST['sa']) ? $_REQUEST['sa'] : 'groupcredits';
 
+	// Updated message
 	if (isset($_REQUEST['updated']))
 		echo '
-		<div class="infobox">
-			', $txt['Shop_inventory_'.$_REQUEST['sa'].'_success'], '
-		</div>';
+	<div class="infobox">
+		', $txt['Shop_inventory_'.$_REQUEST['sa'].'_success'], '
+	</div>';
+	// Success message
 	elseif (isset($_REQUEST['success']))
 		echo '
-		<div class="infobox">
-			', $txt['Shop_inventory_'.$_REQUEST['sa'].'_success'], '
-		</div>';
+	<div class="infobox">
+		', $txt['Shop_inventory_'.$_REQUEST['sa'].'_success'], '
+	</div>';
 
 	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">
-				', $txt['Shop_inventory_'.$_REQUEST['sa']], '
-			</h3>
-		</div>
-		<div class="windowbg">';
+	<div class="cat_bar">
+		<h3 class="catbg">
+			', $txt['Shop_inventory_'.$_REQUEST['sa']], '
+		</h3>
+	</div>
+	<div class="windowbg">
+		<form method="post" action="', $scripturl,'?action=admin;area=shopinventory;sa='.$_REQUEST['sa'].'2">';
+}
+
+function template_send_credits()
+{
+	global $context, $txt;
+
+	echo '
+			<dl class="settings">
+				<dt>
+					', $txt['Shop_inventory_member_name'], '<br/>
+					<span class="smalltext">', $txt['Shop_inventory_members_desc'], '</span>
+				</dt>
+				<dd>
+					<input type="text" name="membername" id="membername" />
+					<div id="membernameItemContainer"></div>
+				</dd>
+				<dt>
+					', $txt['Shop_bank_amount'], '
+				</dt>
+				<dd>
+					', Format::cash('<input class="input_text"  type="number" min="0" name="amount" id="amount" value="0" />'), '
+				</dd>
+			</dl>
+			<input class="button" type="submit" value="', $txt['go'], '" />
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">';
+}
+
+function template_groups()
+{
+	global $context, $txt;
+	
+	echo '
+			<dl class="settings">
+				<dt>
+					', $txt['Shop_inventory_groupcredits_membergroup'], ':
+				</dt>
+				<dd>';
+
+			// Loop through all available membergroups
+			foreach	($context['shop_usergroups'] as $group)
+				echo '
+					<input type="checkbox" name="usergroup[]" value="', $group['id'], '" />', $group['name'], '<br />';
+
+			echo '
+				</dd>
+				<dt>
+					', $txt['Shop_inventory_groupcredits_action'], '
+				</dt>
+				<dd>
+					<label>
+						<input class="input_radio" type="radio" name="m_action" value="add" checked />', $txt['Shop_inventory_groupcredits_add'], '
+					</label><br />
+					<label>
+						<input class="input_radio" type="radio" name="m_action" value="sub" />', $txt['Shop_inventory_groupcredits_substract'], '
+					</label>
+				</dd>
+				<dt>
+					', $txt['Shop_logs_amount'], '
+				</dt>
+				<dd>
+					', Format::cash('<input class="input_text"  type="number" min="0" name="amount" id="amount" value="0" size="10" />'), '
+				</dd>
+			</dl>
+			<input class="button" type="submit" value="', $txt['go'], '" />
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">';
+}
+
+function template_send_items()
+{
+	global $context, $txt;
+
+	echo '
+			<dl class="settings">
+				<dt>
+					', $txt['Shop_inventory_member_name'], '<br/>
+					<span class="smalltext">', $txt['Shop_inventory_members_desc'], '</span>
+				</dt>
+				<dd>
+					<input type="text" name="membername" id="membername" />
+					<div id="membernameItemContainer"></div>
+				</dd>
+				<dt>
+					', $txt['Shop_gift_item_select'], '
+				</dt>
+				<dd>';
+					
+				// List the items
+				if (!empty($context['shop_items_list']))
+				{
+					echo '
+					<select name="item" id="item">
+						<optgroup label="', $txt['Shop_gift_item_select'], '">';
+
+						// List the categories
+						foreach ($context['shop_items_list'] as $item)
+							echo '
+							<option value="', $item['itemid'], '">', $item['name'], '</option>';
+					echo '
+						</optgroup>
+					</select>';
+				}
+				else
+					echo '
+					<strong>', $txt['Shop_inventory_useritems_noitems'], '</strong>';
+
+			echo '
+				</dd>
+			</dl>
+			<input class="button" type="submit" value="', $txt['go'], '" />
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">';
+}
+
+function template_restock()
+{
+	global $context, $txt, $modSettings, $scripturl;
+
+	echo '
+			<dl class="settings">
+				<dt>
+					', $txt['Shop_inventory_restock_what'], ':
+				</dt>
+				<dd>
+					<label><input class="input_radio" type="radio" name="whatitems" value="all" checked onclick="document.getElementById(\'SelectItems\').style.display = this.checked ? \'none\' : \'block\';" />', $txt['Shop_inventory_restock_all'], '</label><br />
+					<label><input class="input_radio" type="radio" name="whatitems" value="selected" onclick="document.getElementById(\'SelectItems\').style.display = this.checked ? \'block\' : \'none\';" />', $txt['Shop_inventory_restock_selected'], '</label>
+				</dd>
+			</dl>
+			<dl class="settings" id="SelectItems" style="display: none;">
+				<dt>
+					', $txt['Shop_inventory_restock_select_items'], '
+				</dt>
+				<dd>
+					<div class="profile_user_links">
+						<ol>';
+
+					// For every module that's possible to add...
+					foreach ($context['shop_items_list'] as $item)
+						echo '
+							<li><input type="checkbox" name="restockitem[]" value="', $item['itemid'], '" /> ', Format::image($item['image']), ' ', $item['name'], '</li>';
+
+						echo '
+						</ol>
+					</div>
+				</dd>
+			</dl>
+			<dl class="settings">
+				<dt>
+					', $txt['Shop_inventory_restock_lessthan'], ':<br />
+					<span class="smalltext">', $txt['Shop_inventory_restock_lessthan_desc'], '</span>
+				</dt>
+				<dd>
+					<input class="input_text" type="number" min="0" name="stock" id="stock" value="5" size="10" />
+				</dd>
+				<dt>
+					', $txt['Shop_inventory_restock_amount'], ':<br/>
+					<span class="smalltext">', $txt['Shop_inventory_restock_amount_desc'], '</span>
+				</dt>
+				<dd>
+					<input class="input_text" type="number" min="1" name="add" id="add" value="10" size="10" />
+				</dd>
+			</dl>
+			<input class="button floatleft" type="submit" value="', $txt['go'], '" />
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">';
 }
 
 function template_send_below()
 {
 	global $context, $txt;
 
+	echo '
+		</form>
+	</div>';
+
 	// Don't mess up the other script
 	if ($_REQUEST['sa'] != 'search')
 		echo '
-	<script>
-		var oAddMemberSuggest = new smc_AutoSuggest({
-			sSelf: \'oAddMemberSuggest\',
-			sSessionId: \'', $context['session_id'], '\',
-			sSessionVar: \'', $context['session_var'], '\',
-			sSuggestId: \'to_suggest\',
-			sControlId: \'membername\',
-			sSearchType: \'member\',
-			sPostName: \'memberid\',
-			sURLMask: \'action=profile;u=%item_id%\',
-			bItemList: true,
-			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
-			sItemListContainerId: \'membernameItemContainer\'
-		});
-	</script>';
-}
-
-function template_groups()
-{
-	global $context, $txt, $scripturl;
-	
-	echo '
-	<form method="post" action="', $scripturl,'?action=admin;area=shopinventory;sa=groupcredits2">
-		<dl class="settings">
-			<dt>
-				', $txt['Shop_membergroup'], ':
-			</dt>
-			<dd>';
-
-		// Loop through all available membergroups
-		foreach	($context['shop_usergroups'] as $group)
-			echo '
-				<input type="checkbox" name="usergroup[]" value="', $group['id'], '" />', $group['name'], '<br />';
-
-		echo '
-			</dd>
-			<dt>
-				', $txt['Shop_groupcredits_action'], '
-			</dt>
-			<dd>
-				<label>
-					<input class="input_radio" type="radio" name="m_action" value="add" checked />', $txt['Shop_groupcredits_add'], '
-				</label><br />
-				<label>
-					<input class="input_radio" type="radio" name="m_action" value="sub" />', $txt['Shop_groupcredits_substract'], '
-				</label>
-			</dd>
-			<dt>
-				', $txt['Shop_bank_amount'], '
-			</dt>
-			<dd>
-				', Format::cash('<input class="input_text"  type="number" min="0" name="amount" id="amount" value="0" size="10" />'), '
-			</dd>
-		</dl>
-		<input class="button" type="submit" value="', $txt['go'], '" />
-		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
-	</form>';
-}
-
-function template_send_credits()
-{
-	global $context, $txt, $scripturl;
-
-	echo '
-	<form method="post" action="', $scripturl,'?action=admin;area=shopinventory;sa=usercredits2">
-		<dl class="settings">
-			<dt>
-				', $txt['Shop_inventory_member_name'], '<br/>
-				<span class="smalltext">', $txt['Shop_inventory_members_desc'], '</span>
-			</dt>
-			<dd>
-				<input type="text" name="membername" id="membername" />
-				<div id="membernameItemContainer"></div>
-			</dd>
-			<dt>
-				', $txt['Shop_bank_amount'], '
-			</dt>
-			<dd>
-				', Format::cash('<input class="input_text"  type="number" min="0" name="amount" id="amount" value="0" size="10" />'), '
-			</dd>
-		</dl>
-		<input class="button" type="submit" value="', $txt['go'], '" />
-		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
-	</form>';
-}
-
-
-
-
-function template_adminShop_invSearch()
-{
-	global $context, $txt, $scripturl;
-
-	echo '
-	<div class="roundframe">
-		<div class="windowbg">
-			<form method="post" action="', $scripturl,'?action=admin;area=shopinventory;sa=search2">
-				', $txt['Shop_inventory_member_name'], '
-				&nbsp;<input class="input_text" type="text" name="membername" id="membername" size="25" />
-				<div id="membernameItemContainer"></div>
-				<span class="smalltext">', $txt['Shop_inventory_member_name_desc'], '</span>
-				<br /><br />
-				<input class="button floatleft" type="submit" value="', $txt['search'], '" />
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
-			</form>
-		</div>
-	</div>
-	<script>
-		var oAddMemberSuggest = new smc_AutoSuggest({
-			sSelf: \'oAddMemberSuggest\',
-			sSessionId: \'', $context['session_id'], '\',
-			sSessionVar: \'', $context['session_var'], '\',
-			sSuggestId: \'to_suggest\',
-			sControlId: \'membername\',
-			sSearchType: \'member\',
-			sPostName: \'memberid\',
-			sURLMask: \'action=profile;u=%item_id%\',
-			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
-			sItemListContainerId: \'membernameItemContainer\'
-		});
-	</script>';
-}
-
-function template_Shop_invRestock()
-{
-	global $context, $txt, $modSettings, $scripturl;
-
-	if (isset($_REQUEST['success']))
-		echo '
-	<div class="infobox">', $txt['Shop_restock_successful'], '</div>';
-
-	echo '
-	<div class="roundframe">
-		<div class="windowbg">
-			<form method="post" action="', $scripturl,'?action=admin;area=shopinventory;sa=restock2">
-				<dl class="settings">
-					<dt>
-						', $txt['Shop_restock_what'], ':
-					</dt>
-					<dd>
-						<label><input class="input_radio" type="radio" name="whatitems" value="all" checked onclick="document.getElementById(\'SelectItems\').style.display = this.checked ? \'none\' : \'block\';" />', $txt['Shop_restock_all'], '</label><br />
-						<label><input class="input_radio" type="radio" name="whatitems" value="selected" onclick="document.getElementById(\'SelectItems\').style.display = this.checked ? \'block\' : \'none\';" />', $txt['Shop_restock_selected'], '</label>
-					</dd>
-				</dl>
-
-				<dl class="settings" id="SelectItems" style="display: none;">
-					<dt>
-						', $txt['Shop_restock_select_items'], '
-					</dt>
-					<dd>
-						<div class="profile_user_links">
-							<ol>';
-						// For every module that's possible to add...
-						foreach ($context['shop_select_items'] as $item)
-						echo '
-								<li><input type="checkbox" name="restockitem[]" value="', $item['id'], '" /> ', $item['image'], ' ', $item['name'], '</li>';
-				echo '
-							</ol>
-						</div>
-					</dd>
-				</dl>
-				<dl class="settings">
-					<dt>
-						', $txt['Shop_restock_lessthan'], ':<br />
-						<span class="smalltext">', $txt['Shop_restock_lessthan_desc'], '</span>
-					</dt>
-					<dd>
-						<input class="input_text" type="number" min="1" name="stock" id="stock" value="5" size="10" />
-					</dd>
-					<dt>
-						', $txt['Shop_restock_amount'], ':
-						<span class="smalltext">', $txt['Shop_restock_amount_desc'], '</span>
-					</dt>
-					<dd>
-						<input class="input_text" type="number" min="1" name="add" id="add" value="30" size="10" />
-					</dd>
-				</dl>
-				<input class="button floatleft" type="submit" value="', $txt['go'], '" />
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
-			</form>
-		</div>
-	</div>';
-}
-
-function template_Shop_invItems()
-{
-	global $context, $txt, $modSettings, $scripturl;
-
-	if (isset($_REQUEST['updated']))
-		echo '<div class="infobox">', $txt['Shop_useritems_sent'], '</div>';
-	
-	echo '
-	<div class="roundframe">
-		<div class="windowbg">
-			<form method="post" action="', $scripturl,'?action=admin;area=shopinventory;sa=useritems2">
-				<dl class="settings">
-					<dt>
-						', $txt['Shop_inventory_member_name'], '<br/>
-						<span class="smalltext">', $txt['Shop_inventory_members_desc'], '</span>
-					</dt>
-					<dd>
-						<input name="membername" id="membername" />
-						<div id="membernameItemContainer"></div>
-					</dd>
-					<dt>
-						', $txt['Shop_gift_item_select'], '
-					</dt>
-					<dd>';
-
-				// Do we even have items?
-				if (!empty($context['shop_items_list'])) {
-					echo '
-						<select name="item" id="item">
-							<optgroup label="', $txt['Shop_gift_item_select'], '">';
-							// List the categories
-							foreach ($context['shop_items_list'] as $item)
-							echo '
-								<option value="', $item['id'], '">', $item['name'], '</option>';
-						echo '
-							</optgroup>
-						</select>';
-				}
-				else
-					echo '
-						<strong>', $txt['Shop_inventory_useritems_noitems'], '</strong>';
-
-
-			echo '
-					</dd>
-				</dl>
-				<input class="button floatleft" type="submit" value="', $txt['go'], '" />
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
-			</form>
-		</div>
-	</div>
-	<script>
-		var oAddMemberSuggest = new smc_AutoSuggest({
-			sSelf: \'oAddMemberSuggest\',
-			sSessionId: \'', $context['session_id'], '\',
-			sSessionVar: \'', $context['session_var'], '\',
-			sSuggestId: \'to_suggest\',
-			sControlId: \'membername\',
-			sSearchType: \'member\',
-			sPostName: \'memberid\',
-			sURLMask: \'action=profile;u=%item_id%\',
-			bItemList: true,
-			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
-			sItemListContainerId: \'membernameItemContainer\'
-		});
-	</script>';
+		<script>
+			var oAddMemberSuggest = new smc_AutoSuggest({
+				sSelf: \'oAddMemberSuggest\',
+				sSessionId: \'', $context['session_id'], '\',
+				sSessionVar: \'', $context['session_var'], '\',
+				sSuggestId: \'to_suggest\',
+				sControlId: \'membername\',
+				sSearchType: \'member\',
+				sPostName: \'memberid\',
+				sURLMask: \'action=profile;u=%item_id%\',
+				bItemList: true,
+				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+				sItemListContainerId: \'membernameItemContainer\'
+			});
+		</script>';
 }
