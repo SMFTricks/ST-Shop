@@ -145,12 +145,12 @@ class Dashboard
 							Shop::getText('inventory_useritems'),
 							'enabled' => !empty($modSettings['Shop_enable_shop']),
 						],
-						'restock' => [
-							Shop::getText('inventory_restock'),
-							'enabled' => !empty($modSettings['Shop_enable_shop']),
-						],
 						'search' => [
 							Shop::getText('tab_inventory'),
+							'enabled' => !empty($modSettings['Shop_enable_shop']),
+						],
+						'restock' => [
+							Shop::getText('inventory_restock'),
 							'enabled' => !empty($modSettings['Shop_enable_shop']),
 						],
 					],
