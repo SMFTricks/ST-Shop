@@ -197,6 +197,10 @@ class User
 		foreach ($alerts as $alert_id => $alert)
 			if ($alert['content_type'] == 'shop')
 			{
+				// Load Modules language file?
+				if (!empty($alert['extra']['module']))
+					loadLanguage('Shop/Modules');
+
 				$alerts[$alert_id]['icon'] = '<img class="alert_icon" src="' . $settings['images_url'] . (!empty($alert['extra']['item_icon']) ? ('/icons/shop/'.$alert['extra']['item_icon']) : $alert['content_type']).'.png">';
 				$alerts[$alert_id]['extra']['content_link'] = $alert['extra']['item_href'];
 			}
