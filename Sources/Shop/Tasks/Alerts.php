@@ -55,22 +55,31 @@ class Alerts extends SMF_BackgroundTask
 		if (empty($members))
 			return true;
 
-		// Check preferences
-		require_once($sourcedir . '/Subs-Notify.php');
-		$prefs = getNotifyPrefs($members, 'shop_user'.$this->_details['action'], true);
-		$notifies = [];
 
 		// Who wants those alerts?
 		$alert_bits = [
 			'alert' => self::RECEIVE_NOTIFY_ALERT,
 			'email' => self::RECEIVE_NOTIFY_EMAIL,
 		];
-		foreach ($prefs as $member => $pref_option)
+		$notifies = [];
+
+		// Check preferences?
+		if (empty($this->_details['ignore_prefs']) || !isset($this->_details['ignore_prefs']))
 		{
-			foreach ($alert_bits as $type => $bitvalue)
-				if ($pref_option['shop_user'.$this->_details['action']] & $bitvalue)
-					$notifies[$type][] = $member;
+			require_once($sourcedir . '/Subs-Notify.php');
+			$prefs = getNotifyPrefs($members, 'shop_user'.$this->_details['action'], true);
+
+			foreach ($prefs as $member => $pref_option)
+			{
+				foreach ($alert_bits as $type => $bitvalue)
+					if ($pref_option['shop_user'.$this->_details['action']] & $bitvalue)
+						$notifies[$type][] = $member;
+			}
 		}
+		// Just fire up these notifications
+		else
+			foreach ($members as $member => $pref_option)
+				$notifies['alert'][] = $member;
 
 		// Deploy alerts
 		if (!empty($notifies['alert']))
