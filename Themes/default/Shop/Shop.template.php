@@ -501,71 +501,6 @@ function template_trade_below()
 }
 
 
-
-
-
-
-
-
-
-function template_Shop_invTradeSet()
-{
-	global $context, $txt, $scripturl;
-
-	echo '
-		<div class="clear"></div>
-		<div class="windowbg">
-			<form method="post" action="', $scripturl,'?action=shop;sa=invtrade2;id=', $_REQUEST['id'], '">
-				<input type="hidden" name="trade" value="', $_REQUEST['id'], '" />
-				', $txt['Shop_trade_cost'], '
-				&nbsp;<input type="number" name="tradecost" id="tradecost" size="20" />
-				<br />
-				<span class="smalltext">', $txt['Shop_trade_cost_desc'], '</span>
-				<br /><br />
-				<input class="button floatleft" type="button" value="', $txt['Shop_no_goback2'], '" onclick="window.location=\'', $scripturl, '?action=shop;area=inventory\'" />
-				<input class="button floatleft" type="submit" value="', $txt['Shop_item_trade_go'], '" />
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
-			</form>
-		</div>';
-}
-
-function template_Shop_invTradeItem()
-{
-	global $context;
-
-	echo '
-		<div class="windowbg">
-			', $context['shop']['tradewhat'], '
-		</div>';
-}
-
-
-function template_Shop_mainTrade_above()
-{
-	global $context, $scripturl, $txt;
-
-	echo '
-	<div class="buttonlist floatleft">';
-		
-	foreach ($context['trade_tabs'] as $action => $tab)
-	{
-		if (!isset($tab['action']))
-		{
-			echo '
-			<a class="button" href="', $tab['link'], '">', $tab['label'], '</a>';
-			continue;
-		}
-		else
-		echo '
-			<a class="button', (in_array($_REQUEST['sa'],$tab['action'])) ? ' active' : '', '" href="' , $scripturl . '?action=shop;sa=', $tab['action'][0], '">', $tab['label'], '</a>';
-	}
-	echo '
-	</div>
-	<div class="clear"></div>';
-}
-
-function template_Shop_mainTrade_below(){}
-
 function template_Shop_mainGames()
 {
 	global $context, $txt, $scripturl, $modSettings;
@@ -752,61 +687,6 @@ function template_Shop_gamesPlay_below()
 	</div>';
 }
 
-function template_Shop_displayInventory($shop_inventory)
-{
-	global $txt, $modSettings, $scripturl;
-
-	$title = sprintf($txt['Shop_inventory_viewing_who'], $shop_inventory['user']);
-	$inventory = (($modSettings['Shop_inventory_placement'] == 0) ? '' : $txt['Shop_posting_inventory']. ':');
-
-	// Profile title
-	if (isset($_REQUEST['action']) && ($_REQUEST['action'] == 'profile'))
-		$inventory .= '<strong>'. $txt['Shop_posting_inventory']. '</strong>:<br />';
-	else
-		$inventory .= '<br />';
-
-	// Bring the items!
-	foreach ($shop_inventory as $item)
-	{
-		if (isset($item['image']))
-			$inventory .= Format::image($item['image']);
-	}
-
-	$inventory .= '<br /><a href="'. $scripturl. '?action=shop;sa=userinv;id='. $shop_inventory['userid']. '" onclick="return reqOverlayDiv(this.href, \''. $shop_inventory['user']. '\', \'icons/shop/top_inventories.png\');">'. $txt['Shop_posting_inventory_all']. '</a>';
-
-	return $inventory;
-
-}
-
-function template_Shop_invBasic()
-{
-	global $context, $boardurl, $settings, $modSettings, $txt;
-
-	echo '
-<!DOCTYPE html>
-<html', $context['right_to_left'] ? ' dir="rtl"' : '', '>
-	<head>
-		<meta charset="', $context['character_set'], '">
-		<meta name="robots" content="noindex">
-		<title>', $context['page_title'], '</title>
-		<link rel="stylesheet" type="text/css" href="', $settings['theme_url'], '/css/index', $context['theme_variant'], '.css', $modSettings['browser_cache'] ,'">
-		<script src="', $settings['default_theme_url'], '/scripts/script.js', $modSettings['browser_cache'] ,'"></script>
-	</head>
-	<body id="shop_inventory_popup">
-		<div class="windowbg">';
-
-	// We're going to list all the items...
-	foreach ($context['shop_items_list'] as $item)
-		if (isset($item['image']))
-			echo $item['image'];
-
-	echo '
-			<br class="clear">
-			<a href="javascript:self.close();">', $txt['close_window'], '</a>
-		</div>
-	</body>
-</html>';
-}
 
 function template_shop_below()
 {
