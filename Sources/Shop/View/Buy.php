@@ -133,8 +133,8 @@ class Buy
 						'style' => 'width: 20%',
 					],
 					'sort' =>  [
-						'default' => 'category DESC',
-						'reverse' => 'category',
+						'default' => 'stock DESC',
+						'reverse' => 'stock',
 					],
 				],
 				'item_options' => [
@@ -145,8 +145,6 @@ class Buy
 					'data' => [
 						'function' => function($row)
 						{
-							global $modSettings;
-
 							return (($row['price'] == 0) ? '<i>' .Shop::getText('item_free').'</i>' : Format::cash($row['price']));
 						},
 						'class' => 'centertext',
@@ -164,21 +162,19 @@ class Buy
 					'data' => [
 						'function' => function($row)
 						{
-							global $context, $modSettings, $scripturl;
+							global $context, $scripturl;
 
 							// If we don\'t have stock... Sold out!
-							if ($row['stock'] == 0)
-								$message = Shop::getText('buy_soldout');
+							if (empty($row['stock']))
+								return Shop::getText('buy_soldout');
 
 							// User doesn't have enough money
 							elseif ($context['user']['shopMoney'] < $row['price'])
-								$message = '<i>' . sprintf(Shop::getText('buy_notenough'), $modSettings['Shop_credits_suffix']) . '</i>';
+								return '<i>' . Shop::getText('buy_notenough') . '</i>';
 
 							// Enough money? Buy it!
 							else
-								$message = '<a href="'. $scripturl. '?action=shop;sa=buy2;id='. $row['itemid']. ';'. $context['session_var'] .'='. $context['session_id'] .'">'. Shop::getText('item_buy'). '</a>';
-
-							return $message;
+								return '<a href="'. $scripturl. '?action=shop;sa=buy2;id='. $row['itemid']. ';'. $context['session_var'] .'='. $context['session_id'] .'">'. Shop::getText('item_buy'). '</a>';
 						},
 						'class' => 'centertext',
 					],

@@ -40,9 +40,10 @@ $txt['alert_group_shop'] = 'Shop alerts';
 $txt['alert_shop_usercredits'] = 'When I receive ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' from someone';
 $txt['alert_shop_useritems'] = 'When I receive a shop gift from someone';
 $txt['alert_shop_usertraded'] = 'When someone purchased an item from my trades list';
-$txt['alert_shop_traded'] = '{member_link} has purchased your item {item_name} listed on the Trade Center';
+$txt['alert_shop_usermodule_steal'] = 'When someone steals from my pocket';
 $txt['alert_shop_credits'] = '{member_link} has sent you {amount}';
 $txt['alert_shop_items'] = '{member_link} has sent you a gift';
+$txt['alert_shop_traded'] = '{member_link} has purchased your item {item_name} listed on the Trade Center';
 $txt['Shop_notification_sold_from'] = 'Forum Shop';
 
 // Shop buy
@@ -53,14 +54,14 @@ $txt['Shop_buy_purchased'] = 'You have successfully purchased the selected item.
 $txt['Shop_buy_item_who'] = 'Who owns \'%s\'';
 $txt['Shop_buy_item_who_nobody'] = 'Nobody owns the item \'%s\' at the moment.';
 $txt['Shop_buy_item_who_this'] = 'Who owns this item';
-$txt['Shop_buy_notenough'] = 'You don\'t have<br /> enough %s';
+$txt['Shop_buy_notenough'] = 'You don\'t have<br/>enough ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits');
 $txt['Shop_whohas_desc'] = 'On this page you can see a list of every user that own the item <i>%s</i> and how many they have.';
 
 // Posting
 $txt['Shop_posting_credits_pocket'] = !empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits';
 $txt['Shop_posting_credits_bank'] = 'Bank ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits');
-$txt['Shop_posting_credits_pocket2'] = ' ' . !empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits';
-$txt['Shop_posting_credits_bank2'] = ' ' .!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits' . ' in bank';
+$txt['Shop_posting_credits_pocket2'] = !empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits' . ' in pocket';
+$txt['Shop_posting_credits_bank2'] = !empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits' . ' in bank';
 $txt['Shop_posting_inventory'] = 'Shop inventory';
 $txt['Shop_posting_inventory_all'] = 'View All';
 
@@ -86,6 +87,7 @@ $txt['Shop_item_uncategorized'] = 'Uncategorized';
 $txt['Shop_item_buy'] = 'Buy item';
 $txt['Shop_item_trade'] = 'Trade';
 $txt['Shop_item_trade_go'] = 'Trade item';
+$txt['Shop_item_trade_desc'] = 'If you are sure that you want to put this item for sale on the trade center, set the price below.';
 $txt['Shop_item_useit'] = 'Use item';
 $txt['Shop_item_using'] = 'Using the item %s';
 $txt['Shop_item_use'] = 'Usable';
@@ -112,10 +114,13 @@ $txt['Shop_inventory_member_find'] = 'Find members';
 $txt['Shop_inventory_viewing_who'] = 'Viewing %s\'s inventory';
 $txt['Shop_item_date'] = 'Date';
 $txt['Shop_item_traded'] = 'The item was successfully added to the Trade Center.<br /> You will receive a personal message when someone buys it. You can also remove it from the Trade Center whenever you want.';
+$txt['Shop_inventory_purchased'] = 'Purchased on: %s';
 
 // Bank
-$txt['Shop_bank_desc'] = 'Welcome to the Bank. Here, you can safely store your %1$s to avoid losing them. All %1$s stored in the bank, gain or lose an interest at a rate of %2$d%3% per day.';
-$txt['Shop_bank_youhave'] = 'You currently have %1$s%2$d %3$s in your pocket and %1$s%4$d %3$s in the bank. Would you like to deposit or withdraw?';
+$txt['Shop_bank_welcome'] = 'Welcome to the Shop Bank';
+$txt['Shop_bank_desc'] = 'Use the bank to safely store your %1$s and avoid losing them. All %1$s stored in the bank, gain or lose an interest at a rate of %2$d%3% per day.';
+$txt['Shop_bank_youhave'] = 'You currently have %1$s in your pocket and %2$s in the bank.';
+$txt['Shop_bank_action'] = 'Would you like to deposit or withdraw?';
 $txt['Shop_bank_deposit'] = 'Deposit';
 $txt['Shop_bank_withdraw'] = 'Widthdraw';
 $txt['Shop_bank_amount'] = 'Amount';
@@ -134,18 +139,19 @@ $txt['Shop_bank_withdraw_successfull'] = 'The withdrawal was successful.';
 
 // Trade center
 $txt['Shop_trade_main'] = 'Trade center';
+$txt['Shop_trade_welcome'] = 'Welcome to the Trade center';
 $txt['Shop_trade_list'] = 'Trade list';
 $txt['Shop_trade_list_desc'] = 'Here you will find every item that users have put for sale in the Trade Center.<br>If you want to find items from a specific user you can use the search tool located below.';
-$txt['Shop_trade_desc'] = '<strong>Welcome %1$s to the Trade Center.</strong><br /> Here, you can trade and buy items from other users, check on your current items listed and find out more about the more active users in terms of sales, profit and purchases.';
-$txt['Shop_item_remove_ftrade'] = 'Remove item from Trade';
-$txt['Shop_item_trade_removed'] = 'Your item was succesfully removed from the trade center.<br> You can now find it back in your inventory.';
+$txt['Shop_trade_desc'] = '<strong>Welcome to the Trade Center, %1$s.</strong><br /> Here you can trade and buy items from other users, check on your current listed items and find out more about the more active users in terms of sales, profit and purchases.';
+$txt['Shop_trade_remove_item'] = 'Remove from Trade';
+$txt['Shop_trade_removed'] = 'Your item was succesfully removed from the trade center.<br> You can now find it back in your inventory.';
 $txt['Shop_trade_notification_sold_subject'] = 'Your item on trade was sold successfully.';
 $txt['Shop_trade_notification_sold_message1'] = 'Congratulations!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has purchased your item \'%3$s\' for [i]%4$s[/i]. All the %5$s from the purchase have been added to your pocket.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
 $txt['Shop_trade_notification_sold_message2'] = 'Congratulations!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has purchased your item \'%3$s\' for [i]%4$s[/i], but has been taken away a fee of [i]%5$s[/i]. The other [i]%6$s[/i] from the purchase have been added to your pocket.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
 $txt['Shop_trade_myprofile'] = 'My items';
 $txt['Shop_trade_myprofile_desc'] = 'This is the list of items <strong>you</strong> currently have in the Trade Center. You can remove them also if you want.';
 $txt['Shop_trade_profile'] = 'Items from %s';
-$txt['Shop_trade_profile_desc'] = 'You are currently viewing the list of <strong>%s\'s</strong> for the items he has in the Trade Center. You can specifically buy items from him.';
+$txt['Shop_trade_profile_desc'] = 'You are currently viewing the list of <strong>%s\'s</strong> for the items this user has in the Trade Center. You can specifically buy items from him.';
 $txt['Shop_trade_mytrades_actions'] = 'Actions';
 $txt['Shop_trade_log'] = 'Trade log';
 $txt['Shop_trade_log_desc'] = 'Find out about the items that you have bought and those that you have sold.';

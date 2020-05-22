@@ -182,7 +182,7 @@ function template_items()
 					<span><label for="itemname">', $txt['Shop_item_name'], ':</label></span>
 				</dt>
 				<dd>
-					<input class="input_text" name="itemname" id="itemname" type="text" value="', !empty($context['shop_item']['name']) ? $context['shop_item']['name'] : '', '" style="width: 100%" />
+					<input name="itemname" id="itemname" type="text" value="', !empty($context['shop_item']['name']) ? $context['shop_item']['name'] : '', '" style="width: 100%" />
 				</dd>
 				<dt>
 					<a id="setting_itemdesc"></a>
@@ -196,7 +196,7 @@ function template_items()
 					<span><label for="itemprice">', $txt['Shop_item_price'], ':</label></span>
 				</dt>
 				<dd>
-					', Format::cash('<input class="input_text" name="itemprice" id="itemprice" type="number" min="0" value="'.(!empty($context['shop_item']['price']) ? $context['shop_item']['price'] : 0). '" />'), '
+					', Format::cash('<input name="itemprice" id="itemprice" type="number" min="0" value="'.(!empty($context['shop_item']['price']) ? $context['shop_item']['price'] : 0). '" />'), '
 				</dd>
 				<dt>
 					<a id="setting_itemstatus"></a>
@@ -212,7 +212,7 @@ function template_items()
 					<span><label for="itemstock">', $txt['Shop_item_stock'], ':</label></span>
 				</dt>
 				<dd>
-					<input class="input_text" name="itemstock" id="itemstock" type="number" min="0" value="', !empty($context['shop_item']['stock']) ? $context['shop_item']['stock'] : 0, '" />
+					<input name="itemstock" id="itemstock" type="number" min="0" value="', !empty($context['shop_item']['stock']) ? $context['shop_item']['stock'] : 0, '" />
 				</dd>
 				<dt>
 					<a id="setting_itemlimit"></a>
@@ -220,7 +220,7 @@ function template_items()
 					<span class="smalltext">', $txt['Shop_item_limit_desc'], '</span>
 				</dt>
 				<dd>
-					<input class="input_text" name="itemlimit" id="itemlimit" type="number" min="0" value="', !empty($context['shop_item']['itemlimit']) ? $context['shop_item']['itemlimit'] : 0, '" />
+					<input name="itemlimit" id="itemlimit" type="number" min="0" value="', !empty($context['shop_item']['itemlimit']) ? $context['shop_item']['itemlimit'] : 0, '" />
 				</dd>
 			</dl>
 			<dl class="settings">
@@ -405,7 +405,7 @@ function template_categories()
 					<span><label for="catname">', $txt['Shop_item_name'], ':</label></span>
 				</dt>
 				<dd>
-					<input class="input_text" name="catname" id="catname" type="text" value="', !empty($context['shop_category']['name']) ? $context['shop_category']['name'] : '', '" style="width: 100%" />
+					<input name="catname" id="catname" type="text" value="', !empty($context['shop_category']['name']) ? $context['shop_category']['name'] : '', '" style="width: 100%" />
 				</dd>
 
 				<dt>
@@ -497,7 +497,7 @@ function template_send_credits()
 					', $txt['Shop_bank_amount'], '
 				</dt>
 				<dd>
-					', Format::cash('<input class="input_text"  type="number" min="0" name="amount" id="amount" value="0" />'), '
+					', Format::cash('<input  type="number" min="0" name="amount" id="amount" value="0" />'), '
 				</dd>
 			</dl>
 			<input class="button" type="submit" value="', $txt['go'], '" />
@@ -537,7 +537,7 @@ function template_groups()
 					', $txt['Shop_logs_amount'], '
 				</dt>
 				<dd>
-					', Format::cash('<input class="input_text"  type="number" min="0" name="amount" id="amount" value="0" size="10" />'), '
+					', Format::cash('<input  type="number" min="0" name="amount" id="amount" value="0" size="10" />'), '
 				</dd>
 			</dl>
 			<input class="button" type="submit" value="', $txt['go'], '" />
@@ -627,14 +627,14 @@ function template_restock()
 					<span class="smalltext">', $txt['Shop_inventory_restock_lessthan_desc'], '</span>
 				</dt>
 				<dd>
-					<input class="input_text" type="number" min="0" name="stock" id="stock" value="5" size="10" />
+					<input type="number" min="0" name="stock" id="stock" value="5" size="10" />
 				</dd>
 				<dt>
 					', $txt['Shop_inventory_restock_amount'], ':<br/>
 					<span class="smalltext">', $txt['Shop_inventory_restock_amount_desc'], '</span>
 				</dt>
 				<dd>
-					<input class="input_text" type="number" min="1" name="add" id="add" value="10" size="10" />
+					<input type="number" min="1" name="add" id="add" value="10" size="10" />
 				</dd>
 			</dl>
 			<input class="button floatleft" type="submit" value="', $txt['go'], '" />

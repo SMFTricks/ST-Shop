@@ -69,11 +69,9 @@ class Alerts extends SMF_BackgroundTask
 			$prefs = getNotifyPrefs($members, 'shop_user'.$this->_details['action'], true);
 
 			foreach ($prefs as $member => $pref_option)
-			{
 				foreach ($alert_bits as $type => $bitvalue)
 					if ($pref_option['shop_user'.$this->_details['action']] & $bitvalue)
 						$notifies[$type][] = $member;
-			}
 		}
 		// Just fire up these notifications
 		else

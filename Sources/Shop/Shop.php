@@ -170,8 +170,6 @@ class Shop
 			'menu_buttons' => 'hookButtons',
 			'actions' => 'hookActions',
 			//'issue_like' => 'Shop::likePost',
-			//'show_alert' => 'Shop::showAlerts',
-			//'fetch_alerts' => 'Shop::fetchAlerts',
 		);
 		foreach ($hooks as $point => $callable)
 			add_integration_function('integrate_' . $point, __CLASS__ . '::'.$callable, false);

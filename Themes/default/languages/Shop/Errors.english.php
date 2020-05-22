@@ -10,6 +10,10 @@
 
 global $scripturl, $modSettings;
 
+// Main
+$txt['Shop_no_goback'] = 'NO, go back!';
+$txt['Shop_no_goback2'] = 'Cancel';
+
 // Errors
 $txt['cannot_shop_canAccess'] = ' You\'re not allowed to access the forum shop.';
 $txt['cannot_shop_canBuy'] = ' You\'re not allowed to buy items.';
@@ -36,6 +40,7 @@ $txt['Shop_cannot_open_images'] = 'Cannot open ../shop_items/items dir!';
 
 $txt['Shop_item_notfound'] = 'Unable to find an item';
 $txt['Shop_no_items'] = 'There are no items added!';
+$txt['Shop_no_items_trade'] = 'No items being traded!';
 $txt['Shop_item_error'] = 'ERROR: Could not create instance of \'%s\' item';
 $txt['Shop_item_name_blank'] = 'You need to enter a name for the item.';
 $txt['Shop_item_no_module'] = 'This item is missing it\'s module file. <br> Couldn\'t open the file: %s.php';
@@ -66,7 +71,7 @@ $txt['Shop_cat_name_blank'] = 'You need to enter a name for the category.';
 
 $txt['Shop_buy_item_nostock'] = 'Sorry, we don\'t have any remaining \'%s\' items in stock';
 $txt['Shop_buy_item_notenough'] = 'You don\'t have enough ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' to buy the item \'%1$s\'. You need %3$s%2$d %1$s more to buy that item.';
-$txt['Shop_buy_item_bought_error'] = 'You probably came here for a mistake, because you have not bought any item before coming to this section.';
+$txt['Shop_buy_item_bought_error'] = 'You probably came here for a mistake, because you have not purchased any item before coming to this section.';
 
 $txt['Shop_user_empty'] = 'Please type a member name.';
 $txt['Shop_user_unable_tofind'] = 'Unable to find an user, please try again.';

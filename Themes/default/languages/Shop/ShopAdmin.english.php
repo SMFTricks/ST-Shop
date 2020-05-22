@@ -20,8 +20,6 @@ $txt['Shop_tab_info'] = 'Shop Information';
 $txt['Shop_tab_info_desc'] = 'Hello %s, welcome to your ST Shop Admin panel. From here you can edit the shop settings, add items, modules, categories and set the reward in the games room.<br> Additionally you can check the shop logs adn use the maintenance tools to restock items or send items/money to specific users, or remove items from their inventory.';
 $txt['Shop_main_credits'] = 'Credits';
 $txt['Shop_news_connect'] = 'Attempting to get ST News...';
-$txt['Shop_no_goback'] = 'NO, go back!';
-$txt['Shop_no_goback2'] = 'Cancel';
 
 // Credits
 $txt['Shop_dash_devs'] = 'Developers';
@@ -145,10 +143,11 @@ $txt['Shop_settings_notifications'] = 'Notificacions';
 $txt['Shop_settings_notifications_desc'] = 'In this area to you activate alerts for the users on certain actions.';
 $txt['Shop_noty_credits'] = 'Notify ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' received';
 $txt['Shop_noty_credits_desc'] = 'Send an alert when the user received credits or and item as a gift or admin action.';
-$txt['Shop_noty_trade'] = 'Notify successfull trade';
-$txt['Shop_noty_trade_desc'] = 'Send an alert to the seller when the item on trade is purchased by someone.';
 $txt['Shop_noty_items'] = 'Notify item/gift received';
 $txt['Shop_noty_items_desc'] = 'Send an alert when the user receives an item as a gift or admin action.';
+$txt['Shop_noty_trade'] = 'Notify successfull trade';
+$txt['Shop_noty_trade_desc'] = 'Send an alert to the seller when the item on trade is purchased by someone.';
+$txt['Shop_noty_items_desc'] = 'Send an alert when another user robs credits from their pocket.';
 
 // Admin Items
 $txt['Shop_tab_items'] = 'Shop Items';

@@ -70,26 +70,17 @@ class Home
 			'gift2' => 'Gift::send',
 			'bank' => 'Bank::main',
 			'bank2' => 'Bank::trans',
+			'invtrade' => 'Trade::set',
+			'invtrade2' => 'Trade::set2',
+			'trade' => 'Trade::main',
+			'tradelist' => 'Trade::list',
+			'mytrades' => 'Trade::list',
+			'tradesearch' => 'Inventory::search_inventory',
 		];
 		$this->_sa = isset($_GET['sa'], $this->_actions[$_GET['sa']]) ? $_GET['sa'] : 'home';
 
 		$subactions2 = [
-			'invtrade' => array(
-				'function' => 'ShopInventory::Trade',
-			),
-			'invtrade2' => array(
-				'function' => 'ShopInventory::Trade2',
-			),
-		
-			'trade' => array(
-				'function' => 'ShopTrade::Main',
-			),
-			'tradelist' => array(
-				'function' => 'ShopTrade::List',
-			),
-			'mytrades' => array(
-				'function' => 'ShopTrade::Profile',
-			),
+			
 			'tradelog' => array(
 				'function' => 'ShopTrade::Log',
 			),
@@ -105,6 +96,7 @@ class Home
 			'tradesearch' => array(
 				'function' => 'ShopTrade::Search',
 			),
+			
 			'stats' => array(
 				'function' => 'ShopStats::Main',
 			),
