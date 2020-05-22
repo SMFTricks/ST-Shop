@@ -70,11 +70,11 @@ class Boards
 		];
 		$context['custom_board_settings']['Shop_credits_topic'] = [
 			'dt' => '<strong>'. Shop::getText('credits_topic'). ':</strong><br /><span class="smalltext">'. Shop::getText('credits_custom_override'). '</span>',
-			'dd' => Format::cash('<input class="input_text" type="text" name="Shop_credits_topic" size="5" value="'. (!empty($context['board']['Shop_credits_topic']) ? $context['board']['Shop_credits_topic'] : $modSettings['Shop_credits_topic']). '">'),
+			'dd' => Format::cash('<input type="text" name="Shop_credits_topic" size="5" value="'. (!empty($context['board']['Shop_credits_topic']) ? $context['board']['Shop_credits_topic'] : $modSettings['Shop_credits_topic']). '">'),
 		];
 		$context['custom_board_settings']['Shop_credits_post'] = [
 			'dt' => '<strong>'. Shop::getText('credits_post'). ':</strong><br /><span class="smalltext">'. Shop::getText('credits_custom_override'). '</span>',
-			'dd' => Format::cash('<input class="input_text" type="text" name="Shop_credits_post" size="5" value="'. (!empty($context['board']['Shop_credits_topic']) ? $context['board']['Shop_credits_post'] : $modSettings['Shop_credits_post']). '">'),
+			'dd' => Format::cash('<input type="text" name="Shop_credits_post" size="5" value="'. (!empty($context['board']['Shop_credits_topic']) ? $context['board']['Shop_credits_post'] : $modSettings['Shop_credits_post']). '">'),
 		];
 		$context['custom_board_settings']['Shop_credits_bonus'] = [
 			'dt' => '<strong>'. Shop::getText('credits_enable_bonus'). ':</strong><br /><span class="smalltext">'. Shop::getText('credits_enable_bonus_desc'). '</span>',

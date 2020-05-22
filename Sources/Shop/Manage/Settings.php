@@ -260,8 +260,8 @@ class Settings extends Dashboard
 		// Shop enabled? Show more options
 		if (!empty($modSettings['Shop_enable_shop']))
 			$this->_shop_vars = [
-				['check', 'Shop_noty_trade', 'subtext' => Shop::getText('noty_trade_desc')],
 				['check', 'Shop_noty_items', 'subtext' => Shop::getText('noty_items_desc')],
+				['check', 'Shop_noty_trade', 'subtext' => Shop::getText('noty_trade_desc')],
 			];
 		$config_vars = array_merge($config_vars, $this->_shop_vars);
 

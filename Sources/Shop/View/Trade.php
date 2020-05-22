@@ -316,7 +316,7 @@ class ShopTrade extends ShopHome
 			<div class="windowbg stripe">
 				<form method="post" action="'. $scripturl.'?action=shop;sa=tradesearch">
 					'. $txt['Shop_inventory_member_name']. '
-					&nbsp;<input class="input_text" type="text" name="membername" id="membername" />
+					&nbsp;<input type="text" name="membername" id="membername" />
 					<div id="membernameItemContainer"></div>
 					<span class="smalltext">'. $txt['Shop_inventory_member_name_desc']. '</span>
 					<br /><br />

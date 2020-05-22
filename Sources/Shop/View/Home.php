@@ -112,7 +112,6 @@ class Home
 				'function' => 'ShopGames::Main',
 			),
 		];
-
 		// More sections?
 		call_integration_hook('integrate_shop_home_actions', array(&$this->_actions, &$this->_sa));
 	}
@@ -169,7 +168,7 @@ class Home
 				'enable' => 'Shop_enable_stats'
 			],
 		];
-		// Magic tabs?
+		// More tabs?
 		call_integration_hook('integrate_shop_home_tabs', [&$this->_shop_tabs]);
 	}
 
