@@ -6,7 +6,7 @@
  * @author Diego Andrés <diegoandres_cortes@outlook.com>
  * @author Daniel15 <dansoft@dansoftaustralia.net>
  * @copyright Copyright (c) 2020, SMF Tricks
- * @copyright Copyright (c) 2020, DanSoft Australia
+ * @copyright Copyright (c) 2005-2007, DanSoft Australia
  * @license https://www.mozilla.org/en-US/MPL/2.0/
  */
 

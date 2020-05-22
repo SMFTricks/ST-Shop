@@ -11,61 +11,90 @@
 namespace Shop\Modules;
 
 use Shop\Shop;
-use Shop\Helper;
+use Shop\Helper\Database;
+use Shop\Helper\Module;
 
 if (!defined('SMF'))
 	die('Hacking attempt...');
 
-class ChangeUsername extends Helper\Module
+class ChangeUsername extends Module
 {
-	function _construct()
-	{
-		$this->authorName = 'Daniel15';
-		$this->authorWeb = 'http://www.dansoftaustralia.net/';
-		$this->authorEmail = 'dansoft@dansoftaustralia.net';
+	/**
+	 * @var string The username.
+	 */
+	private $_username;
 
-		$this->name = 'Change Username';
-		$this->desc = 'Change your Username!';
+	/**
+	 * ChangeUsername::__construct()
+	 *
+	 * Set the details and basics of the module, along with default values if needed.
+	 */
+	function __construct()
+	{
+		// We will of course override stuff...
+		parent::__construct();
+
+		// Item details
+		$this->authorName = 'Daniel15';
+		$this->authorWeb = 'https://github.com/Daniel15';
+		$this->authorEmail = 'dansoft@dansoftaustralia.net';
+		$this->name = Shop::getText('cu_name');
+		$this->desc = Shop::getText('cu_desc');
 		$this->price = 50;
 	}
 
 	function getUseInput()
 	{
-		global $txt;
-
-		$input =
-			$txt['Shop_cu_new_username'].'&nbsp;<input class="input_text" type="text" id="newusername" name="newusername" size="60" /><br />
-				<span class="smalltext">'.$txt['Shop_cu_new_username_desc'].'</span><br />';
-
-		return $input;
+		return '
+			<dl class="settings">
+				<dt>
+					' . Shop::getText('cu_new_username') . '<br />
+					<span class="smalltext">' . Shop::getText('cu_new_username_desc') . '</span>
+				</dt>
+				<dd>
+					<input type="text" id="newusername" name="newusername" size="60" />
+				</dd>
+			</dl>';
 	}
 
 	function onUse()
 	{
-		global $user_info, $smcFunc, $context, $sourcedir, $item_info, $txt;
+		global $user_info, $sourcedir;
 
-		$value = trim(preg_replace('~[\t\n\r \x0B\0' . ($context['utf8'] ? '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}' : '\x00-\x08\x0B\x0C\x0E-\x19\xA0') . ']+~' . ($context['utf8'] ? 'u' : ''), ' ', $_REQUEST['newusername']));
+		// Make sure we got a name
+		if (empty($_REQUEST['newusername']) || !isset($_REQUEST['newusername']))
+			fatal_error(Shop::getText('cu_error_empty'), false);
 
-		// Name can't be empty!
-		if (trim($value) == '')
-			fatal_error($txt['Shop_cu_error_empty'], false);
+		// The new username then
+		$this->_username = Database::sanitize($_REQUEST['newusername']);
+
+		checkSession();
+
+		// It's not a matter of size, but that's not good enough
+		if (trim($this->_username) == '')
+			fatal_error(Shop::getText('cu_error_empty'), false);
 		// It's too long! :o
-		elseif ($smcFunc['strlen']($value) > 25)
-			fatal_error($txt['Shop_cdn_error_long'], false);
-		// Why you want the same name?
-		elseif ($user_info['username'] == $value)
-			fatal_error($txt['Shop_cdn_error_same'], false);
-		// Alright everything fine. But, is it a reserved name?
-		elseif ($user_info['username'] != $value)
+		elseif (Database::strlen($this->_username) > 25)
+			fatal_error(Shop::getText('cu_error_long'), false);
+		// Well, we wanted a change for once
+		elseif ($user_info['username'] == $this->_username)
+			fatal_error(Shop::getText('cu_error_same'), false);
+		// One last detail
+		else
 		{
+			// Check for reserved name
 			require_once($sourcedir . '/Subs-Members.php');
-			if (isReservedName($value, $user_info['id']))
-				fatal_error($txt['Shop_cdn_error_taken'], false);
+
+			if (isReservedName($this->_username, $user_info['id'], true))
+				fatal_error(Shop::getText('cu_error_taken'), false);
 		}
 
-		// Update the information
-		updateMemberData($user_info['id'], array('member_name' => $value));
+		// Update the username
+		updateMemberData($user_info['id'], array('member_name' => $this->_username));
 
-		return '<div class="infobox">' . sprintf($txt['Shop_cu_success'], $value) . '</div>';
+		return '
+			<div class="infobox">
+				' . sprintf(Shop::getText('cu_success'), $this->_username) . '
+			</div>';
 	}
 }

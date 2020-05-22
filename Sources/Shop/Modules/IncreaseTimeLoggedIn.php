@@ -11,63 +11,79 @@
 namespace Shop\Modules;
 
 use Shop\Shop;
-use Shop\Helper;
+use Shop\Helper\Module;
 
 if (!defined('SMF'))
 	die('Hacking attempt...');
 
-class IncreaseTimeLoggedIn extends Helper\Module
+class IncreaseTimeLoggedIn extends Module
 {
-	function _construct()
-	{
-		$this->authorName = 'Daniel15';
-		$this->authorWeb = 'http://www.dansoftaustralia.net/';
-		$this->authorEmail = 'dansoft@dansoftaustralia.net';
+	/**
+	 * @var int Second for 1 hour.
+	 */
+	private $_day;
 
-		$this->name = 'Increase Total Time by xxx';
-		$this->desc = 'Increase your total time logged in by xxx (default is 12 hours)';
+	/**
+	 * @var int Total time logged in.
+	 */
+	private $_time;
+
+	/**
+	 * IncreaseTimeLoggedIn::__construct()
+	 *
+	 * Set the details and basics of the module, along with default values if needed.
+	 */
+	function __construct()
+	{
+		// We will of course override stuff...
+		parent::__construct();
+
+		// Item details
+		$this->authorName = 'Daniel15';
+		$this->authorWeb = 'https://github.com/Daniel15';
+		$this->authorEmail = 'dansoft@dansoftaustralia.net';
+		$this->name = Shop::getText('itli_name');
+		$this->desc = Shop::getText('itli_desc');
 		$this->price = 50;
-		
 		$this->require_input = false;
 		$this->can_use_item = true;
 		$this->addInput_editable = true;
+		
+		// 12 hours by default
+		$this->item_info[1] = 12;
+
+		// 1 hour
+		$this->_day = 3600;
 	}
 	
 	function getAddInput()
 	{
-		global $item_info, $txt;
-
-		// By default 12 hours
-		if (empty($item_info[1]) || !isset($item_info[1]))
-			$item_info[1] = 12;
-
-		$info = '
+		return '
 			<dl class="settings">
 				<dt>
-					'.$txt['Shop_itli_setting1'].'
+					' . Shop::getText('itli_setting1') . '
 				</dt>
 				<dd>
-					<input class="input_text" type="number" min="1" id="info1" name="info1" value="' . $item_info[1] . '" /> '.$txt['Shop_itli_hours'].'
+					<input type="number" min="1" id="info1" name="info1" value="' . $this->item_info[1] . '" /> ' . Shop::getText('itli_hours') . '
 				</dd>
 			</dl>';
-
-		return $info;
 	}
 
 	function onUse()
 	{
-		global $user_info, $item_info, $txt;
+		global $user_info;
 
-		// By default 12 hours
-		if (empty($item_info[1]) || !isset($item_info[1]))
-			$item_info[1] = 12;
+		checkSession();
 
 		// Add the time to his current total
-		$time = (int) ($user_info['total_time_logged_in'] + ($item_info[1] * 3600));
+		$this->_time = (int) ($user_info['total_time_logged_in'] + ($this->item_info[1] * $this->_day));
 
-		// Update info
-		updateMemberData($user_info['id'], array('total_time_logged_in' => (int) $time));
+		// Update total time logged in
+		updateMemberData($user_info['id'], array('total_time_logged_in' => $this->_time));
 		
-		return '<div class="infobox">' . sprintf($txt['Shop_itli_success'], $item_info[1]) . '</div>';
+		return '
+			<div class="infobox">
+				' . sprintf(Shop::getText('itli_success'), $this->item_info[1]) . '
+			</div>';
 	}
 }

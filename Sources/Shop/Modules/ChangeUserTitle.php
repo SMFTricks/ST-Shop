@@ -11,47 +11,70 @@
 namespace Shop\Modules;
 
 use Shop\Shop;
-use Shop\Helper;
+use Shop\Helper\Database;
+use Shop\Helper\Module;
 
 if (!defined('SMF'))
 	die('Hacking attempt...');
 
-class ChangeUserTitle extends Helper\Module
+class ChangeUserTitle extends Module
 {
-	function _construct()
-	{
-		$this->authorName = 'Daniel15';
-		$this->authorWeb = 'http://www.dansoftaustralia.net/';
-		$this->authorEmail = 'dansoft@dansoftaustralia.net';
+	/**
+	 * @var string The desired title.
+	 */
+	private $_title;
 
-		$this->name = 'Change User Title';
-		$this->desc = 'Change your user title';
+	/**
+	 * ChangeOtherTitle::__construct()
+	 *
+	 * Set the details and basics of the module, along with default values if needed.
+	 */
+	function __construct()
+	{
+		// We will of course override stuff...
+		parent::__construct();
+
+		// Item details
+		$this->authorName = 'Daniel15';
+		$this->authorWeb = 'https://github.com/Daniel15';
+		$this->authorEmail = 'dansoft@dansoftaustralia.net';
+		$this->name = Shop::getText('ut_name');
+		$this->desc = Shop::getText('ut_desc');
 		$this->price = 50;
 	}
 
 	function getUseInput()
 	{
-		global $txt;
-
-		$search =
-			$txt['Shop_cot_title']. '
-			&nbsp;<input class="input_text" type="text" name="newtitle" size="50" />
-			<br /><br/>';
-
-		return $search;
+		return '
+			<dl class="settings">
+				<dt>
+					' . Shop::getText('cot_title') . '
+				</dt>
+				<dd>
+					<input type="text" name="newtitle" size="50" />
+				</dd>
+			</dl>';
 	}
 
 	function onUse()
 	{
-		global $txt, $user_info;
+		global $user_info;
 
 		// Somehow we missed the title?
 		if (!isset($_REQUEST['newtitle']))
-			fatal_error($txt['Shop_cot_empty_title'], false);
+			fatal_error(Shop::getText('cot_empty_title'), false);
+
+		checkSession();
+
+		// The title
+		$this->_title = Database::sanitize($_REQUEST['newtitle']);
 
 		// Update the information
-		updateMemberData($user_info['id'], array('usertitle' => $_REQUEST['newtitle']));
+		updateMemberData($user_info['id'], array('usertitle' => $this->_title));
 
-		return '<div class="infobox">' . sprintf($txt['Shop_cot_own_success'], $_REQUEST['newtitle']) . '</div>';
+		return '
+			<div class="infobox">
+				' . sprintf(Shop::getText('ut_success'), $this->_title) . '
+			</div>';
 	}
 }

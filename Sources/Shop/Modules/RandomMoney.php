@@ -11,99 +11,82 @@
 namespace Shop\Modules;
 
 use Shop\Shop;
-use Shop\Helper;
+use Shop\Helper\Format;
+use Shop\Helper\Module;
 
 if (!defined('SMF'))
 	die('Hacking attempt...');
 
-class RandomMoney extends Helper\Module
+class RandomMoney extends Module
 {
-	function _construct()
+	/**
+	 * @var string The amount of credits user will lose/win.
+	 */
+	private $_credits;
+
+	/**
+	 * RandomMoney::__construct()
+	 *
+	 * Set the details and basics of the module, along with default values if needed.
+	 */
+	function __construct()
 	{
+		// We will of course override stuff...
+		parent::__construct();
+
+		// Item details
 		$this->authorName = 'Daniel15';
-		$this->authorWeb = 'http://www.dansoftaustralia.net/';
+		$this->authorWeb = 'https://github.com/Daniel15';
 		$this->authorEmail = 'dansoft@dansoftaustralia.net';
-
-		$this->name = 'Random Money (between xxx and xxx)';
-		$this->desc = 'Get a random amount of money, between xxx and xxx!';
+		$this->name = Shop::getText('rm_name');
+		$this->desc = Shop::getText('rm_desc');
 		$this->price = 75;
-
 		$this->require_input = false;
 		$this->can_use_item = true;
 		$this->addInput_editable = true;
+
+		// Minimum default is -200
+		$this->item_info[1] = -200;
+
+		// Maximum default is 200
+		$this->item_info[2] = 200;
 	}
 
 	function getAddInput()
 	{
-		global $item_info, $txt;
-
-		// By default -190 and 190
-		if (empty($item_info[1]) || !isset($item_info[1]))
-			$item_info[1] = -190;
-		if (empty($item_info[2]) || !isset($item_info[2]))
-			$item_info[2] = 190;
-
-		$info = '
+		return '
 			<dl class="settings">
 				<dt>
-					'.$txt['Shop_rm_setting1'].'
+					' . Shop::getText('rm_setting1') . '
 				</dt>
 				<dd>
-					<input class="input_text" type="number" id="info1" name="info1" value="' . $item_info[1] . '" />
+					<input type="number" id="info1" name="info1" value="' . $this->item_info[1] . '" />
 				</dd>
 				<dt>
-					'.$txt['Shop_rm_setting2'].'
+					' . Shop::getText('rm_setting2') . '
 				</dt>
 				<dd>
-					<input class="input_text" type="number" min="1" id="info2" name="info2" value="' . $item_info[2] . '" />
+					<input type="number" min="1" id="info2" name="info2" value="' . $this->item_info[2] . '" />
 				</dd>
 			</dl>';
-
-		return $info;
 	}
 
 	function onUse()
 	{
-		global $user_info, $item_info, $txt;
+		global $user_info;
 
-		// If an amount was not defined by the admin, assume defaults
-		if (!isset($item_info[1]) || empty($item_info[1]))
-			$item_info[1] = -190;
+		checkSession();
 
-		if (!isset($item_info[2]) || empty($item_info[2]))
-			$item_info[2] = 190;
-
-		$amount = mt_rand($item_info[1], $item_info[2]);
-
-		// By default we are always adding the money to their pocket.
-		$final_value = $user_info['shopMoney'] + $amount;
+		// Get a random value between our limits
+		$this->_credits = mt_rand($this->item_info[1], $this->item_info[2]);
 
 		// Did he lose money?
-		if ($amount < 0)
-		{
-			// If the user has enough money to pay for it out of their pocket
-			if ($user_info['shopMoney'] >= ($amount*(-1)))
-			{
-				updateMemberData($user_info['id'], array('shopMoney' => $final_value));
-				$info_result = '<div class="errorbox">' . sprintf($txt['Shop_rm_lost_pocket'], Shop::formatCash(abs($amount))) . '</div>';
-			}
-			// Remove it from the bank then!
-			else
-			{
-				$final_value = $user_info['shopBank'] + $amount;
-				updateMemberData($user_info['id'], array('shopBank' => $final_value));
-				$info_result = '<div class="errorbox">' . sprintf($txt['Shop_rm_lost_bank'], Shop::formatCash(abs($amount))) . '</div>';
-			}
+		if ($this->_credits != 0)
+			updateMemberData($user_info['id'], array('shop' . ($user_info['shopMoney'] < abs($this->_credits) && $this->_credits < 0 ? 'Bank' : 'Money') => ($user_info['shop' . ($user_info['shopMoney'] < abs($this->_credits) && $this->_credits < 0 ? 'Bank' : 'Money')] + $this->_credits)));
 
-		}
-		// Congratulations! You won some money! :D
-		else
-		{
-			updateMemberData($user_info['id'], array('shopMoney' => $final_value));
-			$info_result = '<div class="infobox">' . sprintf($txt['Shop_rm_success'], Shop::formatCash($amount)) . '</div>';
-
-		}
-		// Return the final message
-		return $info_result;
+		return '
+			<div class="' . ($this->_credits > 0 ? 'info' : 'error') . 'box">
+				'. ($this->_credits != 0 ? sprintf(Shop::getText(($this->_credits < 0 ? ('rm_lost_' . ($user_info['shopMoney'] < abs($this->_credits) && $this->_credits < 0 ? 'bank' : 'pocket')) : 'rm_success' )), Format::cash(abs($this->_credits))) : Shop::getText('rm_zero')) . '
+			</div>';
 	}
 }

@@ -11,23 +11,30 @@
 namespace Shop\Modules;
 
 use Shop\Shop;
-use Shop\Helper;
+use Shop\Helper\Module;
 
 if (!defined('SMF'))
 	die('Hacking attempt...');
 
-class AddToPostCount extends Helper\Module
+class IncreasePostCount extends Module
 {
+	/**
+	 * IncreasePostCount::__construct()
+	 *
+	 * Set the details and basics of the module, along with default values if needed.
+	 */
 	function __construct()
 	{
+		// We will of course override stuff...
+		parent::__construct();
+
+		// Item details
 		$this->authorName = 'Daniel15';
-		$this->authorWeb = 'http://www.dansoftaustralia.net/';
+		$this->authorWeb = 'https://github.com/Daniel15';
 		$this->authorEmail = 'dansoft@dansoftaustralia.net';
-
-		$this->name = 'Add xxx to Post Count';
-		$this->desc = 'Increase your Post Count by xxx!';
+		$this->name = Shop::getText('ip_name');
+		$this->desc = Shop::getText('ip_desc');
 		$this->price = 50;
-
 		$this->require_input = false;
 		$this->can_use_item = true;
 		$this->addInput_editable = true;
@@ -41,10 +48,10 @@ class AddToPostCount extends Helper\Module
 		return '
 			<dl class="settings">
 				<dt>
-					'.Shop::getText('atpc_setting1').'
+					' . Shop::getText('ip_setting1') . '
 				</dt>
 				<dd>
-					<input class="input_text" type="number" min="1" id="info1" name="info1" value="' . $this->item_info[1] . '" />
+					<input type="number" min="1" id="info1" name="info1" value="' . $this->item_info[1] . '" />
 				</dd>
 			</dl>';
 	}
@@ -53,12 +60,14 @@ class AddToPostCount extends Helper\Module
 	{
 		global $user_info;
 
-		// Update info
+		checkSession();
+
+		// Increase posts
 		updateMemberData($user_info['id'], array('posts' => ($this->item_info[1] + $user_info['posts'])));
 		
 		return '
 			<div class="infobox">
-				' . sprintf(Shop::getText('atpc_success'), $this->item_info[1]) . '
+				' . sprintf(Shop::getText('ip_success'), $this->item_info[1]) . '
 			</div>';
 	}
 }

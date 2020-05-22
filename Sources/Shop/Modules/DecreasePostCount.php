@@ -17,7 +17,7 @@ use Shop\Helper\Module;
 if (!defined('SMF'))
 	die('Hacking attempt...');
 
-class ChangeOtherTitle extends Module
+class DecreasePostCount extends Module
 {
 	/**
 	 * @var string The name of the user.
@@ -25,12 +25,7 @@ class ChangeOtherTitle extends Module
 	private $_membername;
 
 	/**
-	 * @var string The desired title.
-	 */
-	private $_title;
-
-	/**
-	 * ChangeOtherTitle::__construct()
+	 * DecreasePostCount::__construct()
 	 *
 	 * Set the details and basics of the module, along with default values if needed.
 	 */
@@ -40,14 +35,31 @@ class ChangeOtherTitle extends Module
 		parent::__construct();
 
 		// Item details
-		$this->authorName = 'Diego Andrés';
-		$this->authorWeb = 'https://smftricks.com/';
-		$this->authorEmail ='admin@smftricks.com';
-		$this->name = Shop::getText('cot_name');
-		$this->desc = Shop::getText('cot_desc');
+		$this->authorName = 'Daniel15';
+		$this->authorWeb = 'https://github.com/Daniel15';
+		$this->authorEmail = 'dansoft@dansoftaustralia.net';
+		$this->name = Shop::getText('dp_name');
+		$this->desc = Shop::getText('dp_desc');
 		$this->price = 200;
 		$this->require_input = true;
 		$this->can_use_item = true;
+		$this->addInput_editable = true;
+
+		// 100 posts by default
+		$this->item_info[1] = 100;
+	}
+	
+	function getAddInput()
+	{
+		return '
+			<dl class="settings">
+				<dt>
+					' . Shop::getText('dp_setting1') . '
+				</dt>
+				<dd>
+					<input type="number" min="1" id="info1" name="info1" value="' . $this->item_info[1] . '" />
+				</dd>
+			</dl>';
 	}
 
 	function getUseInput()
@@ -58,17 +70,11 @@ class ChangeOtherTitle extends Module
 			<dl class="settings">
 				<dt>
 					' . Shop::getText('inventory_member_name') . '<br />
-					<span class="smalltext">' . Shop::getText('cot_find_desc') . '</span>
+					<span class="smalltext">' . Shop::getText('dp_find_desc') . '</span>
 				</dt>
 				<dd>
 					<input type="text" name="membername" id="membername" />
 					<div id="membernameItemContainer"></div>
-				</dd>
-				<dt>
-					' . Shop::getText('cot_title') . '
-				</dt>
-				<dd>
-					<input type="text" name="newtitle" size="50" />
 				</dd>
 			</dl>
 			<script>
@@ -95,19 +101,12 @@ class ChangeOtherTitle extends Module
 		if (empty($_REQUEST['membername']) || !isset($_REQUEST['membername']))
 			fatal_error(Shop::getText('user_unable_tofind'), false);
 
-		// Somehow we missed the title?
-		if (!isset($_REQUEST['newtitle']))
-			fatal_error(Shop::getText('cot_empty_title'), false);
-
 		checkSession();
 		$member_query = [];
 		$member_parameters = [];
 
 		// Get the member name...
 		$this->_membername = Database::sanitize($_REQUEST['membername']);
-
-		// The title
-		$this->_title = Database::sanitize($_REQUEST['newtitle']);
 
 		// Construct the query
 		if (!empty($this->_membername))
@@ -116,11 +115,11 @@ class ChangeOtherTitle extends Module
 			$member_query[] = 'LOWER(real_name) = {string:member_name}';
 			$member_parameters['member_name'] = $this->_membername;
 		}
-		
+
 		// Execute
 		if (!empty($member_query))
 		{
-			$memResult = Database::Get(0, 1000, 'id_member', 'members', ['id_member'], 'WHERE (' . implode(' OR ', $member_query) . ')', true, '', $member_parameters);
+			$memResult = Database::Get(0, 1000, 'id_member', 'members', ['id_member', 'posts'], 'WHERE (' . implode(' OR ', $member_query) . ')', true, '', $member_parameters);
 
 			// We got a result?
 			if (empty($memResult))
@@ -128,14 +127,14 @@ class ChangeOtherTitle extends Module
 
 			// This item is not to use on yourself
 			elseif ($memResult['id_member'] == $user_info['id'])
-				fatal_error(Shop::getText('cot_notown_title'), false);
+				fatal_error(Shop::getText('cot_dp_yourself'), false);
 
-			// Update the title
-			updateMemberData($memResult['id_member'], array('usertitle' => $this->_title));
+			// Update post count
+			updateMemberData($memResult['id_member'], array('posts' => ($memResult['posts'] - $this->item_info[1])));
 
 			return '
 				<div class="infobox">
-					' . sprintf(Shop::getText('cot_success'), $_REQUEST['username'], $this->_title) . '
+					' . sprintf(Shop::getText('dp_success'), $this->_membername, $this->item_info[1]) . '
 				</div>';
 		}
 	}

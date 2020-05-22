@@ -11,26 +11,36 @@
 namespace Shop\Modules;
 
 use Shop\Shop;
-use Shop\Helper;
+use Shop\Helper\Database;
+use Shop\Helper\Module;
 
 if (!defined('SMF'))
 	die('Hacking attempt...');
 
-class ChangeDisplayName extends Helper\Module
+class ChangeDisplayName extends Module
 {
-	// Name
-	var $display_name;
+	/**
+	 * @var string Saves the display name.
+	 */
+	private $display_name;
 
+	/**
+	 * ChangeDisplayName::__construct()
+	 *
+	 * Set the details and basics of the module, along with default values if needed.
+	 */
 	function __construct()
 	{
-		$this->authorName = 'Daniel15';
-		$this->authorWeb = 'http://www.dansoftaustralia.net/';
-		$this->authorEmail = 'dansoft@dansoftaustralia.net';
+		// We will of course override stuff...
+		parent::__construct();
 
-		$this->name = 'Change Display Name';
-		$this->desc = 'Change your display name!';
+		// Item details
+		$this->authorName = 'Daniel15';
+		$this->authorWeb = 'https://github.com/Daniel15';
+		$this->authorEmail = 'dansoft@dansoftaustralia.net';
+		$this->name = Shop::getText('cdn_name');
+		$this->desc = Shop::getText('cdn_desc');
 		$this->price = 50;
-		
 		$this->require_input = true;
 		$this->can_use_item = true;
 		$this->addInput_editable = true;
@@ -41,56 +51,67 @@ class ChangeDisplayName extends Helper\Module
 
 	function getAddInput()
 	{
-		global $item_info, $txt;
-
-		$info = '
+		return '
 			<dl class="settings">
 				<dt>
-					'.Shop::getText('cdn_setting1').'
+					' . Shop::getText('cdn_setting1') . '
 				</dt>
 				<dd>
-					<input class="input_text" type="number" min="1" id="info1" name="info1" this->display_name="' . $this->item_info[1] . '" />
+					<input type="number" min="1" id="info1" name="info1" this->display_name="' . $this->item_info[1] . '" />
 				</dd>
 			</dl>';
-
-		return $info;
 	}
 
 	function getUseInput()
 	{
-		return
-			Shop::getText('cdn_new_display_name').'&nbsp;
-			<input class="input_text" type="text" id="newDisplayName" name="newDisplayName" size="60" /><br />
-			<span class="smalltext">' . sprintf(Shop::getText('dn_new_display_name_desc'), $this->item_info[1]) . '</span>';
+		return '
+		<dl class="settings">
+			<dt>
+				' . Shop::getText('cdn_new_display_name') . '<br />
+				<span class="smalltext">' . sprintf(Shop::getText('dn_new_display_name_desc'), $this->item_info[1]) . '</span>
+			</dt>
+			<dd>
+			<input type="text" id="newDisplayName" name="newDisplayName" size="60" />
+			</dd>
+		</dl>';
 	}
 
 	function onUse()
 	{
-		global $user_info, $context, $sourcedir;
+		global $user_info, $sourcedir;
 
-		$this->display_name = trim(preg_replace('~[\t\n\r \x0B\0' . ($context['utf8'] ? '\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}' : '\x00-\x08\x0B\x0C\x0E-\x19\xA0') . ']+~' . ($context['utf8'] ? 'u' : ''), ' ', $_REQUEST['newDisplayName']));
+		// Make sure we got a name
+		if (empty($_REQUEST['newDisplayName']) || !isset($_REQUEST['newDisplayName']))
+			fatal_error(Shop::getText('cdn_error_empty'), false);
 
-		// Name can't be empty!
+		// The new display name
+		$this->display_name = Database::sanitize($_REQUEST['newDisplayName']);
+
+		checkSession();
+
+		// It's not a matter of size, but that's not good enough
 		if (trim($this->display_name) == '')
 			fatal_error(Shop::getText('cdn_error_empty'), false);
 		// Is it long enough then? ;)
-		elseif (Helper\Database::strlen($this->display_name) < $this->item_info[1])
+		elseif (Database::strlen($this->display_name) < $this->item_info[1])
 			fatal_error(sprintf(Shop::getText('cdn_error_short'), $this->item_info[1]), false);
 		// It's too long! :o
-		elseif (Helper\Database::strlen($this->display_name) > 60)
+		elseif (Database::strlen($this->display_name) > 60)
 			fatal_error(Shop::getText('cdn_error_long'), false);
-		// Why you want the same name?
+		// Well, we wanted a change for once
 		elseif ($user_info['name'] == $this->display_name)
 			fatal_error(Shop::getText('cdn_error_same'), false);
-		// Alright everything fine. But, is it a reserved name?
+		// One last detail
 		elseif ($user_info['name'] != $this->display_name)
 		{
+			// Check for reserved name
 			require_once($sourcedir . '/Subs-Members.php');
-			if (isReservedName($this->display_name, $user_info['id']))
+
+			if (isReservedName($this->display_name, $user_info['id'], true))
 				fatal_error(Shop::getText('cdn_error_taken'), false);
 		}
 
-		// Update the information
+		// Update the display name
 		updateMemberData($user_info['id'], array('real_name' => $this->display_name));
 
 		return '
