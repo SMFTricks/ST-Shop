@@ -24,29 +24,34 @@
 		$smcFunc['db_insert'](
 			'ignore',
 			'{db_prefix}user_alerts_prefs',
-			array(
+			[
 				'id_member' => 'int',
 				'alert_pref' => 'string',
 				'alert_value' => 'int',
-			),
-			array(
-				array(
+			],
+			[
+				[
 					0,
 					'shop_usercredits',
 					1,
-				),
-				array(
+				],
+				[
 					0,
 					'shop_useritems',
 					1,
-				),
-				array(
+				],
+				[
 					0,
 					'shop_usertraded',
 					1,
-				),
-			),
-			array('id_task')
+				],
+				[
+					0,
+					'shop_module_steal',
+					1,
+				],
+			],
+			['id_task']
 		);
 
 		// Scheduled Task
@@ -783,24 +788,24 @@
 					'author' => 'string',
 					'email' => 'string',
 					'require_input' => 'int',
+					'can_use_item' => 'int',
 					'editable_input' => 'int',
-					'can_use' => 'int',
 					'web' => 'string',
 					'file' => 'string',
 				),
 				// Values
 				array(
 					array(
-						'name' => 'Add xxx to Post Count',
-						'description' => 'Increase your Post Count by xxx!',
+						'name' => 'Increase Post Count',
+						'description' => 'Increase the post count by \'x\'',
 						'price' => 50,
 						'author' => 'Daniel15',
 						'email' => 'dansoft@dansoftaustralia.net',
 						'require_input' => 0,
 						'editable_input' => 1,
 						'can_use' => 1,
-						'web' => 'http://www.dansoftaustralia.net/',
-						'file' => 'AddToPostCount',
+						'web' => 'https://github.com/Daniel15',
+						'file' => 'IncreasePostCount',
 					),
 					array(
 						'name' => 'Change Display Name',
@@ -811,31 +816,31 @@
 						'require_input' => 1,
 						'editable_input' => 1,
 						'can_use' => 1,
-						'web' => 'http://www.dansoftaustralia.net/',
+						'web' => 'https://github.com/Daniel15',
 						'file' => 'ChangeDisplayName',
 					),
 					array(
-						'name' => 'Random Money (between xxx and xxx)',
-						'description' => 'Get a random amount of money, between xxx and xxx!',
+						'name' => 'Random Money',
+						'description' => 'Get a random amount of money betwen \'x\' and \'y\'',
 						'price' => 75,
 						'author' => 'Daniel15',
 						'email' => 'dansoft@dansoftaustralia.net',
 						'require_input' => 0,
 						'editable_input' => 1,
 						'can_use' => 1,
-						'web' => 'http://www.dansoftaustralia.net/',
+						'web' => 'https://github.com/Daniel15',
 						'file' => 'RandomMoney',
 					),
 					array(
 						'name' => 'Steal Credits',
-						'description' => 'Try to steal credits from another member!',
+						'description' => 'Attempt to steal from another member',
 						'price' => 50,
 						'author' => 'Diego Andrés',
 						'email' => 'admin@smftricks.com',
 						'require_input' => 1,
 						'editable_input' => 1,
 						'can_use' => 1,
-						'web' => 'https://www.smftricks.com/',
+						'web' => 'https://smftricks.com',
 						'file' => 'Steal',
 					),
 					array(
@@ -847,83 +852,83 @@
 						'require_input' => 1,
 						'editable_input' => 1,
 						'can_use' => 1,
-						'web' => 'http://www.dansoftaustralia.net/',
+						'web' => 'https://github.com/Daniel15',
 						'file' => 'DecreasePost',
 					),
 					array(
-						'name' => 'Games Room Pass xxx days',
-						'description' => 'Allows access to Games Room for xxx days',
+						'name' => 'GGames Room Pass',
+						'description' => 'Gives access to Games Room for \'x\' days',
 						'price' => 50,
-						'author' => 'wdm2005',
+						'author' => 'Sleepy Arcade',
 						'email' => 'wdm2005@blueyonder.co.uk',
 						'require_input' => 0,
 						'editable_input' => 1,
 						'can_use' => 1,
-						'web' => 'http://sleepy-arcade.ath.cx/',
+						'web' => 'https://www.simplemachines.org/community/index.php?action=profile;u=84438',
 						'file' => 'GamesPass',
 					),
 					array(
-						'name' => 'Increase Total Time by xxx',
-						'description' => 'Increase your total time logged in by xxx (default is 12 hours)',
+						'name' => 'Increase Total Time logged In',
+						'description' => 'Increase your total time logged in by \'x\' hours',
 						'price' => 50,
 						'author' => 'Daniel15',
 						'email' => 'dansoft@dansoftaustralia.net',
 						'require_input' => 0,
 						'editable_input' => 1,
 						'can_use' => 1,
-						'web' => 'http://www.dansoftaustralia.net/',
+						'web' => 'https://github.com/Daniel15',
 						'file' => 'IncreaseTimeLoggedIn',
 					),
 					array(
 						'name' => 'Sticky Topic',
-						'description' => 'Make any one of your topics a sticky!',
+						'description' => 'Make any one of your topics a sticky',
 						'price' => 400,
 						'author' => 'Diego Andrés',
 						'email' => 'admin@smftricks.com',
 						'require_input' => 1,
 						'editable_input' => 0,
 						'can_use' => 1,
-						'web' => 'https://www.smftricks.com/',
+						'web' => 'https://smftricks.com',
 						'file' => 'StickyTopic',
 					),
 					array(
 						'name' => 'Change User Title',
-						'description' => 'Change your user title',
+						'description' => 'Allows you to change your title',
 						'price' => 50,
 						'author' => 'Daniel15',
 						'email' => 'dansoft@dansoftaustralia.net',
 						'require_input' => 1,
 						'editable_input' => 0,
 						'can_use' => 1,
-						'web' => 'http://www.dansoftaustralia.net/',
+						'web' => 'https://github.com/Daniel15',
 						'file' => 'ChangeUserTitle',
 					),
 					array(
 						'name' => 'Change Username',
-						'description' => 'Change your Username!',
+						'description' => 'Change your username',
 						'price' => 50,
 						'author' => 'Daniel15',
 						'email' => 'dansoft@dansoftaustralia.net',
 						'require_input' => 1,
 						'editable_input' => 0,
 						'can_use' => 1,
-						'web' => 'http://www.dansoftaustralia.net/',
+						'web' => 'https://github.com/Daniel15',
 						'file' => 'ChangeUsername',
 					),
 					array(
-						'name' => 'Change Other\'s Title',
-						'description' => 'Change someone else\'s title',
+						'name' => 'Change Someone Else\'s Title',
+						'description' => 'Allows you to change someone else\'s title',
 						'price' => 200,
 						'author' => 'Diego Andrés',
 						'email' => 'admin@smftricks.com',
 						'require_input' => 1,
 						'editable_input' => 0,
 						'can_use' => 1,
-						'web' => 'https://www.smftricks.com/',
+						'web' => 'https://smftricks.com',
 						'file' => 'ChangeOtherTitle',
 					),
 				),
-				array()
+				[]
 			);
 
 		}
@@ -933,8 +938,8 @@
 		$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}scheduled_tasks
 			WHERE task = {string:name}',
-			array(
-				'name' => 'bank_interest',
-			)
+			[
+				'name' => 'shop_bank_interest',
+			]
 		);
 	}
