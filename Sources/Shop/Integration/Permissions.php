@@ -72,4 +72,15 @@ class Permissions
 		// Guests do not play nicely with this mod
 		$context['non_guest_permissions'] = array_merge($context['non_guest_permissions'], $this->shop_permissions);
 	}
+
+	/**
+	 * Permissions::language()
+	 *
+	 * Loads the admin language file for the help popups in the permissions page
+	 * 
+	 */
+	public function language()
+	{
+		loadLanguage('Shop/ShopAdmin');
+	}
 }
