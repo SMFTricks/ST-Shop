@@ -206,9 +206,10 @@ class Shop
 		// Add some hooks by action
 		switch ($_REQUEST['action'])
 		{
-			// Permission lang strings
+			// I can simple load the language file, but...
+			// I'll load this hook just to flex on using yet another hook
 			case 'helpadmin':
-				loadLanguage(__NAMESPACE__ . '/ShopAdmin');
+				add_integration_function('integrate_helpadmin', __NAMESPACE__ . '\Integration\Permissions::language', false);
 				break;
 			// Shop Admin
 			case 'admin':
