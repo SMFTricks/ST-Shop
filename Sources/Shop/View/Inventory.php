@@ -138,7 +138,7 @@ class Inventory
 		];
 	}
 
-	public function inventory_list($memberResult, $form_url)
+	public function inventory_list($memberResult, $form_url, $notin = false, $trading = false)
 	{
 		global $modSettings, $user_info, $context;
 
@@ -150,13 +150,13 @@ class Inventory
 			'default_sort_dir' => 'DESC',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_inventory AS si', array_merge(Database::$inventory, array_merge(Database::$items, ['sc.name AS category'])), 'WHERE si.userid = {int:user} AND si.trading = 0 AND s.status = 1'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ' AND s.catid = {int:cat}' : ''), false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid) LEFT JOIN {db_prefix}shop_categories AS sc ON (s.catid = sc.catid)', ['cat' => isset($_REQUEST['cat']) ? $_REQUEST['cat'] : 0, 'user' => $memberResult['id']]],
+				'params' => ['shop_inventory AS si', array_merge(Database::$inventory, array_merge(Database::$items, ['sc.name AS category', 'mem.real_name'])), 'WHERE si.userid '. (empty($notin) ? '=' : '<>') . ' {int:user} AND si.trading = {int:trading} AND s.status = 1'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ' AND s.catid = {int:cat}' : ''), false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid) LEFT JOIN {db_prefix}shop_categories AS sc ON (s.catid = sc.catid) LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = si.userid)', ['cat' => isset($_REQUEST['cat']) ? $_REQUEST['cat'] : 0, 'user' => $memberResult['id'], 'trading' => empty($trading) ? 0 : 1]],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_inventory AS si', array_merge(Database::$inventory, Database::$items), 'WHERE si.userid = {int:user} AND si.trading = 0 AND s.status = 1'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ' AND s.catid = {int:cat}' : ''), 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['cat' => isset($_REQUEST['cat']) ? $_REQUEST['cat'] : 0, 'user' => $memberResult['id']]],
+				'params' => ['shop_inventory AS si', array_merge(Database::$inventory, Database::$items), 'WHERE si.userid '. (empty($notin) ? '=' : '<>') . ' {int:user} AND si.trading = {int:trading} AND s.status = 1'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ' AND s.catid = {int:cat}' : ''), 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['cat' => isset($_REQUEST['cat']) ? $_REQUEST['cat'] : 0, 'user' => $memberResult['id'], 'trading' => empty($trading) ? 0 : 1]],
 			],
-			'no_items_label' =>  (($user_info['id'] == $memberResult['id']) ? Shop::getText('inventory_no_items') : Shop::getText('inventory_other_no_items')),
+			'no_items_label' => !empty($trading) ? Shop::getText('no_items_trade') : (($user_info['id'] == $memberResult['id']) ? Shop::getText('inventory_no_items') : Shop::getText('inventory_other_no_items')),
 			'no_items_align' => 'center',
 			'columns' => [
 				'item_image' => [
@@ -341,7 +341,7 @@ class Inventory
 		// Improve it's look just for the shop action
 		if ($_REQUEST['action'] == 'shop')
 			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=shop;sa=search',
+				'url' => $scripturl . '?action=shop;sa='. $_REQUEST['sa'],
 				'name' => Shop::getText('inventory_search_i'),
 			);
 
@@ -374,7 +374,7 @@ class Inventory
 				fatal_error(Shop::getText('user_unable_tofind'), false);
 			// Redirect
 			else
-				redirectexit('action=' . ($_REQUEST['action'] == 'admin' ? 'admin;area=shopinventory;sa=userinv' : 'shop;sa=inventory') . ($user_info['id'] == $memResult['id_member'] ? '' : ';u='. $memResult['id_member']));
+				redirectexit('action=' . ($_REQUEST['action'] == 'admin' ? 'admin;area=shopinventory;sa=userinv' : 'shop;sa=' . ($_REQUEST['sa'] == 'tradesearch' ? ($user_info['id'] == $memResult['id_member'] ? 'mytrades' : 'tradelist') : 'inventory')) . ($user_info['id'] == $memResult['id_member'] ? '' : ';u='. $memResult['id_member']));
 		}
 	}
 
@@ -691,146 +691,5 @@ class Inventory
 
 		// Load the inventory
 		$context['inventory_list'] = Database::Get(0, 100000, 'favo DESC,' . (!empty($modSettings['Shop_inventory_show_same_once']) ? 'MAX(si.date)' : 'si.date'). ' DESC', 'shop_inventory AS si', array_merge([(!empty($modSettings['Shop_inventory_show_same_once']) ? 'SUM(si.fav)' : 'si.fav'). ' AS favo'], Database::$profile_inventory), 'WHERE si.trading = 0 AND si.userid = {int:mem} AND s.status = 1' . (!empty($modSettings['Shop_inventory_show_same_once']) ? ' GROUP BY si.itemid, si.userid, si.trading, s.name, s.status, s.image, s.description' : ''), false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['mem' => $memData['id_member']]);
-	}
-
-
-
-	public function Trade()
-	{
-		global $smcFunc, $user_info, $context, $scripturl, $modSettings, $txt;
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_viewInventory');
-
-		// The trade center is actually enabled?
-		if (empty($modSettings['Shop_enable_trade']))
-			fatal_error($txt['Shop_currently_disabled_trade'], false);
-
-		// Is the user is allowed to trade items?
-		if (!allowedTo('shop_canTrade') && !allowedTo('shop_canManage'))
-			isAllowedTo('shop_canTrade');
-
-		// Do we have an item? No? Bad luck...
-		if (empty($_REQUEST['id']))
-			fatal_error($txt['Shop_item_notfound'], false);
-
-		// Item id
-		$tradeid = (int) $_REQUEST['id'];
-
-		$result = $smcFunc['db_query']('', '
-			SELECT p.id, p.itemid, p.trading, p.userid, s.name
-			FROM {db_prefix}shop_inventory AS p
-				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
-			WHERE id = {int:tradeid}',
-			array(
-				'tradeid' => $tradeid,
-			)
-		);
-
-		$item = $smcFunc['db_fetch_assoc']($result);
-		$smcFunc['db_free_result']($result);
-
-		// Load up the linktree!
-		$context['page_title'] = $txt['Shop_main_button'] . ' - ' . $txt['Shop_item_trade_go'];
-		$context['template_layers'][] = 'Shop_main';
-		$context['template_layers'][] = 'Shop_invTabs';
-		$context['sub_template'] = 'Shop_invTradeSet';
-		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=shop;sa=invtrade;id=' . $tradeid,
-			'name' => sprintf($txt['Shop_item_trade_go'], $item['name'])
-		);
-		// Sub-menu tabs
-		$context['inventory_tabs'] = $this->_tabs;
-
-		// No item found
-		if (empty($item))
-			fatal_error($txt['Shop_item_notfound'], false);
-		// That item isn't yours, thanks for trying
-		elseif ($item['userid'] != $user_info['id'])
-			fatal_error($txt['Shop_item_notown'], false);
-		// You cannot trade the same item twice
-		elseif ($item['trading'] == 1)
-			fatal_error($txt['Shop_item_alreadytraded'], false);
-	}
-
-	public static function Trade2()
-	{
-		global $smcFunc, $user_info, $context, $scripturl, $modSettings, $txt;
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_viewInventory');
-
-		// The trade center is actually enabled?
-		if (empty($modSettings['Shop_enable_trade']))
-			fatal_error($txt['Shop_currently_disabled_trade'], false);
-
-		// Is the user is allowed to trade items?
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_canTrade');
-
-		// Do we have an item? No? Bad luck...
-		if (empty($_REQUEST['id']))
-			fatal_error($txt['Shop_item_notfound'], false);
-
-		// Item info
-		$tradeid = (int) $_REQUEST['id'];
-		$tradecost = (int) $_REQUEST['tradecost'];
-
-		// Make sure we have a price
-		if (empty($_REQUEST['tradecost']))
-			fatal_error($txt['Shop_item_notprice'], false);
-		// No tricks with the price...
-		elseif ($tradecost <= 0)
-			fatal_error($txt['Shop_item_price_notnegative'], false);
-
-		// Check session
-		checkSession();
-
-		$result = $smcFunc['db_query']('', '
-			SELECT p.id, p.itemid, p.trading, p.userid, s.name
-			FROM {db_prefix}shop_inventory AS p
-				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
-			WHERE id = {int:tradeid}',
-			array(
-				'tradeid' => $tradeid,
-			)
-		);
-
-		$item = $smcFunc['db_fetch_assoc']($result);
-		$smcFunc['db_free_result']($result);
-
-		// Load up the linktree!
-		$context['page_title'] = $txt['Shop_main_button'] . ' - ' . $txt['Shop_item_trade_go'];
-		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=shop;sa=invtrade;id=' . $tradeid,
-			'name' => sprintf($txt['Shop_item_trade_go'], $item['name'])
-		);
-
-		// No item found
-		if (empty($item))
-			fatal_error($txt['Shop_item_notfound'], false);
-		// That item isn't yours, thanks for trying
-		elseif ($item['userid'] != $user_info['id'])
-			fatal_error($txt['Shop_item_notown'], false);
-		// You cannot trade the same item twice
-		elseif ($item['trading'] == 1)
-			fatal_error($txt['Shop_item_alreadytraded'], false);
-
-		// Put the item into the trade center
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}shop_inventory
-			SET	trading = 1,
-				tradecost = {int:tradecost}
-			WHERE id = {int:id}',
-			array(
-				'id' => $item['id'],
-				'tradecost' => $tradecost,
-			)
-		);
-
-		// Tell the user that the item was added successfully
-		redirectexit('action=shop;sa=inventory;traded');
 	}
 }
