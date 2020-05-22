@@ -55,7 +55,6 @@ class Alerts extends SMF_BackgroundTask
 		if (empty($members))
 			return true;
 
-
 		// Who wants those alerts?
 		$alert_bits = [
 			'alert' => self::RECEIVE_NOTIFY_ALERT,
