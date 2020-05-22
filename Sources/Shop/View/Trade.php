@@ -8,39 +8,103 @@
  * @license https://www.mozilla.org/en-US/MPL/2.0/
  */
 
+namespace Shop\View;
+
+use Shop\Shop;
+use Shop\Helper\Database;
+use Shop\Helper\Format;
+use Shop\Helper\Images;
+use Shop\Helper\Log;
+use Shop\Helper\Notify;
+
 if (!defined('SMF'))
 	die('No direct access...');
 
-class ShopTrade extends ShopHome
+class Trade
 {
-	public static function Main()
+	/**
+	 * @var object Send notifications to the user receiving gifts.
+	 */
+	private $_notify;
+
+	/**
+	 * @var object Log any information regarding gifts.
+	 */
+	private $_log;
+	
+	/**
+	 * @var array Save the section tabs.
+	 */
+	protected $_tabs = [];
+
+	/**
+	 * @var int The item being traded.
+	 */
+	private $_trade;
+
+	/**
+	 * @var array Information about the item being traded.
+	 */
+	private $_item;
+
+	/**
+	 * @var int The cost/amount for a certain item.
+	 */
+	private $_amount;
+
+	/**
+	 * @var array Load user data.
+	 */
+	private $_member = [];
+
+	/**
+	 * Trade::__construct()
+	 *
+	 * Set the tabs for the section and create instance of needed objects
+	 */
+	function __construct()
 	{
-		global $context, $txt, $scripturl, $user_info, $modSettings, $sourcedir;
+		// Build the tabs for this section
+		$this->tabs();
+
+		// Prepare to log the gift
+		$this->_log = new Log;
+
+		// Notify
+		$this->_notify = new Notify;
+	}
+
+	public function main()
+	{
+		global $context, $scripturl, $user_info, $modSettings;
 
 		// What if the Trade center is disabled?
 		if (empty($modSettings['Shop_enable_trade']))
-			fatal_error($txt['Shop_currently_disabled_trade'], false);
+			fatal_error(Shop::getText('currently_disabled_trade'), false);
 
-		// Check if he is allowed to access this section
+		// Check if user is allowed to access this section
 		if (!allowedTo('shop_canManage'))
 			isAllowedTo('shop_canTrade');
 
 		// Set all the page stuff
-		$context['page_title'] = $txt['Shop_main_button'] . ' - ' . $txt['Shop_shop_trade'];
-		$context['page_description'] = sprintf($txt['Shop_trade_desc'], $context['user']['name']);
-		$context['template_layers'][] = 'Shop_main';
-		$context['template_layers'][] = 'Shop_mainTrade';
-		$context['sub_template'] = 'Shop_mainTrade';
-		$context['linktree'][] = array(
+		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('main_trade');
+		$context['page_welcome'] = Shop::getText('trade_welcome');
+		$context['page_description'] = sprintf(Shop::getText('trade_desc'), $user_info['name']);
+		// We want to do something a bit different for the trade center
+		$context['template_layers'][] = 'trade';
+		// And then just do the same as usual!
+		$context['template_layers'][] = 'options';
+		$context['sub_template'] = 'trade';
+		$context['linktree'][] = [
 			'url' => $scripturl . '?action=shop;sa=trade',
-			'name' => $txt['Shop_shop_trade'],
-		);
+			'name' => Shop::getText('main_trade'),
+		];
 		// Sub-menu tabs
-		$context['trade_tabs'] = self::Tabs();
+		$context['section_tabs'] = $this->_tabs;
 
 		// Display some trading stats
 		// Load our stats file first
-		require_once($sourcedir. '/Shop/Shop-Stats.php');
+		/*require_once($sourcedir. '/Shop/Shop-Stats.php');
 		// Get the stats
 		$context['trade_stats'] = array(
 			// Most bought items trade
@@ -71,353 +135,364 @@ class ShopTrade extends ShopHome
 				'function' => ShopStats::TopSpent(),
 				'enabled' => true,
 			),
-		);
+		);*/
 	}
 
-	public static function Tabs()
+	public function tabs()
 	{
-		global $context, $modSettings, $txt;
-
-		$context['trade_tabs'] = array(
-			'trade' => array(
-				'action' => array('trade'),
-				'label' => $txt['Shop_trade_main'],
-			),
-			'tradelist' => array(
-				'action' => array('tradelist', 'trade2', 'trade3', 'traderemove'),
-				'label' => $txt['Shop_trade_list'],
-			),
-			'mytrades' => array(
-				'action' => array('mytrades'),
-				'label' => $txt['Shop_trade_myprofile'],
-			),
-			'tradelog' => array(
-				'action' => array('tradelog'),
-				'label' => $txt['Shop_trade_log'],
-			),
-		);
-
-		return $context['trade_tabs'];
+		$this->_tabs = [
+			'trade' => [
+				'action' => ['trade'],
+				'label' => Shop::getText('trade_main'),
+			],
+			'tradelist' => [
+				'action' => ['tradelist', 'trade2', 'trade3', 'traderemove'],
+				'label' => Shop::getText('trade_list'),
+			],
+			'mytrades' => [
+				'action' => ['mytrades', 'invtrade'],
+				'label' => Shop::getText('trade_myprofile'),
+			],
+			'tradelog' => [
+				'action' => ['tradelog'],
+				'label' => Shop::getText('trade_log'),
+			],
+		];
 	}
 
-	public static function List()
+	public function set()
 	{
-		global $context, $smcFunc, $sourcedir, $scripturl, $modSettings, $txt;
+		global $context, $scripturl, $modSettings;
+
+		// Check if he is allowed to access this section
+		if (!allowedTo('shop_canManage'))
+			isAllowedTo('shop_viewInventory');
+
+		// The trade center is actually enabled?
+		if (empty($modSettings['Shop_enable_trade']))
+			fatal_error(Shop::getText('currently_disabled_trade'), false);
+
+		// Is the user is allowed to trade items?
+		if (!allowedTo('shop_canTrade') && !allowedTo('shop_canManage'))
+			isAllowedTo('shop_canTrade');
+
+		// Do we have an item? No? Bad luck...
+		if (empty($_REQUEST['id']) || !isset($_REQUEST['id']))
+			fatal_error(Shop::getText('item_notfound'), false);
+
+		// Item id
+		$this->_trade = (int) $_REQUEST['id'];
+
+		// Set all the page stuff
+		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('item_trade_go');
+		$context['page_welcome'] = Shop::getText('main_trade') . ' - ' . Shop::getText('item_trade_go');
+		$context['page_description'] = Shop::getText('item_trade_desc');
+		$context['template_layers'][] = 'trade';
+		$context['template_layers'][] = 'options';
+		$context['sub_template'] = 'set_trade';
+		$context['linktree'][] = [
+			'url' => $scripturl . '?action=shop;sa=invtrade;id=' . $this->_trade,
+			'name' => Shop::getText('item_trade_go'),
+		];
+		// Sub-menu tabs
+		$context['section_tabs'] = $this->_tabs;
+
+		// Validate the info
+		$this->validate_set($this->_trade);
+
+		// I want to use the info so the user can remember
+		$context['shop_item'] = $this->_item;
+	}
+
+	public function set2()
+	{
+		global $context, $scripturl, $modSettings;
+
+		// Check if he is allowed to access this section
+		if (!allowedTo('shop_canManage'))
+			isAllowedTo('shop_viewInventory');
+
+		// The trade center is actually enabled?
+		if (empty($modSettings['Shop_enable_trade']))
+			fatal_error(Shop::getText('currently_disabled_trade'), false);
+
+		// Is the user is allowed to trade items?
+		if (!allowedTo('shop_canTrade') && !allowedTo('shop_canManage'))
+			isAllowedTo('shop_canTrade');
+
+		// Do we have an item? No? Bad luck...
+		if (empty($_REQUEST['id']) || !isset($_REQUEST['id']))
+			fatal_error(Shop::getText('item_notfound'), false);
+
+		// Item info
+		checkSession();
+		$this->_trade = (int) $_REQUEST['id'];
+		$this->_amount = (int) isset($_REQUEST['tradecost']) ? $_REQUEST['tradecost'] : 0;
+
+		// Set all the page stuff
+		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('item_trade_go');
+		$context['template_layers'][] = 'options';
+		$context['linktree'][] = [
+			'url' => $scripturl . '?action=shop;sa=invtrade;id=' . $this->_trade,
+			'name' => Shop::getText('item_trade_go'),
+		];
+		// Sub-menu tabs
+		$context['section_tabs'] = $this->_tabs;
+
+		// Make sure we have a price
+		if (empty($this->_amount))
+			fatal_error(Shop::getText('item_notprice'), false);
+		// No tricks with the price...
+		elseif ($this->_amount <= 0)
+			fatal_error(Shop::getText('item_price_notnegative'), false);
+
+		// Validate the info
+		$this->validate_set($this->_trade);
+
+		// Set the item for trade
+		Database::Update('shop_inventory', ['id' => $this->_trade, 'tradecost' => $this->_amount, 'date' => time()], 'trading = 1, tradecost = {int:tradecost}, tradedate = {int:date}', 'WHERE id = {int:id}');
+
+		// Tell the user that the item was added successfully
+		redirectexit('action=shop;sa=inventory;traded');
+	}
+
+	public function validate_set($trade)
+	{
+		global $user_info;
+
+		// Load the info
+		$this->_item = Database::Get('', '', '', 'shop_inventory AS si', Database::$profile_inventory, 'WHERE si.id = {int:tradeid} AND s.status = 1 AND si.userid = {int:mem}', true, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['tradeid' => $trade, 'mem' => $user_info['id']]);
+
+		// No item found
+		if (empty($this->_item))
+			fatal_error(Shop::getText('item_notfound'), false);
+		// It's already on the trade center
+		elseif (!empty($this->_item['trading']))
+			fatal_error(Shop::getText('item_alreadytraded'), false);
+	}
+
+	public function list()
+	{
+		global $context, $sourcedir, $scripturl, $modSettings, $user_info, $memberContext, $boardurl;
 
 		// What if the Inventories are disabled?
 		if (empty($modSettings['Shop_enable_trade']))
-			fatal_error($txt['Shop_currently_disabled_trade'], false);
+			fatal_error(Shop::getText('currently_disabled_trade'), false);
 
 		// Check if he is allowed to access this section
 		if (!allowedTo('shop_canManage'))
 			isAllowedTo('shop_canTrade');
 
+		// Specific member only?
+		if (isset($_REQUEST['u']) || isset($_REQUEST['user']))
+		{
+			$this->_member = loadMemberData((isset($_REQUEST['user']) ? $_REQUEST['user'] : ((isset($_REQUEST['u']) ? $_REQUEST['u'] : $user_info['id']))), isset($_REQUEST['user']), 'profile');
+
+			// Don't mind me, just checking if it's a valid profile
+			if (!$this->_member)
+				fatal_error(Shop::getText('user_unable_tofind'), false);
+
+			// If all went well, we have a valid member ID!
+			list ($memID) = $this->_member;
+			loadMemberContext($memID);
+		}
+
 		// Set all the page stuff
 		require_once($sourcedir . '/Subs-List.php');
-		$context['page_title'] = $txt['Shop_main_button'] . ' - ' . $txt['Shop_trade_list'];
-		$context['page_description'] = $txt['Shop_trade_list_desc'];
-		$context['template_layers'][] = 'Shop_main';
-		$context['template_layers'][] = 'Shop_mainTrade';
+		$context['page_title'] = Shop::getText('main_button') . ' - ' . ($_REQUEST['sa'] == 'mytrades' ? Shop::getText('trade_myprofile') : (!isset($_REQUEST['u']) ? Shop::getText('trade_list') : sprintf(Shop::getText('trade_profile'), $memberContext[$memID]['name'])));
+		$context['page_welcome'] = Shop::getText('main_trade') . ' - ' . ($_REQUEST['sa'] == 'mytrades' ? Shop::getText('trade_myprofile') : (!isset($_REQUEST['u']) ? Shop::getText('trade_list') : sprintf(Shop::getText('trade_profile'), $memberContext[$memID]['name'])));
+
+		$context['page_description'] = ($_REQUEST['sa'] == 'mytrades' ? Shop::getText('trade_myprofile_desc') : (!isset($_REQUEST['u']) ? Shop::getText('trade_list_desc') : sprintf(Shop::getText('trade_profile_desc'), $memberContext[$memID]['name'])));
+		$context['template_layers'][] = 'trade';
+		$context['template_layers'][] = 'options';
 		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'items_list';
+		$context['default_list'] = 'inventory';
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=shop;sa=tradelist',
-			'name' => $txt['Shop_trade_list'],
+			'url' => $scripturl . '?action=shop;sa=' . $_REQUEST['sa'],
+			'name' => ($_REQUEST['sa'] == 'mytrades' ? Shop::getText('trade_myprofile') : (!isset($_REQUEST['u']) ? Shop::getText('trade_list') : sprintf(Shop::getText('trade_profile'), $memberContext[$memID]['name']))),
 		);
 		// Sub-menu tabs
-		$context['trade_tabs'] = self::Tabs();
+		$context['section_tabs'] = $this->_tabs;
 
-		// Sub-menu tabs
-		$context['trade_tabs']['search'] = array(
-			'link' => '#searchuser',
-			'label' => $txt['Shop_inventory_search'],
-		);
+		// Is it their own trades?
+		if ($_REQUEST['sa'] != 'mytrades')
+			$context['section_tabs']['tradelist#searchuser'] = [
+				'action' => ['tradelist'],
+				'anchor' => true,
+				'label' => Shop::getText('inventory_search'),
+			];
 
-		// Just a text to inform the user that he doesn't have enough money
-		$context['shop']['notenough'] = sprintf($txt['Shop_item_buy_i_ne'], $modSettings['Shop_credits_suffix']);
-		// Item images...
-		$context['items_url'] = Shop::$itemsdir;
+		// Images...
+		$context['items_url'] = $boardurl . Shop::$itemsdir;
+		$context['shop_images_list'] = Images::list();
 		// ... and categories
-		$context['shop_categories_list'] = Shop::getCatList();
-		$context['form_url'] = '?action=shop;sa=tradelist'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ';cat='.$_REQUEST['cat'] : '');
-
-		// The entire list
-		$listOptions = array(
-			'id' => 'items_list',
-			'items_per_page' => !empty($modSettings['Shop_items_perpage']) ? $modSettings['Shop_items_perpage'] : 15,
-			'base_href' => $context['form_url'],
-			'default_sort_col' => 'item_name',
-			'default_sort_dir' => 'DESC',
-			'get_items' => array(
-				'function' => 'ShopTrade::Get',
-				'params' => array(isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null),
-			),
-			'get_count' => array(
-				'function' => 'ShopTrade::Count',
-				'params' => array(isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null),
-			),
-			'no_items_label' => $txt['Shop_no_items'],
-			'no_items_align' => 'center',
-			'columns' => array(
-				'item_image' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_image'],
-						'class' => 'centertext',
-					),
-					'data' => array(
-						'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
-						'style' => 'width: 10%',
-						'class' => 'centertext',
-					),
-				),
-				'item_name' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_name'],
-						'class' => 'lefttext',
-					),
-					'data' => array(
-						'db' => 'name',
-					),
-					'sort' =>  array(
-						'default' => 'name DESC',
-						'reverse' => 'name',
-					),
-				),
-				'item_description' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_description'],
-						'class' => 'lefttext',
-					),
-					'data' => array(
-						'db' => 'description',
-					),
-					'sort' =>  array(
-						'default' => 'description DESC',
-						'reverse' => 'description',
-					),
-				),
-				'item_category' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_category'],
-						'class' => 'centertext',
-					),
-					'data' => array(
-						'function' => function($row){ global $txt; return $row['catid'] != 0 ? $row['category'] : $txt['Shop_item_uncategorized'];},
-						'class' => 'centertext',
-					),
-					'sort' =>  array(
-						'default' => 'category DESC',
-						'reverse' => 'category',
-					),
-				),
-				'item_owner' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_member'],
-						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
-							'format' => '<a href="'. $scripturl . '?action=profile;u=%1$d">%2$s</a>',
-							'params' => array(
-								'userid' => false,
-								'user' => true
-							),
-						),
-						'class' => 'centertext',
-					),
-					'sort' =>  array(
-						'default' => 'user DESC',
-						'reverse' => 'user',
-					),
-				),
-				'item_price' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_price'],
-						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
-							'format' => $modSettings['Shop_credits_prefix']. '%1$d',
-							'params' => array(
-								'tradecost' => false,
-							),
-						),
-						'class' => 'centertext',
-					),
-					'sort' =>  array(
-						'default' => 'tradecost DESC',
-						'reverse' => 'tradecost',
-					),
-				),
-				'item_buy' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_buy'],
-						'class' => 'centertext',
-					),
-					'data' => array(
-						'function' => function($row){ global $txt, $context, $user_info, $scripturl; 
-							// How much need the user to buy this item?
-							if ($user_info['shopMoney'] < $row['tradecost']) 
-								$message = $context['shop']['notenough'];
-							//Enough money? Buy it!
-							else
-								$message = '<a href="'. $scripturl. '?action=shop;sa=trade2;id='. $row['id']. ';'. $context['session_var'] .'='. $context['session_id'] .'">'. $txt['Shop_item_buy_i']. '</a>';
-							return $message. '<br><a href="'. $scripturl. '?action=shop;sa=whohas;id='. $row['itemid']. '">'. $txt['Shop_buy_item_who_this']. '</a>';},
-						'class' => 'centertext',
-					),
-					'sort' =>  array(
-						'default' => 'id DESC',
-						'reverse' => 'id',
-					),
-				),
-			),
-			'additional_rows' => array(
-			),
-		);
-
-		// Check first for categories
-		if (!empty($context['shop_categories_list']))
-		{
-			// Create the select
-			$catSelect = '
-				<form action="'. $scripturl. $context['form_url']. '" method="post">
-					<select name="cat" id="cat">
-						<optgroup label="'. $txt['Shop_categories']. '">
-							<option value="-1"'. (!isset($_REQUEST['cat']) || $_REQUEST['cat'] == -1 ? ' selected="selected"' : ''). '>'. $txt['Shop_categories_all']. '</option>
-							<option value="0"'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] == 0 ? ' selected="selected"' : ''). '>'. $txt['Shop_item_uncategorized']. '</option>';
-						// List the categories if there are
-						foreach ($context['shop_categories_list'] as $category)
-							$catSelect .= '<option value="'. $category['id']. '"'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] == $category['id'] ? ' selected="selected"' : ''). '>'. $category['name']. '</option>';
-						$catSelect .= '</optgroup>
-					</select>&nbsp;
-					<input class="button_submit" type="submit" value="'. $txt['go']. '" />
-				</form>';
-			// Add the select to filter categories
-			$listOptions['additional_rows']['catselect'] = array(
-				'position' => 'top_of_list',
-				'value' => $catSelect,
-				'class' => 'floatright clear',
-				'style' => 'padding: 7px 0 5px; margin-top: -44px;',
-			);
-		}
+		$context['shop_categories_list'] = Database::Get(0, 1000, 'sc.name', 'shop_categories AS sc', Database::$categories);
+		$context['form_url'] = '?action=shop;sa=' . $_REQUEST['sa'] . (!isset($_REQUEST['u']) ? '' : ';u='. $memberContext[$memID]['id']) . (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ';cat='.$_REQUEST['cat'] : '');
 
 		// Load suggest.js
 		loadJavaScriptFile('suggest.js', array('default_theme' => true, 'defer' => false, 'minimize' => true), 'smf_suggest');
 
-		// We want to search an user?
-		$searchuser = '
-			<br class="clear" />
-			<a id="searchuser"></a>
-			<div class="title_bar">
-				<h4 class="titlebg">
-					'. $txt['Shop_inventory_search']. '
-				</h4>
-			</div>
-			<div class="windowbg stripe">
-				<form method="post" action="'. $scripturl.'?action=shop;sa=tradesearch">
-					'. $txt['Shop_inventory_member_name']. '
-					&nbsp;<input type="text" name="membername" id="membername" />
-					<div id="membernameItemContainer"></div>
-					<span class="smalltext">'. $txt['Shop_inventory_member_name_desc']. '</span>
-					<br /><br />
-					<input class="button_submit floatleft" type="submit" value="'. $txt['search']. '" />
-					<input type="hidden" name="'. $context['session_var']. '" value="'. $context['session_id']. '">
-				</form>
-			</div>
-			<script>
-				var oAddMemberSuggest = new smc_AutoSuggest({
-					sSelf: \'oAddMemberSuggest\',
-					sSessionId: \''. $context['session_id']. '\',
-					sSessionVar: \''. $context['session_var']. '\',
-					sSuggestId: \'to_suggest\',
-					sControlId: \'membername\',
-					sSearchType: \'member\',
-					sPostName: \'memberid\',
-					sURLMask: \'action=profile;u=%item_id%\',
-					sTextDeleteItem: \''. $txt['autosuggest_delete_item']. '\',
-					sItemListContainerId: \'membernameItemContainer\'
-				});
-			</script>';
+		// The entire list
+		$listOptions = Inventory::inventory_list((isset($_REQUEST['u']) ? $memberContext[$memID] : $user_info), $context['form_url'], ($_REQUEST['sa'] == 'mytrades' || isset($_REQUEST['u']) ? false : true), true);
 
-		// Add the search box
-		$listOptions['additional_rows']['search'] = array(
-			'position' => 'below_table_data',
-			'value' => $searchuser,
-		);
+		// Update default sorting
+		$listOptions['default_sort_col'] = 'item_details';
 
-		// Let's finishem
+		// Remove unnecessary stuff from this view
+		unset($listOptions['columns']['item_category']);
+		unset($listOptions['columns']['item_date']);
+		unset($listOptions['columns']['item_use']);
+		unset($listOptions['columns']['item_fav']);
+		unset($listOptions['columns']['item_trade']);
+		unset($listOptions['additional_rows']['traded']);
+
+		// Change date
+		$listOptions['columns']['item_details'] = [
+			'header' => [
+				'value' => Shop::getText('item_details'),
+				'class' => 'lefttext',
+			],
+			'data' => [
+				'function' => function($row)
+				{
+					global $scripturl;
+
+					// Category
+					$details = '<strong>' . Shop::getText('item_category') . ': </strong>' . (!empty($row['catid']) ? $row['category'] : Shop::getText('item_uncategorized'));
+
+					// Date
+					$details .= '<br><strong>' . Shop::getText('item_date') . ': </strong>' . timeformat($row['tradedate']);
+
+					// Who owns this
+					$details .= '<br><a href="' . $scripturl . '?action=shop;sa=owners;id=' . $row['itemid'] . '">' . Shop::getText('buy_item_who_this') . '</a>';
+
+					return $details;
+				},
+				'class' => 'lefttext',
+				'style' => 'width: 20%',
+			],
+			'sort' =>  [
+				'default' => 'tradedate DESC',
+				'reverse' => 'tradedate',
+			],
+		];
+
+		// Owner
+		$listOptions['columns']['item_owner'] = [
+			'header' => [
+				'value' => Shop::getText('item_member'),
+				'class' => 'centertext',
+			],
+			'data' => [
+				'sprintf' => [
+					'format' => '<a href="' . $scripturl . '?action=profile;u=%1$d">%2$s</a>',
+					'params' => [
+						'userid' => false,
+						'real_name' => true
+					],
+				],
+				'class' => 'centertext',
+			],
+			'sort' => [
+				'default' => 'real_name DESC',
+				'reverse' => 'real_name',
+			],
+		];
+		// Price
+		$listOptions['columns']['item_price'] = [
+			'header' => [
+				'value' => Shop::getText('item_price'),
+				'class' => 'centertext',
+			],
+			'data' => [
+				'sprintf' => [
+					'format' => Format::cash('%1$d'),
+					'params' => [
+						'tradecost' => false,
+					],
+				],
+				'class' => 'centertext',
+			],
+			'sort' => [
+				'default' => 'tradecost DESC',
+				'reverse' => 'tradecost',
+			],
+		];
+		// Purchase it
+		$listOptions['columns']['item_buy'] = [
+			'header' => [
+				'value' => Shop::getText('item_buy'),
+				'class' => 'centertext',
+			],
+			'data' => [
+				'function' => function($row)
+				{
+					global $context, $user_info, $scripturl; 
+
+					// How much need the user to buy this item?
+					if ($user_info['shopMoney'] < $row['tradecost']) 
+						return '
+							<i>' . Shop::getText('buy_notenough') . '</i>';
+					//Enough money? Buy it!
+					else
+						return '
+							<a href="' . $scripturl . '?action=shop;sa=trade2;id=' . $row['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+								' . Shop::getText('item_buy') . '
+							</a>';
+				},
+				'class' => 'centertext',
+			],
+			'sort' => [
+				'default' => 'id DESC',
+				'reverse' => 'id',
+			],
+		];
+
+		// My trades
+		if ($_REQUEST['sa'] == 'mytrades')
+		{
+			// Remove stuff
+			unset($listOptions['columns']['item_owner']);
+			unset($listOptions['columns']['item_buy']);
+
+			// Remove it from trarde
+			$listOptions['columns']['item_actions'] = [
+				'header' => [
+					'value' => Shop::getText('trade_mytrades_actions'),
+					'class' => 'centertext',
+				],
+				'data' => [
+					'function' => function($row)
+					{
+						global $context, $scripturl;
+
+						// Remove item from trade center
+						return '	
+							<a href="' . $scripturl . '?action=shop;sa=traderemove;id=' . $row['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+								' . Shop::getText('trade_remove_item') . '
+							</a>';
+					},
+					'class' => 'centertext',
+				],
+				'sort' => [
+					'default' => 'id DESC',
+					'reverse' => 'id',
+				],
+			];
+			// Success removing it
+			$listOptions['additional_rows']['removed'] = [
+				'position' => 'above_column_headers',
+				'value' => (isset($_REQUEST['removed']) ? '<div class="infobox">' . Shop::getText('trade_removed') . '</div>' : '')
+			];
+		}
+
+		// Print our multiple lists with one line :o
 		createList($listOptions);
 	}
 
-	public static function Search()
+	public function remove()
 	{
-		global $smcFunc, $user_info, $txt;
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_canTrade');
-
-		checkSession();
-
-		if (empty($_REQUEST['membername']) && !isset($_REQUEST['u']))
-			fatal_error($txt['Shop_user_empty'], false);
-
-		elseif (empty($_REQUEST['membername']) && isset($_REQUEST['u']))
-				$id['id_member'] = (int) $_REQUEST['u'];
-
-		elseif (!empty($_REQUEST['membername']) && !isset($_REQUEST['u']))
-		{
-			$member_query = array();
-			$member_parameters = array();
-
-			// Get the member name...
-			$_REQUEST['membername'] = strtr($smcFunc['htmlspecialchars']($_REQUEST['membername'], ENT_QUOTES), array('&quot;' => '"'));
-			preg_match_all('~"([^"]+)"~', $_REQUEST['membername'], $matches);
-			$member_name = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_REQUEST['membername']))));
-
-			foreach ($member_name as $index => $name)
-			{
-				$member_name[$index] = trim($smcFunc['strtolower']($member_name[$index]));
-
-				if (strlen($member_name[$index]) == 0)
-					unset($member_name[$index]);
-			}
-
-			// Construct the query
-			if (!empty($member_name))
-			{
-				$member_query[] = 'LOWER(member_name) IN ({array_string:member_name})';
-				$member_query[] = 'LOWER(real_name) IN ({array_string:member_name})';
-				$member_parameters['member_name'] = $member_name;
-			}
-
-			if (!empty($member_query))
-			{
-				$request = $smcFunc['db_query']('', '
-					SELECT id_member
-					FROM {db_prefix}members
-					WHERE (' . implode(' OR ', $member_query) . ')
-					LIMIT 1',
-					$member_parameters
-				);
-				$id = $smcFunc['db_fetch_assoc']($request);
-				$smcFunc['db_free_result']($request);
-			}
-		}
-
-		if (empty($id))
-			fatal_error($txt['Shop_user_unable_tofind'], false);
-
-		// Why are you looking for your OWN user?
-		if ($id['id_member'] == $user_info['id'])
-			redirectexit('action=shop;sa=mytrades');	
-		else
-			redirectexit('action=shop;sa=mytrades;u='. $id['id_member']);
-	}
-
-	public static function Profile()
-	{
-		global $context, $smcFunc, $sourcedir, $user_info, $memberContext, $scripturl, $modSettings, $txt;
+		global $context, $smcFunc, $user_info, $modSettings, $txt;
 
 		// What if the Inventories are disabled?
 		if (empty($modSettings['Shop_enable_trade']))
@@ -427,297 +502,51 @@ class ShopTrade extends ShopHome
 		if (!allowedTo('shop_canManage'))
 			isAllowedTo('shop_canTrade');
 
-		// Did we get the user by name...
-		if (isset($_REQUEST['user']))
-			$memberResult = loadMemberData($_REQUEST['user'], true, 'profile');
-		// ... or by id_member?
-		elseif (!empty($_REQUEST['u']))
-			$memberResult = loadMemberData((int) $_REQUEST['u'], false, 'profile');
-		// If it was just ?sa=mytrades, view your own trade list.
-		else
-			$memberResult = loadMemberData($user_info['id'], false, 'profile');
-		// Check if loadMemberData() has returned a valid result.
-		if (!$memberResult)
-			fatal_lang_error('not_a_user', false, 404);
+		// Make sure id is numeric
+		$id = (int) $_REQUEST['id'];
 
-		// If all went well, we have a valid member ID!
-		list ($memID) = $memberResult;
-		$context['id_member'] = $memID;
-		// Let's have some information about this member ready, too.
-		loadMemberContext($memID);
-		$context['member'] = $memberContext[$memID];
-		$context['user']['is_owner'] = $memID == $user_info['id'];
+		// Check session
+		checkSession('request');
 
-		// Viewing X inventory
-		$context['trades']['whos'] = ((!empty($context['user']['is_owner'])) ? $txt['Shop_trade_myprofile'] : sprintf($txt['Shop_trade_profile'], $context['member']['name']));
+		// If nothing was chosen to delete (shouldn't happen, but meh)
+		if (!isset($id))
+			fatal_error($txt['Shop_item_delete_error'], false);
 
-		// Set all the page stuff
-		require_once($sourcedir . '/Subs-List.php');
-		$context['page_title'] = $txt['Shop_main_button'] . ' - ' . $context['trades']['whos'];
-		$context['page_description'] = ((!empty($context['user']['is_owner'])) ? $txt['Shop_trade_myprofile_desc'] : sprintf($txt['Shop_trade_profile_desc'], $context['member']['name']));
-		$context['template_layers'][] = 'Shop_main';
-		$context['template_layers'][] = 'Shop_mainTrade';
-		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'items_list';
-		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=shop;sa=mytrades;u='.$context['id_member'],
-			'name' => ((!empty($context['user']['is_owner'])) ? $txt['Shop_trade_myprofile'] : $context['trades']['whos']),
-		);
-		// Sub-menu tabs
-		$context['trade_tabs'] = self::Tabs();
-
-		// Just a text to inform the user that he doesn't have enough money
-		$context['shop']['notenough'] = sprintf($txt['Shop_item_buy_i_ne'], $modSettings['Shop_credits_suffix']);
-		// Item images...
-		$context['items_url'] = Shop::$itemsdir;
-		// ... and categories
-		$context['shop_categories_list'] = Shop::getCatList();
-		$context['form_url'] = $scripturl. '?action=shop;sa=mytrades'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ';cat='.$_REQUEST['cat'] : '');
-
-		// The entire list
-		$listOptions = array(
-			'id' => 'items_list',
-			'items_per_page' => !empty($modSettings['Shop_items_perpage']) ? $modSettings['Shop_items_perpage'] : 15,
-			'base_href' => '?action=shop;sa=mytrades'. (isset($_REQUEST['sort']) && !empty($_REQUEST['sort']) ? ';sort='.$_REQUEST['sort'] : ''). (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ';cat='.$_REQUEST['cat'] : ''),
-			'default_sort_col' => 'item_name',
-			'default_sort_dir' => 'DESC',
-			'get_items' => array(
-				'function' => 'ShopTrade::Get',
-				'params' => array(isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null, false, $context['member']['id']),
-			),
-			'get_count' => array(
-				'function' => 'ShopTrade::Count',
-				'params' => array(isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? $_REQUEST['cat'] : null, false, $context['member']['id']),
-			),
-			'no_items_label' => $txt['Shop_no_items'],
-			'no_items_align' => 'center',
-			'columns' => array(
-				'item_image' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_image'],
-						'class' => 'centertext',
-					),
-					'data' => array(
-						'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
-						'style' => 'width: 10%',
-						'class' => 'centertext',
-					),
-				),
-				'item_name' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_name'],
-						'class' => 'lefttext',
-					),
-					'data' => array(
-						'db' => 'name',
-					),
-					'sort' =>  array(
-						'default' => 'name DESC',
-						'reverse' => 'name',
-					),
-				),
-				'item_description' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_description'],
-						'class' => 'lefttext',
-					),
-					'data' => array(
-						'db' => 'description',
-						'style' => 'width: 25%',
-					),
-					'sort' =>  array(
-						'default' => 'description DESC',
-						'reverse' => 'description',
-					),
-				),
-				'item_category' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_category'],
-						'class' => 'lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ global $txt; return $row['catid'] != 0 ? $row['category'] : $txt['Shop_item_uncategorized'];},
-						'class' => 'lefttext',
-					),
-					'sort' =>  array(
-						'default' => 'category DESC',
-						'reverse' => 'category',
-					),
-				),
-				'item_owner' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_member'],
-						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
-							'format' => '<a href="'. $scripturl . '?action=profile;u=%1$d">%2$s</a>',
-							'params' => array(
-								'userid' => false,
-								'user' => true
-							),
-						),
-						'style' => 'width: 15%',
-						'class' => 'centertext',
-					),
-					'sort' =>  array(
-						'default' => 'user DESC',
-						'reverse' => 'user',
-					),
-				),
-				'item_price' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_price'],
-						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
-							'format' => $modSettings['Shop_credits_prefix']. '%1$d',
-							'params' => array(
-								'tradecost' => false,
-							),
-						),
-						'class' => 'centertext',
-					),
-					'sort' =>  array(
-						'default' => 'tradecost DESC',
-						'reverse' => 'tradecost',
-					),
-				),
-				'item_actions' => array(
-					'header' => array(
-						'value' => !empty($context['user']['is_owner']) ? $txt['Shop_trade_mytrades_actions'] : $txt['Shop_item_buy'],
-						'class' => 'centertext',
-					),
-					'data' => array(
-						'function' => function($row){ global $txt, $context, $user_info, $scripturl;
-							//Viewing his own profile?
-							if (!empty($context['user']['is_owner']))
-								$message = '<a href="'. $scripturl. '?action=shop;sa=traderemove;id='. $row['id']. ';'. $context['session_var'] .'='. $context['session_id'] .'">'. $txt['Shop_item_remove_ftrade']. '</a>';
-							// Show buying links
-							else
-							{
-								// How much need the user to buy this item?
-								if ($user_info['shopMoney'] < $row['tradecost']) 
-									$message = $context['shop']['notenough'];
-								//Enough money? Buy it!
-								else
-									$message = '<a href="'. $scripturl. '?action=shop;sa=trade2;id='. $row['id']. ';'. $context['session_var'] .'='. $context['session_id'] .'">'. $txt['Shop_item_buy_i']. '</a>';
-							}
-							return $message. '<br><a href="'. $scripturl. '?action=shop;sa=whohas;id='. $row['itemid']. '">'. $txt['Shop_buy_item_who_this']. '</a>';},
-						'class' => 'centertext',
-					),
-					'sort' =>  array(
-						'default' => 'id DESC',
-						'reverse' => 'id',
-					),
-				),
-			),
-			'additional_rows' => array(
-				'removed' => array(
-					'position' => 'above_column_headers',
-					'value' => (isset($_REQUEST['removed']) ? '<div class="clear"></div><div class="infobox">'.$txt['Shop_item_trade_removed'].'</div>' : '')
-				),
-			),
-		);
-
-		// Remove owner if he's viewing his own items
-		if (!empty($context['user']['is_owner']))
-			unset($listOptions['columns']['item_owner']);
-
-		// Check first for categories
-		if (!empty($context['shop_categories_list']))
-		{
-			// Create the select
-			$catSelect = '
-				<form action="'. $scripturl. $context['form_url']. '" method="post">
-					<select name="cat" id="cat">
-							<optgroup label="'. $txt['Shop_categories']. '">
-								<option value="-1"'. (!isset($_REQUEST['cat']) || $_REQUEST['cat'] == -1 ? ' selected="selected"' : ''). '>'. $txt['Shop_categories_all']. '</option>
-								<option value="0"'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] == 0 ? ' selected="selected"' : ''). '>'. $txt['Shop_item_uncategorized']. '</option>';
-							// List the categories if there are
-							foreach ($context['shop_categories_list'] as $category)
-								$catSelect .= '<option value="'. $category['id']. '"'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] == $category['id'] ? ' selected="selected"' : ''). '>'. $category['name']. '</option>';
-						$catSelect .= '</optgroup>
-					</select>&nbsp;
-					<input class="button_submit" type="submit" value="'. $txt['go']. '" />
-				</form>';
-			// Add the select to filter categories
-			$listOptions['additional_rows']['catselect'] = array(
-				'position' => 'top_of_list',
-				'value' => $catSelect,
-				'class' => 'floatright clear',
-				'style' => 'padding: 7px 0 5px; margin-top: -44px;',
-			);
-		}
-
-		// Let's finishem
-		createList($listOptions);
-	}
-
-	public static function Count($cat = null, $members = true, $memID = 0)
-	{
-		global $smcFunc, $user_info;
-
-		// By default we want his own profile
-		if ($memID == 0)
-			$memID = $user_info['id'];
-
-		$items = $smcFunc['db_query']('', '
-			SELECT p.id, p.itemid, p.userid, p.trading, s.status, s.catid
-			FROM {db_prefix}shop_inventory AS p
-				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
-			WHERE s.status = 1 AND p.trading = 1' . ($cat != null ? '
-			AND s.catid = {int:cat}' : ''). ($members == true ? '
-			AND p.userid <> {int:userid}' : '
-			AND p.userid = {int:userid}'),
-			array(
-				'cat' => $cat,
-				'userid' => $memID,
-			)
-		);
-		$count = $smcFunc['db_num_rows']($items);
-		$smcFunc['db_free_result']($items);
-
-		return $count;
-	}
-
-	public static function Get($start, $items_per_page, $sort, $cat = null, $members = true, $memID = 0)
-	{
-		global $context, $smcFunc, $user_info;
-
-		// By default we want his own profile
-		if ($memID == 0)
-			$memID = $user_info['id'];
-
-		// Get a list of all the item
+		// Search form the item
 		$result = $smcFunc['db_query']('', '
-			SELECT p.id, p.itemid, p.userid, p.trading, p.tradecost, s.name, s.itemid, s.description, s.image, s.count, s.price, s.status, s.catid, c.name AS category, m.real_name AS user
+			SELECT p.id, p.itemid, p.userid
 			FROM {db_prefix}shop_inventory AS p
 				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
-				LEFT JOIN {db_prefix}shop_categories AS c ON (c.catid = s.catid)
-				LEFT JOIN {db_prefix}members AS m ON (m.id_member = p.userid)
-			WHERE s.status = 1 AND p.trading = 1' . ($cat != null ? '
-			AND s.catid = {int:cat}' : ''). ($members == true ? '
-			AND p.userid <> {int:userid}' : '
-			AND p.userid = {int:userid}'). '
-			ORDER by {raw:sort}
-			LIMIT {int:start}, {int:maxindex}',
+			WHERE id = {int:id}',
 			array(
-				'start' => $start,
-				'maxindex' => $items_per_page,
-				'sort' => $sort,
-				'cat' => $cat,
-				'userid' => $memID,
+				'id' => $id,
 			)
 		);
 
-		$context['shop_items_list'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($result))
-			$context['shop_items_list'][] = $row;
+		$item = $smcFunc['db_fetch_assoc']($result);
 		$smcFunc['db_free_result']($result);
 
-		return $context['shop_items_list'];
+		// We didn't get results?
+		if (empty($item))
+			fatal_error($txt['Shop_item_delete_error'], false);
+		// Is that YOUR item
+		if ($item['userid'] != $user_info['id'])
+			fatal_error($txt['Shop_item_notown'], false);
+
+		// Remove item from trading
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}shop_inventory
+			SET	trading = 0,
+				tradecost = 0
+			WHERE id = {int:id} AND userid = {int:user}',
+			array(
+				'id' => $item['id'],
+				'user' => $user_info['id']
+			)
+		);
+
+		// Send the user to the items list with a message
+		redirectexit('action=shop;sa=mytrades;removed');
 	}
 
 	public static function Transaction()
@@ -855,65 +684,6 @@ class ShopTrade extends ShopHome
 			$context['shop']['item_bought'] = $txt['Shop_buy_item_bought_error'];
 	}
 
-	public static function Remove()
-	{
-		global $context, $smcFunc, $user_info, $modSettings, $txt;
-
-		// What if the Inventories are disabled?
-		if (empty($modSettings['Shop_enable_trade']))
-			fatal_error($txt['Shop_currently_disabled_trade'], false);
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_canTrade');
-
-		// Make sure id is numeric
-		$id = (int) $_REQUEST['id'];
-
-		// Check session
-		checkSession('request');
-
-		// If nothing was chosen to delete (shouldn't happen, but meh)
-		if (!isset($id))
-			fatal_error($txt['Shop_item_delete_error'], false);
-
-		// Search form the item
-		$result = $smcFunc['db_query']('', '
-			SELECT p.id, p.itemid, p.userid
-			FROM {db_prefix}shop_inventory AS p
-				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
-			WHERE id = {int:id}',
-			array(
-				'id' => $id,
-			)
-		);
-
-		$item = $smcFunc['db_fetch_assoc']($result);
-		$smcFunc['db_free_result']($result);
-
-		// We didn't get results?
-		if (empty($item))
-			fatal_error($txt['Shop_item_delete_error'], false);
-		// Is that YOUR item
-		if ($item['userid'] != $user_info['id'])
-			fatal_error($txt['Shop_item_notown'], false);
-
-		// Remove item from trading
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}shop_inventory
-			SET	trading = 0,
-				tradecost = 0
-			WHERE id = {int:id} AND userid = {int:user}',
-			array(
-				'id' => $item['id'],
-				'user' => $user_info['id']
-			)
-		);
-
-		// Send the user to the items list with a message
-		redirectexit('action=shop;sa=mytrades;removed');
-	}
-
 	public static function sendPM($seller, $itemname, $amount, $fee)
 	{
 		global $user_info, $sourcedir, $modSettings, $txt;
@@ -945,60 +715,6 @@ class ShopTrade extends ShopHome
 		require_once($sourcedir . '/Subs-Post.php');
 		// Send the PM
 		sendpm($pmto, $subject, $message, false, $pmfrom);
-	}
-
-	public static function logCount()
-	{
-		global $smcFunc, $user_info;
-
-		// Count the log entries
-		$logs = $smcFunc['db_query']('', '
-			SELECT l.id, l.sellerid, l.userid, s.status
-			FROM {db_prefix}shop_log_buy AS l
-			LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = l.itemid)
-			WHERE l.sellerid <> 0 AND  (l.sellerid = {int:user} OR l.userid = {int:user}) AND s.status = 1',
-			array(
-				'user' => $user_info['id'],
-			)
-		);
-		$count = $smcFunc['db_num_rows']($logs);
-		$smcFunc['db_free_result']($logs);
-
-		return $count;
-	}
-
-	public static function logGet($start, $items_per_page, $sort)
-	{
-		global $context, $smcFunc, $user_info;
-
-		
-		// Get a list of all the item
-		$result = $smcFunc['db_query']('', '
-			SELECT l.itemid, l.userid, l.sellerid, l.amount, l.fee, l.date, m1.real_name AS name_buyer, m2.real_name AS name_seller,
-				s.name, s.image, s.status, s.catid, c.name AS category
-			FROM {db_prefix}shop_log_buy AS l
-			LEFT JOIN {db_prefix}members AS m1 ON (m1.id_member = l.userid)
-			LEFT JOIN {db_prefix}members AS m2 ON (m2.id_member = l.sellerid)
-			LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = l.itemid)
-			LEFT JOIN {db_prefix}shop_categories AS c ON (s.catid = c.catid)
-			WHERE l.sellerid <> 0 AND  (l.sellerid = {int:user} OR l.userid = {int:user}) AND s.status = 1
-			ORDER by {raw:sort}
-			LIMIT {int:start}, {int:maxindex}',
-			array(
-				'start' => $start,
-				'maxindex' => $items_per_page,
-				'sort' => $sort,
-				'user' => $user_info['id'],
-			)
-		);
-
-		// Return the data
-		$context['shop_logs_list'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($result))
-			$context['shop_logs_list'][] = $row;
-		$smcFunc['db_free_result']($result);
-
-		return $context['shop_logs_list'];
 	}
 
 	public static function Log()

@@ -184,7 +184,7 @@ function template_options_above()
 		
 		foreach ($context['section_tabs'] as $action => $tab)
 			echo '
-			<a class="button', (isset($_REQUEST['sa']) && in_array($_REQUEST['sa'],$tab['action'])) ? ' active' : '', '" href="' , $scripturl . '?action=shop;sa=', $action, '">', $tab['label'], '</a>';
+			<a class="button', (isset($_REQUEST['sa']) && in_array($_REQUEST['sa'],$tab['action']) && empty($tab['anchor'])) ? ' active' : '', '" href="' , $scripturl . '?action=shop;sa=', $action, '">', $tab['label'], '</a>';
 		
 		echo '
 		</div>';
@@ -230,7 +230,7 @@ function template_use()
 				<input type="hidden" name="id" value="', $context['item']['id'], '">
 				', $txt['Shop_inventory_use_confirm'], '<br /><br />
 				', $context['shop']['use']['input'], '<br />
-				<input class="button" type="submit" value="', $txt['Shop_item_useit'], '" />
+				<input class="button floatright" type="submit" value="', $txt['Shop_item_useit'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 			</form>
 		</div>';
@@ -259,7 +259,7 @@ function template_gift($message = true)
 					', $txt['Shop_gift_amount'], ':
 				</dt>
 				<dd>
-					', Format::cash('<input class="input_text" min="1" type="number" name="amount" size="10" />'), '
+					', Format::cash('<input min="1" type="number" name="amount" size="10" />'), '
 				</dd>';
 	}
 	// Sending an item then...
@@ -354,7 +354,7 @@ function template_bank()
 						', $txt['Shop_bank_amount'], ':
 					</dt>
 					<dd>
-						', Format::cash('<input class="input_text" type="number" min="1" name="amount" />'), '
+						', Format::cash('<input type="number" min="1" name="amount" />'), '
 					</dd>
 				</dl>
 				<input class="button floatright" type="submit" value="', $txt['go'], '" />
@@ -363,51 +363,56 @@ function template_bank()
 		</div>';
 }
 
-
-
-
-
-function template_Shop_invTradeSet()
+function template_set_trade()
 {
 	global $context, $txt, $scripturl;
 
 	echo '
-		<div class="clear"></div>
-		<div class="windowbg">
-			<form method="post" action="', $scripturl,'?action=shop;sa=invtrade2;id=', $_REQUEST['id'], '">
-				<input type="hidden" name="trade" value="', $_REQUEST['id'], '" />
-				', $txt['Shop_trade_cost'], '
-				&nbsp;<input class="input_text" type="number" name="tradecost" id="tradecost" size="20" />
-				<br />
-				<span class="smalltext">', $txt['Shop_trade_cost_desc'], '</span>
-				<br /><br />
-				<input class="button floatleft" type="button" value="', $txt['Shop_no_goback2'], '" onclick="window.location=\'', $scripturl, '?action=shop;area=inventory\'" />
-				<input class="button floatleft" type="submit" value="', $txt['Shop_item_trade_go'], '" />
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
-			</form>
-		</div>';
+	<div class="roundframe">
+		<form method="post" action="', $scripturl,'?action=shop;sa=invtrade2;id=', $_REQUEST['id'], '">
+			<input type="hidden" name="trade" value="', $_REQUEST['id'], '" />
+			<dl class="settings">
+				<dt>
+					', Format::image($context['shop_item']['image']), $context['shop_item']['name'], '
+				</dt>
+				<dd>
+					', sprintf($txt['Shop_inventory_purchased'], timeformat($context['shop_item']['date'])), ' 
+				</dd>
+				<dt>
+					', $txt['Shop_trade_cost'], '<br />
+					<span class="smalltext">', $txt['Shop_trade_cost_desc'], '</span>
+				</dt>
+				<dd>
+					<input type="number" name="tradecost" id="tradecost" min="1" />
+				</dd>
+			</dl>
+			<input class="button floatright" type="button" value="', $txt['Shop_no_goback2'], '" onclick="window.location=\'', $scripturl, '?action=shop;sa=inventory\'" />
+			<input class="button floatright" type="submit" value="', $txt['go'], '" />
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
+		</form>
+	</div>';
 }
 
-function template_Shop_invTradeItem()
+function template_trade_above()
 {
 	global $context;
 
 	echo '
-		<div class="windowbg">
-			', $context['shop']['tradewhat'], '
-		</div>';
+	<div class="title_bar">
+		<h3 class="titlebg">
+			', $context['page_welcome'], '
+		</h3>
+	</div>
+	<div class="information">
+		', $context['page_description'], '
+	</div>';
 }
 
-
-function template_Shop_mainTrade()
+function template_trade()
 {
 	global $context, $txt, $scripturl, $modSettings, $settings;
 
-	echo '
-	<div class="clear"></div>
-		<div class="windowbg">';
-
-	foreach ($context['trade_stats'] as $block)
+	/*foreach ($context['trade_stats'] as $block)
 	{
 		// Check if he has enough privileges to show him this information
 		if (empty($block['enabled']))
@@ -445,11 +450,95 @@ function template_Shop_mainTrade()
 		echo '
 					</dl>
 			</div>';
+	}*/
+
+}
+
+function template_trade_below()
+{
+	global $context, $txt, $scripturl;
+
+	if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'tradelist')
+	{
+		echo '
+		<br class="clear" />
+		<a id="searchuser"></a>
+		<div class="title_bar">
+			<h4 class="titlebg">
+				'. $txt['Shop_inventory_search']. '
+			</h4>
+		</div>
+		<div class="information">
+			<form method="post" action="'. $scripturl.'?action=shop;sa=tradesearch">
+				<dl class="settings">
+					<dt>
+						'. $txt['Shop_inventory_member_name']. '
+					</dt>
+					<dd>
+						<input type="text" name="membername" id="membername" />
+						<div id="membernameItemContainer"></div>
+					</dd>
+				</dl>
+				<input class="button floatright" type="submit" value="'. $txt['search']. '" />
+				<input type="hidden" name="'. $context['session_var']. '" value="'. $context['session_id']. '">
+			</form>
+		</div>
+		<script>
+			var oAddMemberSuggest = new smc_AutoSuggest({
+				sSelf: \'oAddMemberSuggest\',
+				sSessionId: \''. $context['session_id']. '\',
+				sSessionVar: \''. $context['session_var']. '\',
+				sSuggestId: \'to_suggest\',
+				sControlId: \'membername\',
+				sSearchType: \'member\',
+				sPostName: \'memberid\',
+				sURLMask: \'action=profile;u=%item_id%\',
+				sTextDeleteItem: \''. $txt['autosuggest_delete_item']. '\',
+				sItemListContainerId: \'membernameItemContainer\'
+			});
+		</script>';
 	}
+}
+
+
+
+
+
+
+
+
+
+function template_Shop_invTradeSet()
+{
+	global $context, $txt, $scripturl;
 
 	echo '
+		<div class="clear"></div>
+		<div class="windowbg">
+			<form method="post" action="', $scripturl,'?action=shop;sa=invtrade2;id=', $_REQUEST['id'], '">
+				<input type="hidden" name="trade" value="', $_REQUEST['id'], '" />
+				', $txt['Shop_trade_cost'], '
+				&nbsp;<input type="number" name="tradecost" id="tradecost" size="20" />
+				<br />
+				<span class="smalltext">', $txt['Shop_trade_cost_desc'], '</span>
+				<br /><br />
+				<input class="button floatleft" type="button" value="', $txt['Shop_no_goback2'], '" onclick="window.location=\'', $scripturl, '?action=shop;area=inventory\'" />
+				<input class="button floatleft" type="submit" value="', $txt['Shop_item_trade_go'], '" />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
+			</form>
 		</div>';
 }
+
+function template_Shop_invTradeItem()
+{
+	global $context;
+
+	echo '
+		<div class="windowbg">
+			', $context['shop']['tradewhat'], '
+		</div>';
+}
+
 
 function template_Shop_mainTrade_above()
 {
