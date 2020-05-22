@@ -19,7 +19,7 @@ class Database
 	public static $categories = ['sc.catid', 'sc.name', 'sc.image', 'sc.description'];
 	public static $modules = ['sm.id', 'sm.name', 'sm.description', 'sm.price', 'sm.author', 'sm.email', 'sm.require_input', 'sm.can_use_item', 'sm.editable_input', 'sm.web', 'sm.file'];
 	public static $inventory = ['si.id', 'si.userid', 'si.itemid', 'si.trading', 'si.tradecost', 'si.date', 'si.tradedate', 'si.fav'];
-	public static $profile_inventory = ['si.userid', 'si.itemid', 'si.trading', 's.name', 's.image', 's.description', 's.status'];
+	public static $profile_inventory = ['si.userid', 'si.itemid', 'si.trading', 'si.date', 's.name', 's.image', 's.description', 's.status'];
 
 	public function Save($config_vars, $return_config, $sa)
 	{
