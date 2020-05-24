@@ -22,6 +22,21 @@ if (!defined('SMF'))
 class Buy
 {
 	/**
+	 * @var int The item being traded.
+	 */
+	private $_purchase;
+
+	/**
+	 * @var array Information about the item being traded.
+	 */
+	private $_item;
+
+	/**
+	 * @var int Carrying limit.
+	 */
+	private $_limit;
+
+	/**
 	 * Buy::__construct()
 	 *
 	 * Not tabs on this section, but we still need to create instance of log
@@ -30,15 +45,15 @@ class Buy
 	{
 		// Prepare to log the purchase
 		$this->_log = new Log;
+
+		// Check if user is allowed to access this section
+		if (!allowedTo('shop_canManage'))
+			isAllowedTo('shop_canBuy');
 	}
 
 	public function main()
 	{
 		global $context, $scripturl, $modSettings, $sourcedir, $boardurl;
-
-		// Check if user is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_canBuy');
 
 		// Set all the page stuff
 		require_once($sourcedir . '/Subs-List.php');
@@ -145,7 +160,7 @@ class Buy
 					'data' => [
 						'function' => function($row)
 						{
-							return (($row['price'] == 0) ? '<i>' .Shop::getText('item_free').'</i>' : Format::cash($row['price']));
+							return (empty($row['price']) ? '<i>' .Shop::getText('item_free').'</i>' : Format::cash($row['price']));
 						},
 						'class' => 'centertext',
 					],
@@ -185,7 +200,6 @@ class Buy
 				],
 			],
 		];
-
 		// Let's finishem
 		createList($listOptions);
 	}
@@ -193,10 +207,6 @@ class Buy
 	public function purchase()
 	{
 		global $context, $user_info, $modSettings, $scripturl;
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_canBuy');
 
 		// Set all the page stuff
 		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('main_buy');
@@ -212,34 +222,31 @@ class Buy
 			fatal_error(Shop::getText('buy_something'), false);
 
 		// Make sure is an int
-		$id = (int) $_REQUEST['id'];
+		$this->_purchase = (int) $_REQUEST['id'];
 
 		// Get the item's information
-		$context['shop']['item_details'] = Database::Get('', '', '', 'shop_items AS s', Database::$items, 'WHERE s.status = 1 AND s.itemid = {int:itemid}', true, '', ['itemid' => $id]);
+		$this->_item = Database::Get('', '', '', 'shop_items AS s', Database::$items, 'WHERE s.status = 1 AND s.itemid = {int:itemid}', true, '', ['itemid' => $this->_purchase]);
 
 		// We found and item?
-		if (empty($context['shop']['item_details']))
+		if (empty($this->_item))
 			fatal_error(Shop::getText('item_notfound'), false);
 
-		// We need to find out the difference if there's not enough money
-		$notenough = ($context['shop']['item_details']['price'] - $user_info['shopMoney']);
-
 		// How many of this item does the user own?
-		$limit = Database::Count('shop_inventory AS si', Database::$inventory, 'WHERE itemid = {int:id} AND userid = {int:userid}', '', ['id' => $context['shop']['item_details']['itemid'], 'userid' => $user_info['id'],]);
+		$this->_limit = Database::Count('shop_inventory AS si', Database::$inventory, 'WHERE itemid = {int:id} AND userid = {int:userid}', '', ['id' => $this->_purchase, 'userid' => $user_info['id']]);
 
 		// Already reached the limit?
-		if ((!empty($context['shop']['item_details']['itemlimit'])) && ($limit >= $context['shop']['item_details']['itemlimit']))
+		if ((!empty($this->_item['itemlimit'])) && ($this->_limit >= $this->_item['itemlimit']))
 			fatal_error(Shop::getText('item_limit_reached'), false);
 		// Item valid and enabled then... Do we have items in stock?
-		elseif (empty($context['shop']['item_details']['stock']))
-			fatal_error(sprintf(Shop::getText('buy_item_nostock'), $context['shop']['item_details']['name']), false);
+		elseif (empty($this->_item['stock']))
+			fatal_error(sprintf(Shop::getText('buy_item_nostock'), $this->_item['name']), false);
 		// Fine... Does the user have enough money to buy this?
-		elseif ($user_info['shopMoney'] < $context['shop']['item_details']['price'])
-			fatal_error(sprintf(Shop::getText('buy_item_notenough'), $context['shop']['item_details']['name'], $notenough, $modSettings['Shop_credits_prefix']), false);
+		elseif ($user_info['shopMoney'] < $this->_item['price'])
+			fatal_error(sprintf(Shop::getText('buy_item_notenough'), $this->_item['name'], Format::cash($this->_item['price'] - $user_info['shopMoney'])), false);
 
 		// Proceed
 		// Handle item purchase and money deduction and log it
-		$this->_log->purchase($context['shop']['item_details']['itemid'], $user_info['id'], $context['shop']['item_details']['price']);
+		$this->_log->purchase($this->_purchase, $user_info['id'], $this->_item['price']);
 
 		// Redirect to the inventory?
 		redirectexit('action=shop;sa=inventory;sort=item_date;purchased');

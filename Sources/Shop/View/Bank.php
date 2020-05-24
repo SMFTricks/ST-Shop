@@ -47,6 +47,8 @@ class Bank
 	 */
 	function __construct()
 	{
+		global $modSettings;
+
 		// We need to recycle specific strings
 		loadLanguage('Shop/ShopAdmin');
 
@@ -55,11 +57,6 @@ class Bank
 
 		// By default we got nothing
 		$this->_trans = false;
-	}
-
-	public function main()
-	{
-		global $context, $scripturl, $modSettings, $user_info;
 
 		// What if the bank is disabled?
 		if (empty($modSettings['Shop_enable_bank']))
@@ -68,6 +65,11 @@ class Bank
 		// Check if user is allowed to access this section
 		if (!allowedTo('shop_canManage'))
 			isAllowedTo('shop_canBank');
+	}
+
+	public function main()
+	{
+		global $context, $scripturl, $modSettings, $user_info;
 
 		// Set all the page stuff
 		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('main_bank');
@@ -92,14 +94,6 @@ class Bank
 	public function trans()
 	{
 		global $context, $user_info, $modSettings;
-
-		// What if the Inventories are disabled?
-		if (empty($modSettings['Shop_enable_bank']))
-			fatal_error(Shop::getText('currently_disabled_bank'), false);
-
-		// Check if user is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_canBank');
 
 		// Check session
 		checkSession();

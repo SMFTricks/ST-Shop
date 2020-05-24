@@ -45,15 +45,15 @@ class Inventory
 	{
 		// Build the tabs for this section
 		$this->tabs();
+
+		// Check if user is allowed to access this section
+		if (!allowedTo('shop_canManage'))
+			isAllowedTo('shop_viewInventory');
 	}
 
 	public function main()
 	{
 		global $boardurl, $context, $scripturl, $modSettings, $user_info, $memberContext, $sourcedir;
-
-		// Check if user is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_viewInventory');
 
 		// Get the actual owner of this inventory
 		$memberResult = loadMemberData((isset($_REQUEST['user']) ? $_REQUEST['user'] : ((isset($_REQUEST['u']) ? $_REQUEST['u'] : $user_info['id']))), isset($_REQUEST['user']), 'profile');
@@ -302,10 +302,6 @@ class Inventory
 	{
 		global $context, $scripturl;
 
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_viewInventory');
-
 		// Inventory template
 		loadTemplate('Shop/Inventory');
 
@@ -330,10 +326,6 @@ class Inventory
 	public function search_inventory()
 	{
 		global $user_info, $context, $scripturl;
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_viewInventory');
 
 		// Title
 		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('inventory_search_i');
@@ -381,10 +373,6 @@ class Inventory
 	public function use()
 	{
 		global $context, $scripturl;
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_viewInventory');
 
 		// Provisional title
 		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('inventory_myinventory');
@@ -444,10 +432,6 @@ class Inventory
 	public function used()
 	{
 		global $context, $scripturl;
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_viewInventory');
 
 		// Do we have an item? No? Bad luck...
 		if (empty($_REQUEST['id']) || !isset($_REQUEST['id']))
@@ -515,10 +499,6 @@ class Inventory
 	{
 		global $user_info;
 
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_viewInventory');
-
 		// Make sure we got the info
 		if (empty($_REQUEST['id']) || !isset($_REQUEST['id']) || !isset($_REQUEST['fav']))
 			fatal_error(Shop::getText('item_notfound'), false);
@@ -550,10 +530,6 @@ class Inventory
 	public function owners()
 	{
 		global $smcFunc, $context, $scripturl, $txt, $modSettings, $sourcedir;
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_viewInventory');
 
 		// We got an item?
 		if (!isset($_REQUEST['id']) || empty($_REQUEST['id']))
@@ -658,10 +634,6 @@ class Inventory
 	public function display_extend()
 	{
 		global $context, $scripturl, $modSettings;
-
-		// Allowed to see inventories?
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_viewInventory');
 
 		// We need the user id
 		if (empty($_REQUEST['id']) || !isset($_REQUEST['id']))

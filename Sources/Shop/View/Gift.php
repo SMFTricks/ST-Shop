@@ -43,12 +43,19 @@ class Gift
 	private $_gift_info = [];
 
 	/**
+	 * @var array Load user data.
+	 */
+	private $_member = [];
+
+	/**
 	 * Gift::__construct()
 	 *
 	 * Set the tabs for the section and create instance of needed objects
 	 */
 	function __construct()
 	{
+		global $modSettings;
+	
 		// Build the tabs for this section
 		$this->tabs();
 
@@ -57,11 +64,6 @@ class Gift
 
 		// Notify
 		$this->_notify = new Notify;
-	}
-
-	public function main()
-	{
-		global $context, $scripturl, $modSettings, $user_info, $memberContext;
 
 		// What if the Inventories are disabled?
 		if (empty($modSettings['Shop_enable_gift']))
@@ -70,6 +72,11 @@ class Gift
 		// Check if user is allowed to access this section
 		if (!allowedTo('shop_canManage'))
 			isAllowedTo('shop_canGift');
+	}
+
+	public function main()
+	{
+		global $context, $scripturl, $user_info, $modSettings, $memberContext;
 
 		// Inventory template
 		loadTemplate('Shop/Inventory');
@@ -141,14 +148,6 @@ class Gift
 	{
 		global $context, $user_info, $modSettings, $scripturl, $memberContext;
 
-		// What if the Inventories are disabled?
-		if (empty($modSettings['Shop_enable_gift']))
-			fatal_error(Shop::getText('currently_disabled_gift'), false);
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_canGift');
-
 		// Set all the page stuff
 		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('main_gift');
 		$context['linktree'][] = [
@@ -190,15 +189,15 @@ class Gift
 		// Execute
 		if (!empty($member_query))
 		{
-			$memResult = Database::Get(0, 1000, 'id_member', 'members', ['id_member'], 'WHERE (' . implode(' OR ', $member_query) . ')', true, '', $member_parameters);
+			$this->_member = Database::Get(0, 1000, 'id_member', 'members', ['id_member'], 'WHERE (' . implode(' OR ', $member_query) . ')', true, '', $member_parameters);
 
 			// We got a result?
-			if (empty($memResult))
+			if (empty($this->_member))
 				fatal_error(Shop::getText('user_unable_tofind'), false);
 			else
 			{
 				// You cannot gift yourself DUH!
-				if ($memResult['id_member'] == $user_info['id'])
+				if ($this->_member['id_member'] == $user_info['id'])
 					fatal_error(Shop::getText('gift_not_yourself'), false);
 
 				// Did the user leave a message? Nice :)
@@ -222,13 +221,13 @@ class Gift
 					$body = sprintf(Shop::getText('gift_notification_message1'), $user_info['id'], $user_info['name'], $this->_gift_info['name'], $message);
 
 					// Log the item
-					$this->_log->items($user_info['id'], $memResult['id_member'], $itemid, $this->_gift_info['id'], false, $message);
+					$this->_log->items($user_info['id'], $this->_member['id_member'], $itemid, $this->_gift_info['id'], false, $message);
 
 					// Send PM
-					$this->_notify->pm($memResult['id_member'], $subject, $body);
+					$this->_notify->pm($this->_member['id_member'], $subject, $body);
 					// Deploy alert?
 					if (!empty($modSettings['Shop_noty_items']))
-						$this->_notify->alert($memResult['id_member'], 'items', $this->_gift_info['id'], ['shop_href' => ';sa=inventory', 'item_icon' => 'top_gifts_r']);
+						$this->_notify->alert($this->_member['id_member'], 'items', $this->_gift_info['id'], ['shop_href' => ';sa=inventory', 'item_icon' => 'top_gifts_r']);
 				}
 				// Gifting money
 				else
@@ -244,11 +243,11 @@ class Gift
 						fatal_error(Shop::getText('gift_not_negative_or_zero'), false);
 
 					// Find out the member credits...
-					$temp = loadMemberData($memResult['id_member'], false, 'profile');
+					$temp = loadMemberData($this->_member['id_member'], false, 'profile');
 					if (!empty($temp))
 					{
-						loadMemberContext($memResult['id_member']);
-						$membermoney = $memberContext[$memResult['id_member']]['shopMoney'];
+						loadMemberContext($this->_member['id_member']);
+						$membermoney = $memberContext[$this->_member['id_member']]['shopMoney'];
 					}
 					else
 						fatal_error(Shop::getText('user_unable_tofind'), false);
@@ -257,13 +256,13 @@ class Gift
 					$body = sprintf(Shop::getText('gift_notification_message2'), $user_info['id'], $user_info['name'], $modSettings['Shop_credits_suffix'], Format::cash($amount), Format::cash($membermoney + $amount), $message);
 
 					// Log the item
-					$this->_log->credits($user_info['id'], $memResult['id_member'], $amount, false, $message);
+					$this->_log->credits($user_info['id'], $this->_member['id_member'], $amount, false, $message);
 
 					// Send PM
-					$this->_notify->pm($memResult['id_member'], $subject, $body);
+					$this->_notify->pm($this->_member['id_member'], $subject, $body);
 					// Deploy alert?
 					if (!empty($modSettings['Shop_noty_credits']))
-						$this->_notify->alert($memResult['id_member'], 'credits', $user_info['id'], ['item_icon' => 'top_money_r', 'amount' => Format::cash($amount)]);
+						$this->_notify->alert($this->_member['id_member'], 'credits', $user_info['id'], ['item_icon' => 'top_money_r', 'amount' => Format::cash($amount)]);
 				}
 
 				// If there are no errors, then it was a success?
