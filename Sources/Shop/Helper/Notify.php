@@ -67,7 +67,7 @@ class Notify
 		global $user_info, $scripturl;
 
 		// Add forum link
-		$extra_items['item_href'] = $scripturl;
+		$extra_items['item_href'] = $scripturl . '?action=shop';
 
 		// Pointing somewhere else?
 		if (!empty($extra_items['shop_href']))
