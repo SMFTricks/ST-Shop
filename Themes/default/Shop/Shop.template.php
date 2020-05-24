@@ -386,8 +386,8 @@ function template_set_trade()
 					<input type="number" name="tradecost" id="tradecost" min="1" />
 				</dd>
 			</dl>
-			<input class="button floatright" type="button" value="', $txt['Shop_no_goback2'], '" onclick="window.location=\'', $scripturl, '?action=shop;sa=inventory\'" />
 			<input class="button floatright" type="submit" value="', $txt['go'], '" />
+			<input class="button floatright" type="button" value="', $txt['Shop_no_goback2'], '" onclick="window.location=\'', $scripturl, '?action=shop;sa=inventory\'" />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 		</form>
 	</div>';
