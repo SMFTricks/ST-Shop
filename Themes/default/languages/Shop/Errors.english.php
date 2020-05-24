@@ -70,7 +70,7 @@ $txt['Shop_no_categories'] = 'There are no categories created!';
 $txt['Shop_cat_name_blank'] = 'You need to enter a name for the category.';
 
 $txt['Shop_buy_item_nostock'] = 'Sorry, we don\'t have any remaining \'%s\' items in stock';
-$txt['Shop_buy_item_notenough'] = 'You don\'t have enough ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' to buy the item \'%1$s\'. You need %3$s%2$d %1$s more to buy that item.';
+$txt['Shop_buy_item_notenough'] = 'You don\'t have enough ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' to buy the item \'%1$s\'. You need %2$s more to buy that item.';
 $txt['Shop_buy_item_bought_error'] = 'You probably came here for a mistake, because you have not purchased any item before coming to this section.';
 
 $txt['Shop_user_empty'] = 'Please type a member name.';

@@ -43,7 +43,7 @@ $txt['alert_shop_usertraded'] = 'When someone purchased an item from my trades l
 $txt['alert_shop_usermodule_steal'] = 'When someone steals from my pocket';
 $txt['alert_shop_credits'] = '{member_link} has sent you {amount}';
 $txt['alert_shop_items'] = '{member_link} has sent you a gift';
-$txt['alert_shop_traded'] = '{member_link} has purchased your item {item_name} listed on the Trade Center';
+$txt['alert_shop_traded'] = '{member_link} has purchased your item \'{item_name}\' listed on the Trade Center';
 $txt['Shop_notification_sold_from'] = 'Forum Shop';
 
 // Shop buy
@@ -146,19 +146,19 @@ $txt['Shop_trade_desc'] = '<strong>Welcome to the Trade Center, %1$s.</strong><b
 $txt['Shop_trade_remove_item'] = 'Remove from Trade';
 $txt['Shop_trade_removed'] = 'Your item was succesfully removed from the trade center.<br> You can now find it back in your inventory.';
 $txt['Shop_trade_notification_sold_subject'] = 'Your item on trade was sold successfully.';
-$txt['Shop_trade_notification_sold_message1'] = 'Congratulations!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has purchased your item \'%3$s\' for [i]%4$s[/i]. All the %5$s from the purchase have been added to your pocket.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
-$txt['Shop_trade_notification_sold_message2'] = 'Congratulations!' . "\n" . '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has purchased your item \'%3$s\' for [i]%4$s[/i], but has been taken away a fee of [i]%5$s[/i]. The other [i]%6$s[/i] from the purchase have been added to your pocket.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
+$txt['Shop_trade_notification_sold_message1'] = 'Congratulations!' . "\n" . '[url=%1$s]%2$s[/url] has purchased your item \'%3$s\' for [i]%4$s[/i]. All the %5$s from the purchase have been added to your pocket.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
+$txt['Shop_trade_notification_sold_message2'] = 'Congratulations!' . "\n" . '[url=%1$s]%2$s[/url] has purchased your item \'%3$s\' for [i]%4$s[/i], but has been taken away a fee of [i]%5$s[/i]. The other [i]%6$s[/i] from the purchase have been added to your pocket.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
 $txt['Shop_trade_myprofile'] = 'My items';
 $txt['Shop_trade_myprofile_desc'] = 'This is the list of items <strong>you</strong> currently have in the Trade Center. You can remove them also if you want.';
 $txt['Shop_trade_profile'] = 'Items from %s';
 $txt['Shop_trade_profile_desc'] = 'You are currently viewing the list of <strong>%s\'s</strong> for the items this user has in the Trade Center. You can specifically buy items from him.';
 $txt['Shop_trade_mytrades_actions'] = 'Actions';
 $txt['Shop_trade_log'] = 'Trade log';
-$txt['Shop_trade_log_desc'] = 'Find out about the items that you have bought and those that you have sold.';
+$txt['Shop_trade_log_desc'] = 'Find out about the items that you have purchased and those that you have sold.';
 $txt['Shop_trade_cost'] = 'Trade cost:';
 $txt['Shop_trade_cost_desc'] = 'Set the price for your item.';
 $txt['Shop_trade_mytrades'] = 'View trade list';
-
+$txt['Shop_trade_fee'] = 'Fee';
 
 // Gift
 $txt['Shop_gift_member_find'] = 'Type the name of the user you want to send a gift.';
@@ -171,7 +171,7 @@ $txt['Shop_gift_money_sent'] = 'The ' . (!empty($modSettings['Shop_credits_suffi
 $txt['Shop_gift_message'] = 'Message to send to the member';
 $txt['Shop_gift_message_desc'] = 'User will still receive a notification, but you can leave the box blank.';
 $txt['Shop_gift_notification_subject'] = 'You have received a gift.';
-$txt['Shop_gift_notification_message1'] = '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has sent you an item! He has gifted you the item \'%3$s\'.' . "\n" . 'If they left an additional message, will be shown below.' . "\n\n" . '%4$s' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
+$txt['Shop_gift_notification_message1'] = '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has sent you an item! He has gifted you the item %3$s.' . "\n" . 'If they left an additional message, will be shown below.' . "\n\n" . '%4$s' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
 $txt['Shop_gift_notification_message2'] = '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has sent you %3$s! He has gifted you [i]%4$s[/i].' . "\n" . 'You now have %5$s' . "\n" . 'If they left an additional message, will be shown below.' . "\n\n" . '%6$s' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
 
 // Stats
