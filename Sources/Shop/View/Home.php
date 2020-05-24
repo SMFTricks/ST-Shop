@@ -73,29 +73,16 @@ class Home
 			'invtrade' => 'Trade::set',
 			'invtrade2' => 'Trade::set2',
 			'trade' => 'Trade::main',
+			'trade2' => 'Trade::transaction',
+			'traderemove' => 'Trade::remove',
 			'tradelist' => 'Trade::list',
 			'mytrades' => 'Trade::list',
 			'tradesearch' => 'Inventory::search_inventory',
+			'tradelog' => 'Trade::log',
 		];
 		$this->_sa = isset($_GET['sa'], $this->_actions[$_GET['sa']]) ? $_GET['sa'] : 'home';
 
 		$subactions2 = [
-			
-			'tradelog' => array(
-				'function' => 'ShopTrade::Log',
-			),
-			'trade2' => array(
-				'function' => 'ShopTrade::Transaction',
-			),
-			'trade3' => array(
-				'function' => 'ShopTrade::Transaction2',
-			),
-			'traderemove' => array(
-				'function' => 'ShopTrade::Remove',
-			),
-			'tradesearch' => array(
-				'function' => 'ShopTrade::Search',
-			),
 			
 			'stats' => array(
 				'function' => 'ShopStats::Main',

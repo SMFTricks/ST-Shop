@@ -48,9 +48,19 @@ class Trade
 	private $_item;
 
 	/**
+	 * @var int Carrying limit.
+	 */
+	private $_limit;
+
+	/**
 	 * @var int The cost/amount for a certain item.
 	 */
 	private $_amount;
+
+	/**
+	 * @var int The fee on the trade.
+	 */
+	private $_fee;
 
 	/**
 	 * @var array Load user data.
@@ -64,6 +74,8 @@ class Trade
 	 */
 	function __construct()
 	{
+		global $modSettings;
+
 		// Build the tabs for this section
 		$this->tabs();
 
@@ -72,19 +84,19 @@ class Trade
 
 		// Notify
 		$this->_notify = new Notify;
+
+		// The trade center is actually enabled?
+		if (empty($modSettings['Shop_enable_trade']))
+			fatal_error(Shop::getText('currently_disabled_trade'), false);
+
+		// Is the user is allowed to trade items?
+		if (!allowedTo('shop_canManage'))
+			isAllowedTo('shop_canTrade');
 	}
 
 	public function main()
 	{
-		global $context, $scripturl, $user_info, $modSettings;
-
-		// What if the Trade center is disabled?
-		if (empty($modSettings['Shop_enable_trade']))
-			fatal_error(Shop::getText('currently_disabled_trade'), false);
-
-		// Check if user is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_canTrade');
+		global $context, $scripturl, $user_info;
 
 		// Set all the page stuff
 		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('main_trade');
@@ -109,28 +121,28 @@ class Trade
 		$context['trade_stats'] = array(
 			// Most bought items trade
 			'most_traded' => array(
-				'label' => $txt['Shop_stats_most_traded'],
+				'label' => Shop::getText('stats_most_traded'],
 				'icon' => 'most_traded.png',
 				'function' => ShopStats::MostTraded(),
 				'enabled' => true,
 			),
 			// most expensive items (Deals)
 			'most_expensive' => array(
-				'label' => $txt['Shop_stats_most_expensive'],
+				'label' => Shop::getText('stats_most_expensive'],
 				'icon' => 'most_expensive.png',
 				'function' => ShopStats::MostExpensive(),
 				'enabled' => true,
 			),
 			// Top profit
 			'top_profit' => array(
-				'label' => $txt['Shop_stats_top_profit'],
+				'label' => Shop::getText('stats_top_profit'],
 				'icon' => 'top_profit.png',
 				'function' => ShopStats::TopProfit(),
 				'enabled' => true,
 			),
 			// Top profit
 			'top_spent' => array(
-				'label' => $txt['Shop_stats_top_spent'],
+				'label' => Shop::getText('stats_top_spent'],
 				'icon' => 'top_spent.png',
 				'function' => ShopStats::TopSpent(),
 				'enabled' => true,
@@ -162,19 +174,11 @@ class Trade
 
 	public function set()
 	{
-		global $context, $scripturl, $modSettings;
+		global $context, $scripturl;
 
 		// Check if he is allowed to access this section
 		if (!allowedTo('shop_canManage'))
 			isAllowedTo('shop_viewInventory');
-
-		// The trade center is actually enabled?
-		if (empty($modSettings['Shop_enable_trade']))
-			fatal_error(Shop::getText('currently_disabled_trade'), false);
-
-		// Is the user is allowed to trade items?
-		if (!allowedTo('shop_canTrade') && !allowedTo('shop_canManage'))
-			isAllowedTo('shop_canTrade');
 
 		// Do we have an item? No? Bad luck...
 		if (empty($_REQUEST['id']) || !isset($_REQUEST['id']))
@@ -206,19 +210,11 @@ class Trade
 
 	public function set2()
 	{
-		global $context, $scripturl, $modSettings;
+		global $context, $scripturl;
 
 		// Check if he is allowed to access this section
 		if (!allowedTo('shop_canManage'))
 			isAllowedTo('shop_viewInventory');
-
-		// The trade center is actually enabled?
-		if (empty($modSettings['Shop_enable_trade']))
-			fatal_error(Shop::getText('currently_disabled_trade'), false);
-
-		// Is the user is allowed to trade items?
-		if (!allowedTo('shop_canTrade') && !allowedTo('shop_canManage'))
-			isAllowedTo('shop_canTrade');
 
 		// Do we have an item? No? Bad luck...
 		if (empty($_REQUEST['id']) || !isset($_REQUEST['id']))
@@ -273,15 +269,7 @@ class Trade
 
 	public function list()
 	{
-		global $context, $sourcedir, $scripturl, $modSettings, $user_info, $memberContext, $boardurl;
-
-		// What if the Inventories are disabled?
-		if (empty($modSettings['Shop_enable_trade']))
-			fatal_error(Shop::getText('currently_disabled_trade'), false);
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_canTrade');
+		global $context, $sourcedir, $scripturl, $user_info, $memberContext, $boardurl;
 
 		// Specific member only?
 		if (isset($_REQUEST['u']) || isset($_REQUEST['user']))
@@ -307,10 +295,10 @@ class Trade
 		$context['template_layers'][] = 'options';
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'inventory';
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'url' => $scripturl . '?action=shop;sa=' . $_REQUEST['sa'],
 			'name' => ($_REQUEST['sa'] == 'mytrades' ? Shop::getText('trade_myprofile') : (!isset($_REQUEST['u']) ? Shop::getText('trade_list') : sprintf(Shop::getText('trade_profile'), $memberContext[$memID]['name']))),
-		);
+		];
 		// Sub-menu tabs
 		$context['section_tabs'] = $this->_tabs;
 
@@ -330,7 +318,7 @@ class Trade
 		$context['form_url'] = '?action=shop;sa=' . $_REQUEST['sa'] . (!isset($_REQUEST['u']) ? '' : ';u='. $memberContext[$memID]['id']) . (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ';cat='.$_REQUEST['cat'] : '');
 
 		// Load suggest.js
-		loadJavaScriptFile('suggest.js', array('default_theme' => true, 'defer' => false, 'minimize' => true), 'smf_suggest');
+		loadJavaScriptFile('suggest.js', ['default_theme' => true, 'defer' => false, 'minimize' => true], 'smf_suggest');
 
 		// The entire list
 		$listOptions = Inventory::inventory_list((isset($_REQUEST['u']) ? $memberContext[$memID] : $user_info), $context['form_url'], ($_REQUEST['sa'] == 'mytrades' || isset($_REQUEST['u']) ? false : true), true);
@@ -492,408 +480,249 @@ class Trade
 
 	public function remove()
 	{
-		global $context, $smcFunc, $user_info, $modSettings, $txt;
-
-		// What if the Inventories are disabled?
-		if (empty($modSettings['Shop_enable_trade']))
-			fatal_error($txt['Shop_currently_disabled_trade'], false);
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_canTrade');
+		global $context, $user_info;
 
 		// Make sure id is numeric
-		$id = (int) $_REQUEST['id'];
+		$this->_trade = (int) isset($_REQUEST['id']) ? $_REQUEST['id'] : 0;
 
 		// Check session
 		checkSession('request');
 
-		// If nothing was chosen to delete (shouldn't happen, but meh)
-		if (!isset($id))
-			fatal_error($txt['Shop_item_delete_error'], false);
+		// If nothing was chosen to delete
+		if (empty($this->_trade))
+			fatal_error(Shop::getText('item_delete_error'), false);
 
-		// Search form the item
-		$result = $smcFunc['db_query']('', '
-			SELECT p.id, p.itemid, p.userid
-			FROM {db_prefix}shop_inventory AS p
-				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
-			WHERE id = {int:id}',
-			array(
-				'id' => $id,
-			)
-		);
-
-		$item = $smcFunc['db_fetch_assoc']($result);
-		$smcFunc['db_free_result']($result);
+		// Load this item info
+		$this->_item = Database::Get('', '', '', 'shop_inventory AS si', ['si.id', 'si.itemid', 'si.userid'], 'WHERE si.id = {int:id}', true, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['id' => $this->_trade]);
 
 		// We didn't get results?
-		if (empty($item))
-			fatal_error($txt['Shop_item_delete_error'], false);
+		if (empty($this->_item))
+			fatal_error(Shop::getText('item_delete_error'), false);
 		// Is that YOUR item
-		if ($item['userid'] != $user_info['id'])
-			fatal_error($txt['Shop_item_notown'], false);
+		if ($this->_item['userid'] != $user_info['id'])
+			fatal_error(Shop::getText('item_notown'), false);
 
 		// Remove item from trading
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}shop_inventory
-			SET	trading = 0,
-				tradecost = 0
-			WHERE id = {int:id} AND userid = {int:user}',
-			array(
-				'id' => $item['id'],
-				'user' => $user_info['id']
-			)
-		);
+		Database::Update('shop_inventory', ['id' => $this->_item['id'], 'user' => $user_info['id']], 'trading = 0, tradecost = 0,', 'WHERE id = {int:id} AND userid = {int:user}');
 
 		// Send the user to the items list with a message
 		redirectexit('action=shop;sa=mytrades;removed');
 	}
 
-	public static function Transaction()
+	public function transaction()
 	{
-		global $smcFunc, $context, $user_info, $modSettings, $scripturl, $txt, $boardurl, $settings;
-
-		// What if the Inventories are disabled?
-		if (empty($modSettings['Shop_enable_trade']))
-			fatal_error($txt['Shop_currently_disabled_trade'], false);
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_canTrade');
+		global $context, $user_info, $modSettings, $scripturl;
 
 		// Set all the page stuff
-		$context['page_title'] = $txt['Shop_main_button'] . ' - ' . $txt['Shop_shop_trade'];
-		$context['linktree'][] = array(
+		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('main_trade');
+		$context['template_layers'][] = 'options';
+		$context['linktree'][] = [
 			'url' => $scripturl . '?action=shop;sa=trade',
-			'name' => $txt['Shop_shop_trade'],
-		);
+			'name' => Shop::getText('main_trade'),
+		];
+		// Sub-menu tabs
+		$context['section_tabs'] = $this->_tabs;
 
 		// Check session
 		checkSession('request');
 
 		// You cannot get here without an item
-		if (!isset($_REQUEST['id']))
-			fatal_error($txt['Shop_trade_something'], false);
+		if (!isset($_REQUEST['id']) || empty($_REQUEST['id']))
+			fatal_error(Shop::getText('trade_something'), false);
 
-		// Make sure is an int
-		$id = (int) $_REQUEST['id'];
+		// Make sure it's an int
+		$this->_trade = (int) $_REQUEST['id'];
 
-		// Get the item's information
-		$result = $smcFunc['db_query']('', '
-			SELECT p.id, p.itemid, p.trading, p.tradecost, p.userid, s.status, s.name, s.itemlimit, s.image
-			FROM {db_prefix}shop_inventory AS p
-				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = p.itemid)
-			WHERE p.id = {int:id} AND p.trading = 1 AND s.status = 1',
-			array(
-				'id' => $id,
-			)
-		);
-		$row = $smcFunc['db_fetch_assoc']($result);
-		$smcFunc['db_free_result']($result);
+		// Item info
+		$this->_item = Database::Get('','','', 'shop_inventory AS si', array_merge(Database::$inventory, Database::$items), 'WHERE si.id = {int:id} AND si.trading = 1 AND s.status = 1', true, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['id' => $this->_trade]);
 
 		// How many of this item does the user own?
-		$limit = parent::CheckLimit($row['itemid']);
+		$this->_limit = Database::Count('shop_inventory AS si', Database::$inventory, 'WHERE itemid = {int:id} AND userid = {int:userid}', '', ['id' => $this->_item['itemid'], 'userid' => $user_info['id']]);
 
-		// Little array of info
-		$extra_items = array();
 		// Is that id actually valid?
-		// Also, let's check if this "smart" guy is not trying to buy a disabled item or an item that is not set for trading
-		if (empty($row))
-			fatal_error($txt['Shop_item_notfound'], false);
+		if (empty($this->_item))
+			fatal_error(Shop::getText('item_notfound'), false);
 		// Already reached the limit?
-		elseif (($row['itemlimit'] != 0) && ($row['itemlimit'] <= $limit))
-			fatal_error($txt['Shop_item_limit_reached'], false);
+		elseif (($this->_item['itemlimit'] != 0) && ($this->_item['itemlimit'] <= $this->_limit))
+			fatal_error(Shop::getText('item_limit_reached'), false);
 		// Are you really so stupid to buy your own item?
-		elseif ($row['userid'] == $user_info['id'])
-			fatal_error($txt['Shop_item_notbuy_own'], false);
-		// Fine... Do the user has enough money to buy this? This is just to avoid those "smart" guys
-		elseif ($user_info['shopMoney'] < $row['tradecost'])
-		{
-			// We need to find out the difference
-			$notenough = ($row['tradecost'] - $user_info['shopMoney']);
-			fatal_lang_error('Shop_buy_item_notenough', false, array($modSettings['Shop_credits_suffix'], $row['name'], $notenough, $modSettings['Shop_credits_prefix']));
-		}
-		// Add more info
-		$extra_items['item_name'] = $row['name'];
-		$extra_items['item_icon'] = $boardurl . self::$itemsdir . $row['image'];
-		// The amount that the user received
-		$totalrec = (int) ($row['tradecost'] - (($row['tradecost'] * $modSettings['Shop_items_trade_fee'])/100));
-		// The actual fee he has to pay:
-		$fee = (int) (($row['tradecost'] * $modSettings['Shop_items_trade_fee'])/100);
-		// Send the info!
-		parent::logBuy($row['itemid'], $user_info['id'], $row['tradecost'], $row['userid'], $fee, $row['id']);
-		// Send a PM to the seller saying that his item was successfully bought
-		self::sendPM($row['userid'], $row['name'], $row['tradecost'], $fee);
-		// Send an alert
+		elseif ($this->_item['userid'] == $user_info['id'])
+			fatal_error(Shop::getText('item_notbuy_own'), false);
+		// Fine... Does the user have enough money to buy this?
+		elseif ($user_info['shopMoney'] < $this->_item['tradecost'])
+			fatal_error(sprintf(Shop::getText('buy_item_notenough'), $this->_item['name'], Format::cash($this->_item['tradecost'] - $user_info['shopMoney'])), false);
+
+		// Fee
+		$this->_fee = (int) (($this->_item['tradecost'] * $modSettings['Shop_items_trade_fee'])/100);
+
+		// Proceed
+		// Handle item purchase and money deduction and log it
+		$this->_log->purchase($this->_item['itemid'], $user_info['id'], $this->_item['tradecost'], $this->_item['userid'], $this->_fee, $this->_trade);
+
+		// Send PM
+		$this->_notify->pm($this->_item['userid'], Shop::getText('trade_notification_sold_subject'), (!empty($modSettings['Shop_items_trade_fee']) ? sprintf(Shop::getText('trade_notification_sold_message2'), $scripturl . '?action=profile;u='.$user_info['id'], $user_info['name'], $this->_item['name'], Format::cash($this->_item['tradecost']), Format::cash($this->_fee), Format::cash($this->_item['tradecost'] - $this->_fee)) : sprintf(Shop::getText('trade_notification_sold_message1'), $scripturl . '?action=profile;u='.$user_info['id'], $user_info['name'], $this->_item['name'], Format::cash($this->_item['tradecost']), $modSettings['Shop_credits_suffix'])));
+
+		// Alert?
 		if (!empty($modSettings['Shop_noty_trade']))
-			Shop::deployAlert($row['userid'], 'traded', $row['id'], '?action=shop;sa=tradelog', $extra_items);
-		// Let's get out of here and later we'll show a nice message
-		redirectexit('action=shop;sa=trade3;id='. $id);
+			$this->_notify->alert($this->_item['userid'], 'traded', $this->_item['id'], ['shop_href' => ';sa=inventory', 'item_icon' => $this->_item['image'], 'trade' => true, 'item_name' => $this->_item['name']]);
+			
+		// Redirect to the inventory?
+		redirectexit('action=shop;sa=inventory;sort=item_date;purchased');
 	}
 
-	public static function Transaction2()
+	public function log()
 	{
-		global $context, $smcFunc, $modSettings, $scripturl, $user_info, $txt;
-
-		// What if the Inventories are disabled?
-		if (empty($modSettings['Shop_enable_trade']))
-			fatal_error($txt['Shop_currently_disabled_trade'], false);
-
-		// Check if he is allowed to access this section
-		if (!allowedTo('shop_canManage'))
-			isAllowedTo('shop_canTrade');
+		global $context, $scripturl, $sourcedir, $modSettings, $user_info;
 
 		// Set all the page stuff
-		$context['page_title'] = $txt['Shop_main_button'] . ' - ' . $txt['Shop_shop_trade'];
-		$context['sub_template'] = 'Shop_buyItem';
-		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=shop;sa=trade',
-			'name' => $txt['Shop_shop_trade'],
-		);
-
-		// You cannot get here without an item
-		if (!isset($_REQUEST['id']))
-			fatal_error($txt['Shop_trade_something'], false);
-
-		$id = (int) $_REQUEST['id'];
-
-		// Get the item's information
-		$result = $smcFunc['db_query']('', '
-			SELECT p.id, p.itemid, s.name, s.can_use_item, s.status
-			FROM {db_prefix}shop_inventory AS p
-			LEFT JOIN {db_prefix}shop_items AS s ON (p.itemid = s.itemid)
-			WHERE p.id = {int:id}',
-			array(
-				'id' => $id,
-			)
-		);
-		$row = $smcFunc['db_fetch_assoc']($result);
-		$smcFunc['db_free_result']($result);
-
-		// That item is not currently enabled!
-		if (!isset($_REQUEST['id']) || empty($row) || ($row['status'] == 0))
-			fatal_error($txt['Shop_item_notfound'], false);
-		// Not an usable item?
-		elseif (isset($_REQUEST['id']) && !empty($row) && ($row['can_use_item'] == 0))
-			$context['shop']['item_bought'] = sprintf($txt['Shop_buy_item_bought'], $row['name'], $modSettings['Shop_credits_prefix'], $user_info['shopMoney'], $modSettings['Shop_credits_suffix']);
-		// An usable item eh?
-		elseif (isset($_REQUEST['id']) && !empty($row) && ($row['can_use_item'] == 1))
-			$context['shop']['item_bought'] = sprintf($txt['Shop_buy_item_bought_use'], $row['name'], $modSettings['Shop_credits_prefix'], $user_info['shopMoney'], $modSettings['Shop_credits_suffix']);		
-		// None of the above options? What are you doing here then?
-		else
-			$context['shop']['item_bought'] = $txt['Shop_buy_item_bought_error'];
-	}
-
-	public static function sendPM($seller, $itemname, $amount, $fee)
-	{
-		global $user_info, $sourcedir, $modSettings, $txt;
-
-		// Who is sending the PM
-		$pmfrom = array(
-			'id' => 0,
-			'name' => $txt['Shop_trade_notification_sold_from'],
-			'username' => $txt['Shop_trade_notification_sold_from'],
-		);
-
-		// Who is receiving the PM		
-		$pmto = array(
-			'to' => array($seller),
-			'bcc' => array()
-		);
-		// The message subject
-		$subject = $txt['Shop_trade_notification_sold_subject'];
-		$total = ($amount - $fee);
-
-		if (!empty($modSettings['Shop_items_trade_fee']))
-			// The actual message
-			$message = sprintf($txt['Shop_trade_notification_sold_message2'], $user_info['id'], $user_info['name'], $itemname, Shop::formatCash($amount), Shop::formatCash($fee), Shop::formatCash($total));
-		else
-			// The actual message
-			$message = sprintf($txt['Shop_trade_notification_sold_message1'], $user_info['id'], $user_info['name'], $itemname, Shop::formatCash($amount), $modSettings['Shop_credits_suffix']);
-
-		// We need this file
-		require_once($sourcedir . '/Subs-Post.php');
-		// Send the PM
-		sendpm($pmto, $subject, $message, false, $pmfrom);
-	}
-
-	public static function Log()
-	{
-		global $context, $scripturl, $sourcedir, $modSettings, $txt;
-
 		require_once($sourcedir . '/Subs-List.php');
-		$context['page_title'] = $txt['Shop_main_button']. ' - ' . $txt['Shop_trade_log'];
-		$context['page_description'] = $txt['Shop_trade_log_desc'];
-		$context['template_layers'][] = 'Shop_main';
-		$context['template_layers'][] = 'Shop_mainTrade';
+		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('trade_log');
+		$context['page_welcome'] = Shop::getText('main_trade') . ' - ' . Shop::getText('trade_log');
+		$context['page_description'] = Shop::getText('trade_log_desc');
+		// We want to do something a bit different for the trade center
+		$context['template_layers'][] = 'trade';
+		// And then just do the same as usual!
+		$context['template_layers'][] = 'options';
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'trade_log';
-		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=shop;sa=tradelog',
-			'name' => $txt['Shop_trade_log'],
-		);
+		$context['linktree'][] = [
+			'url' => $scripturl . '?action=shop;sa=trade',
+			'name' => Shop::getText('main_trade'),
+		];
 		// Sub-menu tabs
-		$context['trade_tabs'] = self::Tabs();
+		$context['section_tabs'] = $this->_tabs;
 
 		// The entire list
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'trade_log',
 			'items_per_page' => !empty($modSettings['Shop_items_perpage']) ? $modSettings['Shop_items_perpage'] : 15,
 			'base_href' => '?action=shop;sa=tradelog',
 			'default_sort_col' => 'date',
-			'get_items' => array(
-				'function' => 'ShopTrade::logGet',
-			),
-			'get_count' => array(
-				'function' => 'ShopTrade::logCount',
-			),
-			'no_items_label' => $txt['Shop_logs_empty'],
+			'get_items' => [
+				'function' => 'Shop\Helper\Database::Get',
+				'params' => ['shop_log_buy AS lb', array_merge(Database::$log_buy, ['seller.real_name AS name_seller', 'buyer.real_name AS name_buyer']), 'WHERE lb.sellerid <> 0 AND (lb.sellerid = {int:user} OR lb.userid = {int:user}) AND s.status = 1', false, 'LEFT JOIN {db_prefix}members AS seller ON (seller.id_member = lb.sellerid) LEFT JOIN {db_prefix}members AS buyer ON (buyer.id_member = lb.userid) LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = lb.itemid)', ['user' => $user_info['id']]],
+			],
+			'get_count' => [
+				'function' => 'Shop\Helper\Database::Count',
+				'params' => ['shop_log_buy AS lb', Database::$log_buy, 'WHERE lb.sellerid <> 0 AND (lb.sellerid = {int:user} OR lb.userid = {int:user}) AND s.status = 1', 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = lb.itemid)', ['user' => $user_info['id']]],
+			],
+			'no_items_label' => Shop::getText('logs_empty'),
 			'no_items_align' => 'center',
-			'columns' => array(
-				'item_image' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_image'],
+			'columns' => [
+				'item_image' => [
+					'header' => [
+						'value' => Shop::getText('item_image'),
 						'class' => 'centertext',
-					),
-					'data' => array(
-						'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							 return Format::image($row['image']);
+						},
 						'style' => 'width: 10%',
 						'class' => 'centertext',
-					),
-				),
-				'item_name' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_name'],
+					],
+				],
+				'item_name' => [
+					'header' => [
+						'value' => Shop::getText('item_name'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'name',
-						'style' => 'width: 18%'
-					),
-					'sort' =>  array(
+						'class' => 'lefttext',
+						'style' => 'width: 32%',
+					],
+					'sort' =>  [
 						'default' => 'name DESC',
 						'reverse' => 'name',
-					),
-				),
-				'item_category' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_category'],
+					],
+				],
+				'item_user' => [
+					'header' => [
+						'value' => Shop::getText('user_name'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ global $txt; return $row['catid'] != 0 ? $row['category'] : $txt['Shop_item_uncategorized'];},
-						'class' => 'lefttext',
-						'style' => 'width: 15%',
-					),
-					'sort' =>  array(
-						'default' => 'category DESC',
-						'reverse' => 'category',
-					),
-				),
-				'item_user' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_user'],
-						'class' => 'lefttext',
-					),
-					'data' => array(
-						'function' => function($row) { global $user_info, $scripturl;
-							// You bought it. From who?
-							if ($row['userid'] == $user_info['id'])
-							{
-								$name = $row['name_seller'];
-								$id = $row['sellerid'];
-							}
-							// You sold it. To who?
-							elseif ($row['sellerid'] == $user_info['id'])
-							{
-								$name = $row['name_buyer'];
-								$id = $row['userid'];
-							}
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							global $user_info, $scripturl;
 
-							// Format a link to his inventory
-							$user = '<a href="'. $scripturl . '?action=shop;sa=inventory;u='.$id.'">'.$name.'</a>';
-							return $user;
+							// Format link depending of buyer/seller
+							return '<a href="'. $scripturl . '?action=shop;sa=inventory;u=' . ($row['userid'] == $user_info['id'] ? $row['sellerid'] : $row['userid']) . '">' . ($row['userid'] == $user_info['id'] ? $row['name_seller'] : $row['name_buyer']) . '</a>';
 						},
 						'style' => 'width: 12%',
-					),
-				),
-				'amount' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_amount'],
+					],
+					'sort' =>  [
+						'default' => 'name_seller DESC, name_buyer DESC',
+						'reverse' => 'name_seller, name_buyer',
+					],
+				],
+				'amount' => [
+					'header' => [
+						'value' => Shop::getText('bank_amount'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ global $user_info;
-							// Show a "-" if you bought it and a "+" if you sold it
-							if ($row['userid'] == $user_info['id'])
-							{
-								$sign = '-';
-								$color = 'red';
-							}
-							elseif ($row['sellerid'] == $user_info['id'])
-							{
-								$sign = '+';
-								$color = 'green';
-							}
-		
-							return '<span style="color: '.$color.'">'.$sign.Shop::formatCash($row['amount']).'</span>';
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							global $user_info;
+
+							// Show a sign and color depending on the user
+							return '<span style="color: '. ($row['userid'] == $user_info['id'] ? 'red">- ' : 'green">+ ') . Format::cash($row['amount']) . '</span>';
 						},
 						'style' => 'width: 15%'
-					),
-					'sort' =>  array(
+					],
+					'sort' =>  [
 						'default' => 'amount DESC',
 						'reverse' => 'amount',
-					),
-				),
-				'fee' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_fee'],
+					],
+				],
+				'fee' => [
+					'header' => [
+						'value' => Shop::getText('trade_fee'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ global $user_info;
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							global $user_info;
+
 							// Only show fee if you sold it
 							if ($row['sellerid'] == $user_info['id'])
 								$fee = $row['fee'];
 							else
 								$fee = 0;
 
-							$sign ='';
-							$color = '';
-							// color it because it's bad?
-							if ($fee > 0)
-							{
-								$color = 'red';
-								$sign = '-';
-							}
-
-							return '<span'.(!empty($color) ? ' style="color: '.$color.'"' : '').'>'.$sign.Shop::formatCash($fee).'</span>';
+							// Show a sign and color depending on the fee
+							return '<span style="color: '. ($fee > 0 ? 'red">-' : '">') . Format::cash($fee) . '</span>';
 						},
 						'style' => 'width: 12%'
-					),
-					'sort' =>  array(
+					],
+					'sort' =>  [
 						'default' => 'fee DESC',
 						'reverse' => 'fee',
-					),
-				),
-				'date' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_date'],
+					],
+				],
+				'date' => [
+					'header' => [
+						'value' => Shop::getText('item_date'),
 						'class' => ' lefttext',
-					),
-					'data' => array(
-						'function' => function($row) {return timeformat($row['date']);},
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							return timeformat($row['date']);
+						},
 						'style' => 'width: 25%',
-					),
-					'sort' =>  array(
+					],
+					'sort' =>  [
 						'default' => 'date DESC',
 						'reverse' => 'date',
-					),
-				),
-			),
-			'additional_rows' => array(
-			),
-		);
+					],
+				],
+			],
+		];
 		// Let's finishem
 		createList($listOptions);
 	}
