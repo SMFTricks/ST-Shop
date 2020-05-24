@@ -15,11 +15,15 @@ if (!defined('SMF'))
 
 class Database
 {
+	// Regular
 	public static $items = ['s.itemid', 's.name', 's.image', 's.description', 's.price', 's.stock', 's.module', 's.info1', 's.info2', 's.info3', 's.info4', 's.input_needed', 's.can_use_item', 's.delete_after_use', 's.catid', 's.status', 's.itemlimit'];
 	public static $categories = ['sc.catid', 'sc.name', 'sc.image', 'sc.description'];
 	public static $modules = ['sm.id', 'sm.name', 'sm.description', 'sm.price', 'sm.author', 'sm.email', 'sm.require_input', 'sm.can_use_item', 'sm.editable_input', 'sm.web', 'sm.file'];
 	public static $inventory = ['si.id', 'si.userid', 'si.itemid', 'si.trading', 'si.tradecost', 'si.date', 'si.tradedate', 'si.fav'];
 	public static $profile_inventory = ['si.userid', 'si.itemid', 'si.trading', 'si.date', 's.name', 's.image', 's.description', 's.status'];
+
+	// Logs
+	public static $log_buy = ['lb.id', 'lb.itemid', 'lb.invid', 'lb.userid', 'lb.sellerid', 'lb.amount', 'lb.fee', 'lb.date', 's.name', 's.image', 's.status', 's.catid'];
 
 	public function Save($config_vars, $return_config, $sa)
 	{
