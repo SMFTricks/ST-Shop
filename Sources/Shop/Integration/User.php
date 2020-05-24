@@ -192,7 +192,7 @@ class User
 	 */
 	public function fetch_alerts(&$alerts, &$formats)
 	{
-		global $settings;
+		global $settings, $boardurl;
 
 		foreach ($alerts as $alert_id => $alert)
 			if ($alert['content_type'] == 'shop')
@@ -201,7 +201,7 @@ class User
 				if (!empty($alert['extra']['module']))
 					loadLanguage('Shop/Modules');
 
-				$alerts[$alert_id]['icon'] = '<img class="alert_icon" src="' . $settings['images_url'] . (!empty($alert['extra']['item_icon']) ? ('/icons/shop/'.$alert['extra']['item_icon']) : $alert['content_type']).'.png">';
+				$alerts[$alert_id]['icon'] = '<img' .(empty($alert['extra']['trade']) ? '' : ' style="width:16px; height:16px"') . ' class="alert_icon" src="' . (empty($alert['extra']['trade']) ? $settings['images_url'] : $boardurl . Shop::$itemsdir) . (!empty($alert['extra']['item_icon']) ? ((empty($alert['extra']['trade']) ? '/icons/shop/' : '') . $alert['extra']['item_icon']) : $alert['content_type']) . (empty($alert['extra']['trade']) ? '.png' : '') . '">';
 				$alerts[$alert_id]['extra']['content_link'] = $alert['extra']['item_href'];
 			}
 	}
