@@ -39,7 +39,7 @@ class Shop
 	{
 		global $modSettings;
 
-		$defaults = array(
+		$defaults = [
 			'Shop_enable_shop' => 0,
 			'Shop_stats_refresh' => 900,
 			'Shop_credits_register' => 200,
@@ -153,7 +153,7 @@ class Shop
 			'Shop_noty_trade' => 0,
 			'Shop_noty_credits' => 0,
 			'Shop_noty_items' => 0,
-		);
+		];
 		$modSettings = array_merge($defaults, $modSettings);
 	}
 
@@ -165,12 +165,12 @@ class Shop
 	 */
 	public static function defineHooks()
 	{
-		$hooks = array(
+		$hooks = [
 			'autoload' => 'autoload',
 			'menu_buttons' => 'hookButtons',
 			'actions' => 'hookActions',
 			//'issue_like' => 'Shop::likePost',
-		);
+		];
 		foreach ($hooks as $point => $callable)
 			add_integration_function('integrate_' . $point, __CLASS__ . '::'.$callable, false);
 	}
@@ -199,7 +199,7 @@ class Shop
 		$actions['shop'] = ['Shop/View/Home.php', __NAMESPACE__  . '\View\Home::main#'];
 
 		// Feed
-		$actions['shopfeed'] = array(false, __CLASS__ . '::getFeed');
+		$actions['shopfeed'] = [false, __CLASS__ . '::getFeed'];
 		
 		// Add some hooks by action
 		switch ($_REQUEST['action'])
@@ -244,13 +244,13 @@ class Shop
 	public static function userHooks()
 	{
 		// Load user and alerts hooks
-		$hooks = array(
+		$hooks = [
 			'load_member_data',
 			'user_info',
 			'simple_actions',
 			'member_context',
 			'fetch_alerts',
-		);
+		];
 		foreach ($hooks as $hook)
 			add_integration_function('integrate_' . $hook, __NAMESPACE__ . '\Integration\User::' . $hook.'#', false);
 	}
@@ -316,7 +316,7 @@ class Shop
 			if ($position !== false) {
 				$before = array_slice($context['template_layers'], 0, $position + 1);
 				$after = array_slice($context['template_layers'], $position + 1);
-				$context['template_layers'] = array_merge($before, array('shop'), $after);
+				$context['template_layers'] = array_merge($before, ['shop'], $after);
 			}
 		}
 	}
