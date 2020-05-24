@@ -119,7 +119,7 @@ class Log
 
 		// Regular user? Just switch the item from one inventory to another
 		if (empty($admin))
-			Database::Update('shop_inventory', ['user' => $users, 'invid' => $invid], 'userid = {int:user}', 'WHERE id = {int:invid}');
+			Database::Update('shop_inventory', ['user' => $users[0], 'invid' => $invid], 'userid = {int:user}', 'WHERE id = {int:invid}');
 		// Admin? Insert a new item on each inventory, and reduce stock?
 		else
 		{
