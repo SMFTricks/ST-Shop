@@ -79,6 +79,8 @@ class Home
 			'mytrades' => 'Trade::list',
 			'tradesearch' => 'Inventory::search_inventory',
 			'tradelog' => 'Trade::log',
+
+			'games' => 'GamesRoom::main',
 		];
 		$this->_sa = isset($_GET['sa'], $this->_actions[$_GET['sa']]) ? $_GET['sa'] : 'home';
 
@@ -87,9 +89,7 @@ class Home
 			'stats' => array(
 				'function' => 'ShopStats::Main',
 			),
-			'games' => array(
-				'function' => 'ShopGames::Main',
-			),
+
 		];
 		// More sections?
 		call_integration_hook('integrate_shop_home_actions', array(&$this->_actions, &$this->_sa));
