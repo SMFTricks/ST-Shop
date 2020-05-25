@@ -33,6 +33,11 @@ class Home
 	 */
 	protected $_sa;
 
+	/**
+	 * Home::__construct()
+	 *
+	 * Build the tabs for the section, set the actions array and load languages and templates
+	 */
 	function __construct()
 	{
 		// Load language files
