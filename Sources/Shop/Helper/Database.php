@@ -25,20 +25,20 @@ class Database
 	// Logs
 	public static $log_buy = ['lb.id', 'lb.itemid', 'lb.invid', 'lb.userid', 'lb.sellerid', 'lb.amount', 'lb.fee', 'lb.date', 's.name', 's.image', 's.status', 's.catid'];
 
-	public function Save($config_vars, $return_config, $sa)
+	public function Save($config_vars, $return_config, $sa, $area = 'shopsettings')
 	{
 		global $context, $scripturl;
 
 		if ($return_config)
 			return $config_vars;
 
-		$context['post_url'] = $scripturl . '?action=admin;area=shopsettings;sa='. $sa. ';save';
+		$context['post_url'] = $scripturl . '?action=admin;area='. $area. ';sa='. $sa. ';save';
 
 		// Saving?
 		if (isset($_GET['save'])) {
 			checkSession();
 			saveDBSettings($config_vars);
-			redirectexit('action=admin;area=shopsettings;sa='. $sa. '');
+			redirectexit('action=admin;area='. $area. ';sa='. $sa. '');
 		}
 		prepareDBSettingContext($config_vars);
 	}
