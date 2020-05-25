@@ -68,6 +68,13 @@ class Log
 			'type' => 'int',
 			'date' => 'int',
 		];
+		// Games
+		$this->_games = [
+			'userid' => 'int',
+			'amount' => 'int',
+			'game' => 'string',
+			'date' => 'int',
+		];
 	}
 
 	public function credits($sender, $users, $amount, $admin = false, $message = '')
@@ -198,5 +205,19 @@ class Log
 			$type,
 			time(),
 		], $this->_bank);
+	}
+
+	public function game($userid, $amount, $game)
+	{
+		// Update money
+		Database::Update('members', ['user' => $userid, 'amount' => $amount], 'shopMoney = shopMoney + {int:amount},', 'WHERE id_member = {int:user}');
+
+		// Log the changes
+		Database::Insert('shop_log_games', [
+			$userid,
+			$amount,
+			$game,
+			time(),
+		], $this->_games);
 	}
 }
