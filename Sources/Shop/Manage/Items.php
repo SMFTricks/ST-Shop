@@ -22,6 +22,9 @@ if (!defined('SMF'))
 
 class Items extends Dashboard
 {
+	/**
+	 * @var array Additional information provided by the item file var or the item row in the database.
+	 */
 	protected $_item_info = [
 		1 => '',
 		2 => '',
