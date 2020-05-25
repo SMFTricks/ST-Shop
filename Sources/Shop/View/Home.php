@@ -235,45 +235,6 @@ class Home
 		);*/
 	}
 
-
-
-
-	public static function logGames($userid, $amount, $game = 'slots')
-	{
-		global $smcFunc;
-
-		// Add/remove the amount from the player
-		$smcFunc['db_query']('', '
-			UPDATE {db_prefix}members
-			SET	shopMoney = shopMoney + {int:amount}
-			WHERE id_member = {int:userid}',
-			array(
-				'userid' => $userid,
-				'amount' => $amount,
-			)
-		);
-
-		// Insert the information in the log
-		$smcFunc['db_insert']('',
-			'{db_prefix}shop_log_games',
-			array(
-				'userid' => 'int',
-				'amount' => 'int',
-				'game' => 'string',
-				'date' => 'int',
-			),
-			array(
-				$userid,
-				$amount,
-				$game,
-				time()
-			),
-			array()
-		);
-	}
-
-
-
 	/**
 	 * Shop::copyright()
 	 *
