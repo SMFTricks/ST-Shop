@@ -16,29 +16,32 @@ use Shop\Helper\Database;
 if (!defined('SMF'))
 	die('No direct access...');
 
-class Games
+class Games extends Dashboard
 {
-	public function main()
+	function __construct()
 	{
-		global $context;
-
 		// Load Games language
 		loadLanguage('Shop/Games');
 
-		$subactions = [
+		// Array of sections
+		$this->_subactions = [
 			'slots' => 'slots',
 			'lucky2' => 'lucky2',
 			'number' => 'number',
 			'pairs' => 'pairs',
 			'dice' => 'dice',
 		];
+		$this->_sa = isset($_GET['sa'], $this->_subactions[$_GET['sa']]) ? $_GET['sa'] : 'slots';
+	}
 
-		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'slots';
+	public function main()
+	{
+		global $context;
 
 		// Create the tabs for the template.
 		$context[$context['admin_menu_name']]['tab_data'] = [
-			'title' => Shop::getText('tab_settings'),
-			'description' => Shop::getText('settings_general_desc'),
+			'title' => Shop::getText('tab_settings'). ' - ' . Shop::getText('tab_games'),
+			'description' => Shop::getText('games_desc'),
 			'tabs' => [
 				'slots' => ['description' => Shop::getText('settings_slots_desc')],
 				'lucky2' => ['description' => Shop::getText('settings_lucky2_desc')],
@@ -47,7 +50,7 @@ class Games
 				'dice' => ['description' => Shop::getText('settings_dice_desc')],
 			],
 		];
-		call_helper(__CLASS__ .'::' . $subactions[$sa]);
+		call_helper(__CLASS__ . '::' . $this->_subactions[$this->_sa].'#');
 	}
 
 	public function slots($return_config = false)
@@ -56,8 +59,9 @@ class Games
 
 		require_once($sourcedir . '/ManageServer.php');
 		$context['sub_template'] = 'show_settings';
-		$context['page_title'] = Shop::getText('tab_settings') . ' - ' . Shop::getText('games_slots');
+		$context['page_title'] = Shop::getText('tab_settings') . ' - ' . Shop::getText('tab_games') . ' - ' . Shop::getText('games_slots');
 		$context[$context['admin_menu_name']]['tab_data']['title'] = $context['page_title'];
+		$context[$context['admin_menu_name']]['tab_data']['description'] = Shop::getText('settings_slots_desc');
 
 		$config_vars = [
 			['int', 'Shop_settings_slots_losing', 'min' => '0'],
@@ -72,7 +76,7 @@ class Games
 			['int', 'Shop_settings_slots_melon', 'min' => '0'],
 			['int', 'Shop_settings_slots_grapes', 'min' => '0'],
 		];
-		Database::Save($config_vars, $return_config, 'slots');
+		Database::Save($config_vars, $return_config, 'slots', 'shopgames');
 	}
 
 	public function lucky2($return_config = false)
@@ -81,7 +85,7 @@ class Games
 
 		require_once($sourcedir . '/ManageServer.php');
 		$context['sub_template'] = 'show_settings';
-		$context['page_title'] = Shop::getText('tab_settings') . ' - ' . Shop::getText('games_lucky2');
+		$context['page_title'] = Shop::getText('tab_settings') . ' - ' . Shop::getText('tab_games') . ' - ' . Shop::getText('games_lucky2');
 		$context[$context['admin_menu_name']]['tab_data']['title'] = $context['page_title'];
 
 		$config_vars = [
@@ -89,7 +93,7 @@ class Games
 			'',
 			['int', 'Shop_settings_lucky2_price', 'min' => '0'],
 		];
-		Database::Save($config_vars, $return_config, 'lucky2');
+		Database::Save($config_vars, $return_config, 'lucky2', 'shopgames');
 	}
 
 	public function number($return_config = false)
@@ -98,7 +102,7 @@ class Games
 
 		require_once($sourcedir . '/ManageServer.php');
 		$context['sub_template'] = 'show_settings';
-		$context['page_title'] = Shop::getText('tab_settings') . ' - ' . Shop::getText('games_number');
+		$context['page_title'] = Shop::getText('tab_settings') . ' - ' . Shop::getText('tab_games') . ' - ' . Shop::getText('games_number');
 		$context[$context['admin_menu_name']]['tab_data']['title'] = $context['page_title'];
 
 		$config_vars = [
@@ -109,16 +113,16 @@ class Games
 			['int', 'Shop_settings_number_secondtwo', 'min' => '0'],
 			['int', 'Shop_settings_number_firstlast', 'min' => '0'],
 		];
-		Database::Save($config_vars, $return_config, 'number');
+		Database::Save($config_vars, $return_config, 'number', 'shopgames');
 	}
 
-	public static function Pairs($return_config = false)
+	public function Pairs($return_config = false)
 	{
 		global $context, $sourcedir;
 
 		require_once($sourcedir . '/ManageServer.php');
 		$context['sub_template'] = 'show_settings';
-		$context['page_title'] = Shop::getText('tab_settings') . ' - ' . Shop::getText('games_pairs');
+		$context['page_title'] = Shop::getText('tab_settings') . ' - ' . Shop::getText('tab_games') . ' - ' . Shop::getText('games_pairs');
 		$context[$context['admin_menu_name']]['tab_data']['title'] = $context['page_title'];
 
 		$config_vars = [
@@ -184,16 +188,16 @@ class Games
 			['int', 'Shop_settings_pairs_spades_12', 'min' => '0'],
 			['int', 'Shop_settings_pairs_spades_13', 'min' => '0'],
 		];
-		Database::Save($config_vars, $return_config, 'pairs');
+		Database::Save($config_vars, $return_config, 'pairs', 'shopgames');
 	}
 
-	public static function Dice($return_config = false)
+	public function Dice($return_config = false)
 	{
 		global $context, $sourcedir;
 
 		require_once($sourcedir . '/ManageServer.php');
 		$context['sub_template'] = 'show_settings';
-		$context['page_title'] = Shop::getText('tab_settings') . ' - ' . Shop::getText('games_dice');
+		$context['page_title'] = Shop::getText('tab_settings') . ' - ' . Shop::getText('tab_games') . ' - ' . Shop::getText('games_dice');
 		$context[$context['admin_menu_name']]['tab_data']['title'] = $context['page_title'];
 
 		$config_vars = [
@@ -206,6 +210,6 @@ class Games
 			['int', 'Shop_settings_dice_5', 'min' => '0'],
 			['int', 'Shop_settings_dice_6', 'min' => '0'],
 		];
-		Database::Save($config_vars, $return_config, 'dice');
+		Database::Save($config_vars, $return_config, 'dice', 'shopgames');
 	}
 }
