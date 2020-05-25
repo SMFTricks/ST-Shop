@@ -626,7 +626,7 @@ class Inventory
 			return false;
 
 		// Load the inventory
-		$this->_inventory_items = Database::Get(0, empty($modSettings['Shop_inventory_items_num']) ? 5 : $modSettings['Shop_inventory_items_num'], 'favo DESC,' . (!empty($modSettings['Shop_inventory_show_same_once']) ? 'MAX(si.date)' : 'si.date'). ' DESC', 'shop_inventory AS si', array_merge([(!empty($modSettings['Shop_inventory_show_same_once']) ? 'SUM(si.fav)' : 'si.fav'). ' AS favo'], Database::$profile_inventory), 'WHERE si.trading = 0 AND si.userid = {int:mem} AND s.status = 1' . (!empty($modSettings['Shop_inventory_show_same_once']) ? ' GROUP BY si.itemid, si.userid, si.trading, s.name, s.status, s.image, s.description' : ''), false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['mem' => $memID]);
+		$this->_inventory_items = Database::Get(0, empty($modSettings['Shop_inventory_items_num']) ? 5 : $modSettings['Shop_inventory_items_num'], 'favo DESC,' . (!empty($modSettings['Shop_inventory_show_same_once']) ? 'MAX(si.date)' : 'si.date'). ' DESC', 'shop_inventory AS si', array_merge([(!empty($modSettings['Shop_inventory_show_same_once']) ? 'SUM(si.fav)' : 'si.fav'). ' AS favo'], Database::$profile_inventory), 'WHERE si.trading = 0 AND si.userid = {int:mem} AND s.status = 1' . (!empty($modSettings['Shop_inventory_show_same_once']) ? ' GROUP BY si.itemid, si.userid, si.trading, si.date, s.name, s.status, s.image, s.description' : ''), false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['mem' => $memID]);
 
 		return $this->_inventory_items;
 	}
@@ -662,6 +662,6 @@ class Inventory
 		];
 
 		// Load the inventory
-		$context['inventory_list'] = Database::Get(0, 100000, 'favo DESC,' . (!empty($modSettings['Shop_inventory_show_same_once']) ? 'MAX(si.date)' : 'si.date'). ' DESC', 'shop_inventory AS si', array_merge([(!empty($modSettings['Shop_inventory_show_same_once']) ? 'SUM(si.fav)' : 'si.fav'). ' AS favo'], Database::$profile_inventory), 'WHERE si.trading = 0 AND si.userid = {int:mem} AND s.status = 1' . (!empty($modSettings['Shop_inventory_show_same_once']) ? ' GROUP BY si.itemid, si.userid, si.trading, s.name, s.status, s.image, s.description' : ''), false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['mem' => $memData['id_member']]);
+		$context['inventory_list'] = Database::Get(0, 100000, 'favo DESC,' . (!empty($modSettings['Shop_inventory_show_same_once']) ? 'MAX(si.date)' : 'si.date'). ' DESC', 'shop_inventory AS si', array_merge([(!empty($modSettings['Shop_inventory_show_same_once']) ? 'SUM(si.fav)' : 'si.fav'). ' AS favo'], Database::$profile_inventory), 'WHERE si.trading = 0 AND si.userid = {int:mem} AND s.status = 1' . (!empty($modSettings['Shop_inventory_show_same_once']) ? ' GROUP BY si.itemid, si.userid, si.trading, si.date, s.name, s.status, s.image, s.description' : ''), false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['mem' => $memData['id_member']]);
 	}
 }
