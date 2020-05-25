@@ -146,9 +146,9 @@ class Slots extends GamesRoom
 			list($this->_start[1], $this->_start[2], $this->_start[3]) = [0,0,0];
 
 			// Value of each wheel
-			$this->_stop[1] = mt_rand(count($this->_wheel[1])+$this->_start[1], 10*count($this->_wheel[1])) % count($this->_wheel[1]);
-			$this->_stop[2] = mt_rand(count($this->_wheel[2])+$this->_start[2], 10*count($this->_wheel[2])) % count($this->_wheel[2]);
-			$this->_stop[3] = mt_rand(count($this->_wheel[3])+$this->_start[3], 10*count($this->_wheel[3])) % count($this->_wheel[3]);
+			$this->_stop[1] = mt_rand(count($this->_wheel[1]), 10*count($this->_wheel[1])) % count($this->_wheel[1]);
+			$this->_stop[2] = mt_rand(count($this->_wheel[2]), 10*count($this->_wheel[2])) % count($this->_wheel[2]);
+			$this->_stop[3] = mt_rand(count($this->_wheel[3]), 10*count($this->_wheel[3])) % count($this->_wheel[3]);
 
 			// The results!!! Let's see if we are lucky
 			$this->_result[1] = $this->_wheel[1][$this->_stop[1]];
@@ -172,7 +172,7 @@ class Slots extends GamesRoom
 			}
 
 			// Update user cash
-			//$this->_log->game($user_info['id'], (!empty($this->_winner) ? $modSettings['Shop_settings_' . $this->_game . '_' . $this->_faces[$this->_result[1]]] : ((-1) * $modSettings['Shop_settings_' . $this->_game . '_losing'])), $_REQUEST['play']);
+			$this->_log->game($user_info['id'], (!empty($this->_winner) ? $modSettings['Shop_settings_' . $this->_game . '_' . $this->_faces[$this->_result[1]]] : ((-1) * $modSettings['Shop_settings_' . $this->_game . '_losing'])), $this->_game);
 
 			// User real money
 			$context['user']['games']['real_money'] = Format::cash(empty($this->_winner) ? ($user_info['shopMoney'] - $modSettings['Shop_settings_' . $this->_game . '_losing']) : ($user_info['shopMoney'] + $modSettings['Shop_settings_' . $this->_game . '_' . $this->_faces[$this->_result[1]]]));
