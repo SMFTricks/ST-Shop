@@ -27,13 +27,20 @@ class Dashboard
 	 */
 	protected $_sa;
 
+	/**
+	 * @var array Columns with the information.
+	 */
 	protected $_fields_data = [];
-	protected $_fields_type = [];
+
+	/**
+	 * @var array|string The type of the columns.
+	 */
+	protected $_fields_type;
 
 	/**
 	 * Dashboard::__construct()
 	 *
-	 * Call certain administrative hooks and load the language file
+	 * Call certain administrative hooks and load the language files
 	 */
 	function __construct()
 	{
@@ -54,7 +61,7 @@ class Dashboard
 	 *
 	 * Adding the admin section
 	 * @param array $admin_areas An array with all the admin areas
-	 * @return
+	 * @return void
 	 */
 	public function hookAreas(&$admin_areas)
 	{
@@ -122,7 +129,7 @@ class Dashboard
 				'shopgames' => [
 					'label' => Shop::getText('tab_games'),
 					'icon' => 'paid',
-					'function' => __NAMESPACE__ . '\Games::main',
+					'function' => __NAMESPACE__ . '\Games::main#',
 					'permission' => ['shop_canManage'],
 					'enabled' => !empty($modSettings['Shop_enable_shop']) && !empty($modSettings['Shop_enable_games']),
 					'subsections' => [
@@ -158,8 +165,7 @@ class Dashboard
 				'shoplogs' => [
 					'label' => Shop::getText('tab_logs'),
 					'icon' => 'logs',
-					'file' => 'Shop/AdminShop-Logs.php',
-					'function' => 'AdminShopLogs::Main',
+					'function' =>  __NAMESPACE__ . '\Logs::main#',
 					'permission' => ['shop_canManage'],
 					'subsections' => [
 						'admin_money' => [
@@ -356,87 +362,5 @@ class Dashboard
 		];
 
 		return $credits;
-	}
-
-
-
-	public static function logInventory($userid, $receivers, $ids, $message, $amount = 0, $itemid = 0)
-	{
-		global $smcFunc;
-
-		// He sent an item
-		if ($amount == 0) {
-			// Transfer the item to the new user
-			foreach ($receivers as $memID)
-			{
-				// Insert the information in the log
-				$smcFunc['db_insert']('',
-					'{db_prefix}shop_inventory',
-					array(
-						'userid' => 'int',
-						'itemid' => 'int',
-						'date' => 'int',
-					),
-					array(
-						$memID,
-						$itemid,
-						time()
-					),
-					array()
-				);
-				// And finally, the stock gets one less item
-				$smcFunc['db_query']('', '
-					UPDATE {db_prefix}shop_items
-					SET	count = count - {int:count}
-					WHERE itemid = {int:itemid}',
-					array(
-						'count' => 1,
-						'itemid' => $itemid,
-					)
-				);
-			}
-		}
-		// He sent money
-		else {
-			// Add the amount to users
-			$smcFunc['db_query']('', '
-				UPDATE {db_prefix}members
-				SET shopMoney = shopMoney + {int:amount}
-				WHERE ' .$ids,
-				array(
-					'member_ids' => $receivers,
-					'amount' => $amount,
-				)
-			);
-		}
-
-		foreach ($receivers as $memID)
-		{
-			// Insert the information in the log
-			$smcFunc['db_insert']('',
-				'{db_prefix}shop_log_gift',
-				array(
-					'userid' => 'int',
-					'receiver' => 'int',
-					'amount' => 'int',
-					'itemid' => 'int',
-					'invid' => 'int',
-					'message' => 'string',
-					'is_admin' => 'int',
-					'date' => 'int',
-				),
-				array(
-					$userid,
-					$memID,
-					$amount,
-					$itemid,
-					0,
-					$message,
-					1,
-					time()
-				),
-				array()
-			);
-		}
 	}
 }
