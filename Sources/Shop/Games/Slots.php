@@ -27,7 +27,7 @@ class Slots extends GamesRoom
 	/**
 	 * @var string Name of the game.
 	 */
-	private $_game;
+	private $_game = 'slots';
 
 	/**
 	 * @var array Virtual "wheel" of the game.
@@ -64,8 +64,8 @@ class Slots extends GamesRoom
 		// Load previous info
 		parent::__construct();
 
-		// Set the images url
-		$this->_images_dir .= 'slots/';
+		// Set the images url for this game
+		$this->_images_dir .= $this->_game . '/';
 
 		// Set up the payouts
 		$this->payouts();
@@ -105,14 +105,14 @@ class Slots extends GamesRoom
 
 		// Linktree
 		$context['linktree'][] = [
-			'url' => $scripturl . '?action=shop;sa=games;play=slots',
-			'name' => Shop::getText('games_slots'),
+			'url' => $scripturl . '?action=shop;sa=games;play=' . $this->_game,
+			'name' => Shop::getText('games_' . $this->_game),
 		];
 
 		// Title and description
-		$context['game']['title'] = Shop::getText('games_slots');
+		$context['game']['title'] = Shop::getText('games_' . $this->_game);
 		$context['page_title'] .= ' - ' . $context['game']['title'];
-		$context['page_description'] = Shop::getText('games_slots_desc');
+		$context['page_description'] = Shop::getText('games_' . $this->_game . '_desc');
 
 		// Sub template
 		$context['sub_template'] = 'games_play';
@@ -159,7 +159,7 @@ class Slots extends GamesRoom
 			$context['shop_game']['wheel'] = $this->_result;
 
 			// By default user's a loser
-			$context['game_result'] = [$this->_winner, sprintf(Shop::getText('games_loser'), Format::cash($modSettings['Shop_settings_slots_losing']))];
+			$context['game_result'] = [$this->_winner, sprintf(Shop::getText('games_loser'), Format::cash($modSettings['Shop_settings_' . $this->_game . '_losing']))];
 
 			// You are very lucky
 			if ($this->_result[1] == $this->_result[2] && $this->_result[2] == $this->_result[3])
@@ -168,14 +168,14 @@ class Slots extends GamesRoom
 				$this->_winner = true;
 
 				// The user is a winner
-				$context['game_result'] = [$this->_winner, sprintf(Shop::getText('games_winner'), Format::cash($modSettings['Shop_settings_slots_' . $this->_faces[$this->_result[1]]]))];
+				$context['game_result'] = [$this->_winner, sprintf(Shop::getText('games_winner'), Format::cash($modSettings['Shop_settings_' . $this->_game . '_' . $this->_faces[$this->_result[1]]]))];
 			}
 
 			// Update user cash
-			//$this->_log->game($user_info['id'], (!empty($this->_winner) ? $modSettings['Shop_settings_slots_' . $this->_faces[$this->_result[1]]] : ((-1) * $modSettings['Shop_settings_slots_losing'])), $_REQUEST['play']);
+			//$this->_log->game($user_info['id'], (!empty($this->_winner) ? $modSettings['Shop_settings_' . $this->_game . '_' . $this->_faces[$this->_result[1]]] : ((-1) * $modSettings['Shop_settings_' . $this->_game . '_losing'])), $_REQUEST['play']);
 
 			// User real money
-			$context['user']['games']['real_money'] = Format::cash(empty($this->_winner) ? ($user_info['shopMoney'] - $modSettings['Shop_settings_slots_losing']) : ($user_info['shopMoney'] + $modSettings['Shop_settings_slots_' . $this->_faces[$this->_result[1]]]));
+			$context['user']['games']['real_money'] = Format::cash(empty($this->_winner) ? ($user_info['shopMoney'] - $modSettings['Shop_settings_' . $this->_game . '_losing']) : ($user_info['shopMoney'] + $modSettings['Shop_settings_' . $this->_game . '_' . $this->_faces[$this->_result[1]]]));
 		}
 	}
 }
