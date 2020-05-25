@@ -30,6 +30,11 @@ class Lucky2 extends GamesRoom
 	private $_game = 'lucky2';
 
 	/**
+	 * @var string Type of game.
+	 */
+	private $_type = 'roll';
+
+	/**
 	 * @var array Virtual "dice" of the game.
 	 */
 	private $_dice = [];
@@ -73,10 +78,10 @@ class Lucky2 extends GamesRoom
 	{
 		$this->_faces = [
 			1 => 0,
-			2 => 'price', 
-			3 => 0, 
-			4 => 0, 
-			5 => 0, 
+			2 => 'price',
+			3 => 0,
+			4 => 0,
+			5 => 0,
 			6 => 0,
 		];
 	}
@@ -110,6 +115,9 @@ class Lucky2 extends GamesRoom
 
 		// Spin wheel
 		$context['shop_game_spin'] = [true, 1];
+
+		// Type of action
+		$context['shop_game_type'] = $this->_type;
 	}
 
 	public function play()
@@ -148,7 +156,7 @@ class Lucky2 extends GamesRoom
 			}
 
 			// Update user cash
-			//$this->_log->game($user_info['id'], (!empty($this->_winner) ? $modSettings['Shop_settings_' . $this->_game . '_' . $this->_faces[$this->_result]] : ((-1) * $modSettings['Shop_settings_' . $this->_game . '_losing'])), $_REQUEST['play']);
+			$this->_log->game($user_info['id'], (!empty($this->_winner) ? $modSettings['Shop_settings_' . $this->_game . '_' . $this->_faces[$this->_result]] : ((-1) * $modSettings['Shop_settings_' . $this->_game . '_losing'])), $this->_game);
 
 			// User real money
 			$context['user']['games']['real_money'] = Format::cash(empty($this->_winner) ? ($user_info['shopMoney'] - $modSettings['Shop_settings_' . $this->_game . '_losing']) : ($user_info['shopMoney'] + $modSettings['Shop_settings_' . $this->_game . '_' . $this->_faces[$this->_result]]));
