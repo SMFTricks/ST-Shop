@@ -51,6 +51,10 @@ class Dashboard
 		// Permissions
 		$this->permissions();
 
+		// Package types
+		if (isset($_REQUEST['area']) && $_REQUEST['area'] == 'packages')
+			$this->packages();
+
 		// Boards settings
 		if (isset($_REQUEST['area']) && $_REQUEST['area'] == 'manageboards')
 			$this->manageboards();
@@ -285,6 +289,20 @@ class Dashboard
 		add_integration_function('integrate_edit_board', 'Shop\Integration\Boards::edit_board#', false);
 		add_integration_function('integrate_create_board', 'Shop\Integration\Boards::create_board#', false);
 		add_integration_function('integrate_modify_board', 'Shop\Integration\Boards::modify_board', false);
+	}
+
+	/**
+	 * Dashboard::packages()
+	 *
+	 * Loads hooks for packages
+	 * @return void
+	 */
+	public function packages()
+	{
+		add_integration_function('integrate_package_upload', 'Shop\Integration\Packages::package_downupload#', false);
+		add_integration_function('integrate_package_download', 'Shop\Integration\Packages::package_downupload#', false);
+		add_integration_function('integrate_modification_types', 'Shop\Integration\Packages::modification_types#', false);
+		add_integration_function('integrate_packages_sort_id', 'Shop\Integration\Packages::packages_sort#', false);
 	}
 
 	/**
