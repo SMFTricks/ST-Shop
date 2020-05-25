@@ -19,7 +19,7 @@ class Shop
 	public static $version = '4.0';
 	public static $itemsdir = '/shop_items/items/';
 	public static $modulesdir = '/Shop/Modules/';
-	public static $gamesdir = '/shop_items/games';
+	public static $gamesdir = '/shop_items/games/';
 	public static $supportSite = 'https://smftricks.com/index.php?action=.xml;sa=news;board=51;limit=10;type=rss2';
 
 	public static function initialize()

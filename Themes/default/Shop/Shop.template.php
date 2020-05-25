@@ -72,7 +72,7 @@ function template_home()
 			<a href="', $scripturl, '?action=profile"><img class="avatar" style="display: inline" src="', $context['user']['avatar']['href'], '" alt="" /></a><br />
 			<strong>', $txt['Shop_money_pocket'], ':</strong> ', Format::cash($context['user']['shopMoney']), '<br />
 			<strong>', $txt['Shop_money_bank'], ':</strong> ', Format::cash($context['user']['shopBank']), '<br />
-			<strong>', $txt['Shop_main_games'], ':</strong> ', $context['user']['gamedays'], $txt['Shop_games_daysleft'], '
+			<strong>', $txt['Shop_main_games'], ':</strong> ', $context['user']['gamedays'], $txt['Shop_games_days'], '
 		</div>
 	</div>
 	<div id="detailedinfo" style="float: left;">
@@ -501,44 +501,44 @@ function template_trade_below()
 }
 
 
-function template_Shop_mainGames()
+function template_games()
 {
 	global $context, $txt, $scripturl, $modSettings;
 
 	echo '
-	<div class="roundframe flow_auto">
-		<div id="basicinfo" style="float: right; text-align: center;">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $context['user']['name'], '
-				</h3>
-			</div>
-			<div class="information">
-				<a href="', $scripturl, '?action=profile"><img class="avatar" style="display: inline" src="', $context['user']['avatar']['href'], '" alt="" /></a><br />
-				<strong>', $txt['Shop_money_pocket'], ':</strong> ', $modSettings['Shop_credits_prefix'], $context['user']['shopMoney'], ' ', $modSettings['Shop_credits_suffix'], '<br />
-				<strong>', $txt['Shop_money_bank'], ':</strong> ', $modSettings['Shop_credits_prefix'], $context['user']['shopBank'], ' ', $modSettings['Shop_credits_suffix'], '<br />
-				<strong>', $txt['Shop_shop_games'], ':</strong> ', $context['user']['gamedays'], $txt['Shop_games_daysleft'], '
-			</div>
+	<div id="basicinfo" style="float: right; text-align: center;">
+		<div class="title_bar">
+			<h3 class="titlebg">
+				', $context['user']['name'], '
+			</h3>
 		</div>
-		<div id="detailedinfo" style="float: left;">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $txt['Shop_games_welcome'], '
-				</h3>
-			</div>
-			<div class="information">
-				', $context['page_description'], '
-			</div>
-			<div class="title_bar">
-				<h4 class="titlebg">', $txt['Shop_games_listof'], '</h4>
-			</div>';
+		<div class="information">
+			<a href="', $scripturl, '?action=profile"><img class="avatar" style="display: inline" src="', $context['user']['avatar']['href'], '" alt="" /></a><br />
+			<strong>', $txt['Shop_money_pocket'], ':</strong> ', Format::cash($context['user']['shopMoney']), '<br />
+			<strong>', $txt['Shop_money_bank'], ':</strong> ', Format::cash($context['user']['shopBank']), '<br />
+			<strong>', $txt['Shop_main_games'], ':</strong> ', $context['user']['gamedays'], $txt['Shop_games_days'], '
+		</div>
+	</div>
+	<div id="detailedinfo" style="float: left;">
+		<div class="title_bar">
+			<h3 class="titlebg">
+				', $txt['Shop_games_welcome'], '
+			</h3>
+		</div>
+		<div class="information">
+			', $context['page_description'], '
+		</div>
+		<div class="title_bar">
+			<h4 class="titlebg">', $txt['Shop_games_list'], '</h4>
+		</div>
+		<div class="roundframe">';
 
 	// The list of games!
 	foreach ($context['shop']['games'] as $game => $type)
 	{
 		echo '
-			<div class="windowbg stripes">
-				<img class="floatleft" src="', $type['src'], '" style="border: 1px solid #333;" alt="', $type['name'], '" />
+			<div class="windowbg">
+				<img class="floatleft" src="', $type['icon'], '" style="border: 1px solid #333;" alt="', $type['name'], '" />
 				&nbsp; <strong>', $type['name'], '</strong><br />
 				&nbsp; <a href="', $scripturl, '?action=shop;sa=games;play=', $game, '">', $txt['Shop_games_playgame'], '</a>
 			</div>';
@@ -549,139 +549,112 @@ function template_Shop_mainGames()
 	</div>';
 }
 
-function template_Shop_gamesPlay_above()
+function template_games_play_above()
 {
 	global $txt, $context, $modSettings;
 
 	echo '
-	<div class="roundframe flow_auto">
-		<div id="basicinfo" style="float: right">
-			<div class="cat_bar">
-				<h3 class="catbg">
-					', $txt['Shop_games_payouts'], '
-				</h3>
-			</div>
-			<div class="information">';
+	<div id="basicinfo">
+		<div class="title_bar">
+			<h3 class="titlebg">
+				', $txt['Shop_games_payouts'], '
+			</h3>
+		</div>
+		<div class="information">';
 
 	// Playing slots or lucky2 or pairs or dice
-	if (isset($_REQUEST['play']) && ($_REQUEST['play'] == 'slots' || $_REQUEST['play'] == 'lucky2' || $_REQUEST['play'] == 'pairs' || $_REQUEST['play'] == 'dice'))
+	if (!empty($context['shop_game_spin'][0]))
 	{
 		// The payouts table
 		foreach ($context['game']['faces'] as $face => $payout)
 		{
-			if ($payout == 0)
+			// No payout for this one
+			if (empty($modSettings['Shop_settings_' . $_REQUEST['play'] . '_' . $payout]))
 				continue;
 
-			// Slots
-			if ($_REQUEST['play'] == 'slots')
-				$repeat = 3;
-			// Lucky2
-			elseif ($_REQUEST['play'] == 'luck2')
-				$repeat = 1;
-			// Pairs and Dice
-			elseif ($_REQUEST['play'] == 'pairs' || $_REQUEST['play'] == 'dice')
-				$repeat = 2;
-			// By default 1
+			// Display the payout table for others
+			if (!empty($context['shop_game_spin'][1]))
+				echo str_repeat('<img src="'. $context['shop_game_images'] . $face . '.png" alt="" style="width: 25px; height: 25px; vertical-align: middle;" />', $context['shop_game_spin'][1]), '&nbsp; ', Format::cash($modSettings['Shop_settings_' . $_REQUEST['play'] . '_' . $payout]), '<br /><hr />';
 			else
-				$repeat = 1;
+				echo $txt['Shop_games_' . $_REQUEST['play'] . '_'. $type], $modSettings['Shop_settings_' . $_REQUEST['play'] . '_' . $payout];
 
-			// Display the payout table
-			echo str_repeat('<img src="'. $context['game_images']['src'] . $face . '.png" alt="" style="'. (($_REQUEST['play'] == 'pairs') ? 'width: 55px; height: 65px;' : 'width: 25px; height: 25px;'). ' vertical-align: middle;" />', $repeat), '&nbsp; ', $modSettings['Shop_credits_prefix'], $payout, ' ', $modSettings['Shop_credits_suffix'], '<br /><hr />';
-		}
-	}
-
-	// Playing numberslots
-	if (isset($_REQUEST['play']) && ($_REQUEST['play'] == 'number'))
-	{
-		// The payouts table
-		foreach ($context['game']['payout'] as $type => $payout)
-		{
-			if ($payout == 0)
-				continue;
-			echo '
-				', $txt['Shop_games_number_'. $type], $payout, '
-				<hr />
-			';
 		}
 	}
 
 	echo '
-			</div>
 		</div>
-		<div id="detailedinfo" style="float: left;">';
-
-}
-
-function template_Shop_gamesPlay()
-{
-	global $context, $txt, $scripturl, $modSettings;
-
-	echo '
-		<div class="cat_bar">
-			<h3 class="catbg">
+	</div>
+	<div id="detailedinfo">
+		<div class="title_bar">
+			<h3 class="titlebg">
 				', $context['game']['title'], '
 			</h3>
 		</div>
 		<div class="information">
 			', $context['page_description'], '
 		</div>
-		<div class="title_bar">
-			<h4 class="titlebg">', $txt['Shop_games_letsplay'], $context['game']['title'], '</h4>
+		<div class="cat_bar">
+			<h3 class="catbg">', $txt['Shop_games_letsplay'], $context['game']['title'], '</h3>
 		</div>
-		<div class="windowbg">';
+		<div class="roundframe">';
+
+}
+
+function template_games_play()
+{
+	global $context, $txt, $scripturl, $modSettings;
 
 	// Win/Lose message
 	if (isset($_REQUEST['do']))
-		// Winner
-		if (isset($context['win']))
-			echo '
-				<div class="infobox">' . $context['win'] . '</div>';
-		// Loser
-		else
-			echo '
-				<div class="errorbox">' . $context['nowin'] . '</div>';
-
-	// Type to set the wheels
-	if (isset($_REQUEST['do']) && ($_REQUEST['play'] == 'slots' || $_REQUEST['play'] == 'lucky2' || $_REQUEST['play'] == 'pairs' || $_REQUEST['play'] == 'dice'))
 	{
 		echo '
-			<img src="', $context['game_images']['src'], $context['game']['wheel1'], '.png" alt="" />';
+			<div class="' . (!empty($context['game_result'][0]) ? 'infobox' : 'errorbox') . '">
+				' . $context['game_result'][1] . '
+			</div>';
 
-		// Set next wheel
-		if (isset($_REQUEST['do']) && $_REQUEST['play'] != 'lucky2')
+
+		// Type to set the wheels
+		if (!empty($context['shop_game_spin'][0]))
 		{
 			echo '
-			<img src="', $context['game_images']['src'], $context['game']['wheel2'], '.png" alt="" />';
+				<img src="', $context['shop_game_images'], $context['shop_game']['wheel'][1], '.png" alt="" />';
 
-			// Set the third wheel
-			if (isset($_REQUEST['do']) && ($_REQUEST['play'] != 'pairs' && $_REQUEST['play'] != 'dice'))
+			// Set next wheel
+			if (isset($context['shop_game']['wheel'][2]))
+			{
 				echo '
-			<img src="', $context['game_images']['src'], $context['game']['wheel3'], '.png" alt="" />';
+					<img src="', $context['shop_game_images'], $context['shop_game']['wheel'][2], '.png" alt="" />';
+
+				// Set the third wheel
+				if (isset($context['shop_game']['wheel'][3]))
+					echo '
+						<img src="', $context['shop_game_images'], $context['shop_game']['wheel'][3], '.png" alt="" />';
+			}
 		}
+	
+		// Just print this if the user decided to play numberslots!
+		elseif (!empty($context['shop_game_number']))
+			echo '
+				<span class="largetext" style="padding-left: 10px;">| ', $context['shop_game']['wheel'][1], ' | ', $context['shop_game']['wheel'][2], ' | ', $context['shop_game']['wheel'][3], ' |</span>';
 	}
-	// Just print this if the user decided to play numberslots!
-	elseif (isset($_REQUEST['do']) && $_REQUEST['play'] == 'number')
-		echo '
-			<span class="largetext" style="padding-left: 10px;">| ', $context['game']['wheel1'], ' | ', $context['game']['wheel2'], ' | ', $context['game']['wheel3'], ' |</span>';
 
 	echo '
 			<br/>';
 }
 
-function template_Shop_gamesPlay_below()
+function template_games_play_below()
 {
 	global $scripturl, $context, $txt;
 
 	echo'
-				<br />
-				<form method="post" action="',$scripturl,'?action=shop;sa=games;play=', $_REQUEST['play'], ';do">
-					<input class="button floatleft" type="submit" value="', ((isset($_REQUEST['do']) && isset($_REQUEST['play'])) ? $txt['Shop_games_again'] : $context['spin']), '" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
-				</form>	
-				<br /><br />
-				<div class="windowbg stripes">
-					', $txt['Shop_games_youhave'], $context['user']['games']['real_money'],'
-				</div>
+			<br />
+			<form method="post" action="',$scripturl,'?action=shop;sa=games;play=', $_REQUEST['play'], ';do">
+				<input class="button floatleft" type="submit" value="', $txt['Shop_games_' . ((isset($_REQUEST['do']) && isset($_REQUEST['play'])) ? 'again' : 'spin')], '" />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
+			</form>	
+			<br /><br />
+			<div class="information">
+				', $txt['Shop_games_youhave'], $context['user']['games']['real_money'],'
 			</div>
 		</div>
 	</div>';

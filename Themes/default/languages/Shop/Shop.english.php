@@ -34,6 +34,7 @@ $txt['Shop_money_bank'] = 'Bank';
 $txt['Shop_user_avatar'] = 'Avatar';
 $txt['Shop_user_name'] = 'Member';
 $txt['Shop_user_count'] = 'Count';
+$txt['Shop_games_days'] = ' days left';
 
 // Notifications and alerts
 $txt['alert_group_shop'] = 'Shop alerts';
@@ -194,41 +195,6 @@ $txt['Shop_stats_last_bought'] = 'Last items bought or traded';
 $txt['Shop_stats_top_profit'] = 'Top profit';
 $txt['Shop_stats_top_spent'] = 'Top spent';
 $txt['Shop_stats_most_expensive'] = 'Most expensive';
-
-// Games Room
-$txt['Shop_games_welcome'] = 'Welcome to the Games Room';
-$txt['Shop_games_welcome_desc'] = 'Here you can play some games and win some money, or lose it... Good luck and enjoy!<br />You currently have %d days left to play in the Games Room.';
-$txt['Shop_games_setting1'] = 'Days until games room pass expires:';
-$txt['Shop_games_success'] = 'Successfully set games room pass to expire in %d days!';
-$txt['Shop_games_invalidpass'] = 'Your pass for the games room has expired, please buy a new pass at the shop!';
-$txt['Shop_games_daysleft'] = ' days left';
-$txt['Shop_games_listof'] = 'List of games available';
-$txt['Shop_games_playgame'] = 'Play the game!';
-$txt['Shop_games_letsplay'] = 'Let\'s play ';
-$txt['Shop_games_slots'] = 'Slots';
-$txt['Shop_games_lucky2'] = 'Lucky2';
-$txt['Shop_games_number'] = 'Number Slots';
-$txt['Shop_games_pairs'] = 'Pairs';
-$txt['Shop_games_dice'] = 'Dice';
-$txt['Shop_games_bet'] = 'Bet';
-$txt['Shop_games_seven'] = 'Seven';
-$txt['Shop_games_blackjack'] = 'Blackjack';
-$txt['Shop_games_payouts'] = 'Payouts table';
-$txt['Shop_games_loser'] = 'Sorry, you lost %s';
-$txt['Shop_games_winner'] = 'Congratulations, you won %s';
-$txt['Shop_games_spin'] = 'Spin the wheel';
-$txt['Shop_games_roll'] = 'Roll the dice';
-$txt['Shop_games_again'] = 'Try again!';
-$txt['Shop_games_youhave'] = 'You have: ';
-$txt['Shop_games_slots_desc'] = 'On this game you have to try to get exactly the same three images. Good luck!';
-$txt['Shop_games_lucky2_desc'] = 'Here you just have to roll the dice and try to get a <strong>two</strong>. Good luck!';
-$txt['Shop_games_number_desc'] = 'This game it\'s very similar to Slots, the difference is that here you have only numbers, and better chances to win. Good luck!';
-$txt['Shop_games_number_complete'] = 'Three numbers: ';
-$txt['Shop_games_number_firsttwo'] = 'First two numbers: ';
-$txt['Shop_games_number_secondtwo'] = 'Last two numbers: ';
-$txt['Shop_games_number_firstlast'] = 'First and last numbers: ';
-$txt['Shop_games_pairs_desc'] = 'This game is quite hard, you need to get the exact pair of cards, and there are 52. Good luck!';
-$txt['Shop_games_dice_desc'] = 'On this game you need to get the same numbers in both dices, let\'s roll the dice. Good luck!';
 
 // Shop who
 $txt['whoallow_shopinfo'] = 'Managing the Shop in the admin center';

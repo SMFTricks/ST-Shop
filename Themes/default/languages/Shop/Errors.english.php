@@ -87,3 +87,5 @@ $txt['Shop_gift_not_enough_pocket'] = 'You do not have enough ' . (!empty($modSe
 $txt['Shop_gift_not_negative_or_zero'] = 'The amount to send cannot be negative nor zero.';
 
 $txt['Shop_restock_error_noitems'] = 'You didn\'t select any items.';
+
+$txt['Shop_games_invalid'] = 'Your pass for the games room has expired, please buy a new pass at the shop!';

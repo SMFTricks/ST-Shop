@@ -11,9 +11,7 @@
 namespace Shop\View;
 
 use Shop\Shop;
-use Shop\Helper\Database;
 use Shop\Helper\Format;
-use Shop\Helper\Images;
 use Shop\Helper\Log;
 
 if (!defined('SMF'))
@@ -22,14 +20,29 @@ if (!defined('SMF'))
 class GamesRoom
 {
 	/**
-	 * @var object Log any information regarding gifts.
+	 * @var object Log the user history playing at the games room.
 	 */
 	private $_log;
-	
+
 	/**
-	 * @var array Save the section tabs.
+	 * @var array List of games.
 	 */
-	protected $_tabs = [];
+	protected $_list = [];
+
+	/**
+	 * @var string The URL for the games images
+	 */
+	protected $_images_dir;
+
+	/**
+	 * @var array Array of games.
+	 */
+	protected $_games = [];
+
+	/**
+	 * @var string The current game.
+	 */
+	protected $_sa;
 
 	/**
 	 * GamesRoom::__construct()
@@ -38,12 +51,18 @@ class GamesRoom
 	 */
 	function __construct()
 	{
-		global $modSettings, $user_info;
+		global $modSettings, $user_info, $boardurl;
 
 		// Load language files
 		loadLanguage('Shop/Games');
 
+		// Set the images url
+		$this->_images_dir = $boardurl . Shop::$gamesdir;
+
 		// Build the tabs for this section
+		$this->list();
+
+		// Games
 		$this->games();
 
 		// Prepare to log the gift
@@ -61,166 +80,85 @@ class GamesRoom
 		if (time() >= $user_info['gamesPass'])
 			fatal_error(Shop::getText('games_invalid'), false);
 	}
-	public function main()
-	{
-		global $context, $txt, $user_info, $scripturl, $modSettings, $boardurl;
-
-		// Get the days!
-		if ($user_info['gamesPass'] <= time())
-			$context['user']['gamedays'] = 0;
-		else
-			$context['user']['gamedays'] = round((($user_info['gamesPass'] - time()) / 86400));
-
-		// Set all the page stuff
-		$context['page_title'] = $txt['Shop_main_button'] . ' - ' . $txt['Shop_shop_games'];
-		$context['page_description'] = sprintf($txt['Shop_games_welcome_desc'], $context['user']['gamedays']);
-		$context['sub_template'] = 'Shop_mainGames';
-		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=shop;sa=games',
-			'name' => $txt['Shop_shop_games'],
-		);
-
-		// Shop games
-		$context['shop']['games'] = $this->games();
-
-		// Let's set those games...
-		$subactions = array(
-			'slots' => 'self::Slots',
-			'lucky2' => 'self::Lucky2',
-			'number' => 'self::Number',
-			'pairs' => 'self::Pairs',
-			'dice' => 'self::Dice',
-		);
-
-		// Load the game function
-		if (isset($_REQUEST['play']) && !empty($_REQUEST['play']))
-		{
-			// Game
-			$sa = $_REQUEST['play'];
-
-			// Set all the page stuff
-			$context['template_layers'][] = 'Shop_gamesPlay';
-			$context['sub_template'] = 'Shop_gamesPlay';
-			$context['page_title'] .= ' - '. $txt['Shop_games_'.$sa];
-			$context['game']['title'] = $txt['Shop_games_'.$sa];
-			$context['page_description'] = $txt['Shop_games_'.$sa.'_desc'];
-			$context['spin'] = $txt['Shop_games_spin'];
-
-			// Load the game
-			$subactions[$sa]();
-		}
-	}
 
 	public function games()
 	{
-		global $context, $txt, $boardurl;
+		// Big array of actions
+		$this->_games = [
+			'slots' => 'Slots',
+			'lucky2' => 'Lucky2',
+			'number' => 'Number',
+			'pairs' => 'Pairs',
+			'dice' => 'Dice',
+		];
+		$this->_sa = isset($_GET['play'], $this->_games[$_GET['play']]) ? $_GET['play'] : '';
 
-		// Shop games
-		$this->_tabs = array(
-			'slots' => array(
-				'name' => $txt['Shop_games_slots'],
-				'src' => $boardurl . Shop::$gamesdir . '/slots.png',
-				'action' => array('slots'),
-			),
-			'lucky2' => array(
-				'name' => $txt['Shop_games_lucky2'],
-				'src' => $boardurl . Shop::$gamesdir . '/lucky2.png',
-				'action' => array('lucky2'),
-			),
-			'number' => array(
-				'name' => $txt['Shop_games_number'],
-				'src' => $boardurl . Shop::$gamesdir . '/numberslots.png',
-				'action' => array('number'),
-			),
-			'pairs' => array(
-				'name' => $txt['Shop_games_pairs'],
-				'src' => $boardurl . Shop::$gamesdir . '/pairs.png',
-				'action' => array('pairs'),
-			),
-			'dice' => array(
-				'name' => $txt['Shop_games_dice'],
-				'src' => $boardurl . Shop::$gamesdir . '/dice.png',
-				'action' => array('dice'),
-			),
-		);
+		// More sections?
+		call_integration_hook('integrate_shop_games_play', array(&$this->_games, &$this->_sa));
 	}
 
-	public static function Slots()
+	public function main()
 	{
-		global $context, $scripturl, $txt, $boardurl, $modSettings, $user_info;
+		global $context, $user_info, $scripturl;
+
+		// Games Pass, get the days!
+		$context['user']['gamedays'] = ($user_info['gamesPass'] <= time() || empty($user_info['gamesPass']) ? 0 : Format::gamespass($user_info['gamesPass']));
 
 		// Set all the page stuff
-		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=shop;sa=games;play=slots',
-			'name' => $txt['Shop_games_slots'],
-		);
+		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('main_games');
+		$context['page_description'] = sprintf(Shop::getText('games_welcome_desc'), $context['user']['gamedays']);
+		$context['sub_template'] = 'games';
+		$context['linktree'][] = [
+			'url' => $scripturl . '?action=shop;sa=games',
+			'name' => Shop::getText('main_games'),
+		];
 
-		// Faces
-		$context['game']['faces'] = array(
-			'7' => $modSettings['Shop_settings_slots_7'],
-			'bell' => $modSettings['Shop_settings_slots_bell'],
-			'cherry' => $modSettings['Shop_settings_slots_cherry'],
-			'lemon' => $modSettings['Shop_settings_slots_lemon'],
-			'orange' => $modSettings['Shop_settings_slots_orange'],
-			'plum' => $modSettings['Shop_settings_slots_plum'],
-			'dollar' => $modSettings['Shop_settings_slots_dollar'],
-			'melon' => $modSettings['Shop_settings_slots_melon'],
-			'grapes' => $modSettings['Shop_settings_slots_grapes'],
-		);
-		
-		// Slots directory
-		$context['game_images']['src'] = $boardurl . Shop::$gamesdir . '/slots/';
+		// Shop games
+		$context['shop']['games'] = $this->_list;
 
-		if (isset($_REQUEST['do']) && ($_REQUEST['play'] == 'slots'))
+		// Load the game function
+		if (!empty($this->_sa))
 		{
-			// Check session
-			checkSession();
+			// Set all the page stuff
+			$context['template_layers'][] = 'games_play';
 
-			// Construct wheels
-			$wheel1 = array();
-			foreach ($context['game']['faces'] as $face => $pay)
-				$wheel1[] = $face;
-			$wheel2 = array_reverse($wheel1);
-			$wheel3 = $wheel1;
-
-			// Set to zero just in case
-			list($start1, $start2, $start3) = array(0,0,0);
-			// Value of each wheel
-			$stop1 = mt_rand(count($wheel1)+$start1, 10*count($wheel1)) % count($wheel1);
-			$stop2 = mt_rand(count($wheel2)+$start2, 10*count($wheel2)) % count($wheel2);
-			$stop3 = mt_rand(count($wheel3)+$start3, 10*count($wheel3)) % count($wheel3);
-
-			// The results!!! Let's see if we are lucky
-			$result1 = $wheel1[$stop1];
-			$result2 = $wheel2[$stop2];
-			$result3 = $wheel3[$stop3];
-
-			// Format the images...
-			$context['game']['wheel1'] = $result1;
-			$context['game']['wheel2'] = $result2;
-			$context['game']['wheel3'] = $result3;
-
-			// By default he's a loser
-			$context['nowin'] = sprintf($txt['Shop_games_loser'], Shop::formatCash($modSettings['Shop_settings_slots_losing']));
-			$amount = (-1) * $modSettings['Shop_settings_slots_losing'];
-			$final_value = $user_info['shopMoney'] - $modSettings['Shop_settings_slots_losing'];
-
-			// You are very lucky
-			if (($result1 == $result2) && ($result1 == $result3) && ($result2 == $result3))
-			{
-				// Tell him that he's a winner
-				$context['win'] = sprintf($txt['Shop_games_winner'], Shop::formatCash($context['game']['faces'][$result1]));
-				$final_value = $user_info['shopMoney'] + $context['game']['faces'][$result1];
-				$amount = $context['game']['faces'][$result1];
-			}
-			// Update user cash
-			parent::logGames($user_info['id'], $amount, $_REQUEST['play']);
-			// User real money
-			$context['user']['games']['real_money'] = Shop::formatCash($final_value);
+			// Let's play
+			call_helper('Shop\Games\\' . $this->_games[$this->_sa] . '::play#');
 		}
-		// User money
-		else
-			$context['user']['games']['real_money'] = Shop::formatCash($user_info['shopMoney']);
+	}
+
+	public function list()
+	{
+		// Shop games
+		$this->_list = [
+			'slots' => [
+				'name' => Shop::getText('games_slots'),
+				'icon' => $this->_images_dir . 'slots.png',
+				'action' => ['slots'],
+			],
+			'lucky2' => [
+				'name' => Shop::getText('games_lucky2'),
+				'icon' => $this->_images_dir . 'lucky2.png',
+				'action' => ['lucky2'],
+			],
+			'number' => [
+				'name' => Shop::getText('games_number'),
+				'icon' => $this->_images_dir . 'numberslots.png',
+				'action' => ['number'],
+			],
+			'pairs' => [
+				'name' => Shop::getText('games_pairs'),
+				'icon' => $this->_images_dir . 'pairs.png',
+				'action' => ['pairs'],
+			],
+			'dice' => [
+				'name' => Shop::getText('games_dice'),
+				'icon' => $this->_images_dir . 'dice.png',
+				'action' => ['dice'],
+			],
+		];
+		// More games?
+		call_integration_hook('integrate_shop_games_list', [&$this->_list, &$this->_images_dir]);
 	}
 
 	public static function Lucky2()
