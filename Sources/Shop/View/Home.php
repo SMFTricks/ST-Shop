@@ -34,6 +34,11 @@ class Home
 	protected $_sa;
 
 	/**
+	 * @var object Home stats.
+	 */
+	protected $_stats;
+
+	/**
 	 * Home::__construct()
 	 *
 	 * Build the tabs for the section, set the actions array and load languages and templates
@@ -207,37 +212,21 @@ class Home
 		if (isset($_REQUEST['u']) && !empty($_REQUEST['u']))
 			redirectexit('action=shop;sa=gift;u='.$_REQUEST['u']);
 
-		// Display some general stats
-		/*$context['home_stats'] = array(
-			// Last items added
-			'last_added' => array(
-				'label' => $txt['Shop_stats_last_added'],
-				'icon' => 'last_added.png',
-				'function' => ShopStats::LastItems(),
-				'enabled' => true,
-			),
-			// Last items bought
-			'last_bought' => array(
-				'label' => $txt['Shop_stats_last_bought'],
-				'icon' => 'last_bought.png',
-				'function' => ShopStats::LastBought(),
-				'enabled' => allowedTo('shop_canBuy'),
-			),
-			// Richest pocket
-			'richest_pocket' => array(
-				'label' => $txt['Shop_stats_richest_pocket'],
-				'icon' => 'richest_pocket.png',
-				'function' => ShopStats::Richest('pocket'),
-				'enabled' => true,
-			),
-			// Richest bank
-			'richest_bank' => array(
-				'label' => $txt['Shop_stats_richest_bank'],
-				'icon' => 'richest_bank.png',
-				'function' => ShopStats::Richest('bank'),
-				'enabled' => allowedTo('shop_canBank') && !empty($modSettings['Shop_enable_bank']),
-			),
-		);*/
+		// Home stats
+		$this->_stats = new Stats(false);
+		$context['stats_blocks'] = array_merge(
+			[
+				'last_added' => [
+					'call' => $this->_stats->recent(),
+					'enabled' => true,
+				],
+				'last_purchased' => [
+					'call' => $this->_stats->last_purchased(),
+					'enabled' => true,
+				],
+			],
+			$this->_stats->home_stats()
+		);
 	}
 
 	/**

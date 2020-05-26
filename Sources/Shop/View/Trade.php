@@ -68,6 +68,11 @@ class Trade
 	private $_member = [];
 
 	/**
+	 * @var object Trade stats.
+	 */
+	protected $_stats;
+
+	/**
 	 * Trade::__construct()
 	 *
 	 * Set the tabs for the section and create instance of needed objects
@@ -106,48 +111,34 @@ class Trade
 		$context['template_layers'][] = 'trade';
 		// And then just do the same as usual!
 		$context['template_layers'][] = 'options';
-		$context['sub_template'] = 'trade';
+		$context['sub_template'] = 'stats';
 		$context['linktree'][] = [
 			'url' => $scripturl . '?action=shop;sa=trade',
 			'name' => Shop::getText('main_trade'),
 		];
 		// Sub-menu tabs
 		$context['section_tabs'] = $this->_tabs;
-
-		// Display some trading stats
-		// Load our stats file first
-		/*require_once($sourcedir. '/Shop/Shop-Stats.php');
-		// Get the stats
-		$context['trade_stats'] = array(
-			// Most bought items trade
-			'most_traded' => array(
-				'label' => Shop::getText('stats_most_traded'],
-				'icon' => 'most_traded.png',
-				'function' => ShopStats::MostTraded(),
+		
+		// Home stats
+		$this->_stats = new Stats(false);
+		$context['stats_blocks'] = [
+			'most_traded' => [
+				'call' => $this->_stats->traded(),
 				'enabled' => true,
-			),
-			// most expensive items (Deals)
-			'most_expensive' => array(
-				'label' => Shop::getText('stats_most_expensive'],
-				'icon' => 'most_expensive.png',
-				'function' => ShopStats::MostExpensive(),
+			],
+			'most_expensive' => [
+				'call' => $this->_stats->expensive(),
 				'enabled' => true,
-			),
-			// Top profit
-			'top_profit' => array(
-				'label' => Shop::getText('stats_top_profit'],
-				'icon' => 'top_profit.png',
-				'function' => ShopStats::TopProfit(),
+			],
+			'top_profit' => [
+				'call' => $this->_stats->profit(),
 				'enabled' => true,
-			),
-			// Top profit
-			'top_spent' => array(
-				'label' => Shop::getText('stats_top_spent'],
-				'icon' => 'top_spent.png',
-				'function' => ShopStats::TopSpent(),
+			],
+			'top_spent' => [
+				'call' => $this->_stats->profit(true),
 				'enabled' => true,
-			),
-		);*/
+			],
+		];
 	}
 
 	public function tabs()
@@ -341,10 +332,8 @@ class Trade
 				'class' => 'lefttext',
 			],
 			'data' => [
-				'function' => function($row)
+				'function' => function($row) use ($scripturl)
 				{
-					global $scripturl;
-
 					// Category
 					$details = '<strong>' . Shop::getText('item_category') . ': </strong>' . (!empty($row['catid']) ? $row['category'] : Shop::getText('item_uncategorized'));
 
@@ -393,12 +382,10 @@ class Trade
 				'class' => 'centertext',
 			],
 			'data' => [
-				'sprintf' => [
-					'format' => Format::cash('%1$d'),
-					'params' => [
-						'tradecost' => false,
-					],
-				],
+				'function' => function($row)
+				{
+					return Format::cash($row['tradecost']);
+				},
 				'class' => 'centertext',
 			],
 			'sort' => [
@@ -413,10 +400,8 @@ class Trade
 				'class' => 'centertext',
 			],
 			'data' => [
-				'function' => function($row)
+				'function' => function($row) use ($context, $user_info, $scripturl)
 				{
-					global $context, $user_info, $scripturl; 
-
 					// How much need the user to buy this item?
 					if ($user_info['shopMoney'] < $row['tradecost']) 
 						return '
@@ -450,11 +435,8 @@ class Trade
 					'class' => 'centertext',
 				],
 				'data' => [
-					'function' => function($row)
+					'function' => function($row) use ($context, $scripturl)
 					{
-						global $context, $scripturl;
-
-						// Remove item from trade center
 						return '	
 							<a href="' . $scripturl . '?action=shop;sa=traderemove;id=' . $row['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">
 								' . Shop::getText('trade_remove_item') . '

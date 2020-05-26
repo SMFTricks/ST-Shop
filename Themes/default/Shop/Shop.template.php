@@ -83,95 +83,11 @@ function template_home()
 		</div>
 		<div class="information">
 			', $context['shop']['welcome'], '
-		</div>';
-
-	/*foreach ($context['home_stats'] as $block)
-	{
-		// Check if he has enough privileges to show him this information
-		if (empty($block['enabled']))
-			continue;
-
-		echo '
-			<div class="half_content">
-				<div class="title_bar">
-					<h4 class="titlebg">
-						<img class="centericon" src="', $settings['default_images_url'], '/icons/shop/', $block['icon'], '" alt="" /> ', $block['label'], '
-					</h4>
-				</div>
-
-					<dl class="stats" style="padding: 5px;">';
-
-		foreach ($block['function'] as $item)
-		{
-			echo '
-						<dt style="font-weight: normal;">
-							', (!empty($item['image']) ? $item['image'] : $item['link']), '
-						</dt>
-						<dd class="statsbar', empty($item['image']) ? ' generic_bar righttext' : '', '">';
-
-				if (!empty($item['percent']))
-					echo '
-							<div class="bar" style="width: ', $item['percent'], '%;"></div>';
-				else
-					echo '
-							<div class="bar empty"></div>';
-			echo '
-							<span>', (!empty($item['image']) ? $item['name'] : $item['num']), '</span>
-						</dd>';
-		}
-
-		echo '
-					</dl>
-			</div>';
-	}*/
-			echo '
+		</div>
+		', template_stats(), '
 	</div>';
 }
 
-function template_shop_stats()
-{
-	global $txt, $context, $settings;
-
-	// Store Stats
-	foreach ($context['stats_blocks']['shop'] as $block)
-	{
-		// Check if he has enough privileges to show him this information
-		if (empty($block['enabled']))
-			continue;
-
-		echo '
-			<div class="half_content">
-				<div class="title_bar">
-					<h4 class="titlebg">
-						<img class="centericon" src="', $settings['default_images_url'], '/icons/shop/', $block['icon'], '" alt="" /> ', $block['label'], '
-					</h4>
-				</div>
-					<dl class="stats">';
-
-		foreach ($block['function'] as $item)
-		{
-				echo '
-						<dt>
-							', !empty($item['image']) ? $item['image'].' &nbsp;'.$item['name'] : $item['link'], '
-						</dt>
-						<dd class="statsbar generic_bar righttext">';
-
-				if (!empty($item['percent']))
-					echo '
-							<div class="bar" style="width: ', $item['percent'], '%;"></div>';
-				else
-					echo '
-							<div class="bar empty"></div>';
-			echo '
-							<span>', $item['num'], '</span>
-						</dd>';
-		}
-
-		echo '
-					</dl>
-			</div>';
-	}
-}
 function template_options_above()
 {
 	global $scripturl, $context, $txt;
@@ -408,52 +324,6 @@ function template_trade_above()
 	</div>';
 }
 
-function template_trade()
-{
-	global $context, $txt, $scripturl, $modSettings, $settings;
-
-	/*foreach ($context['trade_stats'] as $block)
-	{
-		// Check if he has enough privileges to show him this information
-		if (empty($block['enabled']))
-			continue;
-
-		echo '
-			<div class="half_content">
-				<div class="title_bar">
-					<h4 class="titlebg">
-						<img class="centericon" src="', $settings['default_images_url'], '/icons/shop/', $block['icon'], '" alt="" /> ', $block['label'], '
-					</h4>
-				</div>
-
-					<dl class="stats" style="padding: 5px;">';
-
-		foreach ($block['function'] as $item)
-		{
-			echo '
-						<dt style="font-weight: normal;">
-							', (!empty($item['image']) ? $item['image'].' &nbsp;'.$item['name'] : $item['link']), '
-						</dt>
-						<dd class="statsbar generic_bar righttext">';
-
-				if (!empty($item['percent']))
-					echo '
-							<div class="bar" style="width: ', $item['percent'], '%;"></div>';
-				else
-					echo '
-							<div class="bar empty"></div>';
-			echo '
-							<span>', $item['num'], '</span>
-						</dd>';
-		}
-
-		echo '
-					</dl>
-			</div>';
-	}*/
-
-}
-
 function template_trade_below()
 {
 	global $context, $txt, $scripturl;
@@ -500,10 +370,9 @@ function template_trade_below()
 	}
 }
 
-
 function template_games()
 {
-	global $context, $txt, $scripturl, $modSettings;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="basicinfo" style="float: right; text-align: center;">
@@ -562,10 +431,8 @@ function template_games_play_above()
 		</div>
 		<div class="information">';
 
-	// Playing slots or lucky2 or pairs or dice
+	// The payouts table
 	if (!empty($context['shop_game_spin'][0]))
-	{
-		// The payouts table
 		foreach ($context['game']['faces'] as $face => $payout)
 		{
 			// No payout for this one
@@ -576,10 +443,8 @@ function template_games_play_above()
 			if (!empty($context['shop_game_spin'][1]))
 				echo str_repeat('<img src="'. $context['shop_game_images'] . $face . '.png" alt="" style="width: 25px; height: 25px; vertical-align: middle;" />', $context['shop_game_spin'][1]), '&nbsp; ', Format::cash($modSettings['Shop_settings_' . $_REQUEST['play'] . '_' . $payout]), '<br /><hr />';
 			else
-				echo $txt['Shop_games_' . $_REQUEST['play'] . '_'. $type], $modSettings['Shop_settings_' . $_REQUEST['play'] . '_' . $payout];
-
+				echo $txt['Shop_games_' . $_REQUEST['play'] . '_'. $payout], $modSettings['Shop_settings_' . $_REQUEST['play'] . '_' . $payout] . '<hr />';
 		}
-	}
 
 	echo '
 		</div>
@@ -610,11 +475,13 @@ function template_games_play()
 		echo '
 			<div class="' . (!empty($context['game_result'][0]) ? 'infobox' : 'errorbox') . '">
 				' . $context['game_result'][1] . '
-			</div>';
+			</div>
+			
+			<div class="information">';
 
 
 		// Type to set the wheels
-		if (!empty($context['shop_game_spin'][0]))
+		if (!empty($context['shop_game_spin'][0]) && empty($context['shop_game_number']))
 		{
 			echo '
 				<img src="', $context['shop_game_images'], $context['shop_game']['wheel'][1], '.png" alt="" />';
@@ -636,10 +503,10 @@ function template_games_play()
 		elseif (!empty($context['shop_game_number']))
 			echo '
 				<span class="largetext" style="padding-left: 10px;">| ', $context['shop_game']['wheel'][1], ' | ', $context['shop_game']['wheel'][2], ' | ', $context['shop_game']['wheel'][3], ' |</span>';
-	}
 
-	echo '
-			<br/>';
+		echo '
+			</div>';
+	}
 }
 
 function template_games_play_below()
@@ -647,19 +514,70 @@ function template_games_play_below()
 	global $scripturl, $context, $txt;
 
 	echo'
-			<br />
 			<form method="post" action="',$scripturl,'?action=shop;sa=games;play=', $_REQUEST['play'], ';do">
-				<input class="button floatleft" type="submit" value="', $txt['Shop_games_' . ((isset($_REQUEST['do']) && isset($_REQUEST['play'])) ? 'again' : 'spin')], '" />
+				<input class="button floatleft" type="submit" value="', $txt['Shop_games_' . ((isset($_REQUEST['do']) && isset($_REQUEST['play'])) ? 'again' : (!empty($context['shop_game_type']) ? $context['shop_game_type'] : 'spin'))], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 			</form>	
-			<br /><br />
-			<div class="information">
+			<div class="clear"></div>
+			<div class="windowbg">
 				', $txt['Shop_games_youhave'], $context['user']['games']['real_money'],'
 			</div>
 		</div>
 	</div>';
 }
 
+function template_stats()
+{
+	global $txt, $context, $settings, $scripturl;
+
+	echo '
+		<div class="roundframe">';
+
+	// Store Stats
+	foreach ($context['stats_blocks'] as $stat => $block)
+	{
+		// Check if he has enough privileges to show him this information
+		if (empty($block['enabled']))
+			continue;
+
+		echo '
+			<div class="half_content">
+				<div class="title_bar">
+					<h4 class="titlebg">
+						<img class="centericon" src="', $settings['default_images_url'], '/icons/shop/', $stat, '.png" alt="" /> ', $txt['Shop_stats_' . $stat], '
+					</h4>
+				</div>
+					<dl class="stats" style="padding: 5px">';
+
+		foreach ($block['call'] as $item)
+		{
+			echo '
+						<dt>
+							', (isset($item['num']) ? (!empty($item['image']) ? ($item['image'] . ' &nbsp;') : '') . (!empty($item['link']) ? 
+								$item['name'] : 
+								'<a href="' . $scripturl. '?action=profile;u=' . $item['id'] . '">' . $item['name'] . '</a>') : $item['image']), '
+						</dt>
+						<dd class="statsbar', isset($item['num']) ? ' generic_bar righttext' : '', '">';
+
+				if (!empty($item['percent']))
+					echo '
+							<div class="bar" style="width: ', $item['percent'], '%;"></div>';
+				else
+					echo '
+							<div class="bar empty"></div>';
+				echo '
+							<span>', isset($item['num']) ? $item['num'] : $item['name'], '</span>
+						</dd>';
+		}
+
+		echo '
+					</dl>
+			</div>';
+	}
+
+	echo '
+		</div>';
+}
 
 function template_shop_below()
 {
