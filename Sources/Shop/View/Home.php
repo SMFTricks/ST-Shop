@@ -116,7 +116,7 @@ class Home
 			'inventory' => [
 				'action' => ['inventory', 'invdisp', 'invuse', 'invused', 'owners','search','search2'],
 				'label' => Shop::getText('main_inventory'),
-				'permission' => 'shop_canBuy',
+				'permission' => 'shop_viewInventory',
 				'enable' => 'Shop_enable_shop'
 			],
 			'gift' => [
@@ -134,7 +134,7 @@ class Home
 			'trade' => [
 				'action' => ['trade', 'tradelist', 'mytrades', 'tradelog', 'trade2','trade3','traderemove', 'invtrade', 'invtrade2',],
 				'label' => Shop::getText('main_trade'),
-				'permission' => 'shop_canBuy',
+				'permission' => 'shop_canTrade',
 				'enable' => 'Shop_enable_trade'
 			],
 			'games' => [
@@ -169,7 +169,7 @@ class Home
 		if (empty($modSettings['Shop_enable_shop']))
 			fatal_error(Shop::getText('currently_disabled'), false);
 
-		// Last but not less important. Are they actually allowed to Access the Shop? If not.. YOU SHALL NOT PASS. 
+		// Are they allowed to Access the Shop? If not.. YOU SHALL NOT PASS. 
 		// Anyway if user can Manage the Shop, there's no problem :).
 		if (!empty($modSettings['Shop_enable_shop']) && !allowedTo('shop_canAccess') && !allowedTo('shop_canManage'))
 			isAllowedTo('shop_canAccess');
@@ -214,19 +214,15 @@ class Home
 
 		// Home stats
 		$this->_stats = new Stats(false);
-		$context['stats_blocks'] = array_merge(
-			[
-				'last_added' => [
-					'call' => $this->_stats->recent(),
-					'enabled' => true,
-				],
-				'last_purchased' => [
-					'call' => $this->_stats->last_purchased(),
-					'enabled' => true,
-				],
-			],
-			$this->_stats->home_stats()
-		);
+		$context['stats_blocks']['last_added'] = [
+			'call' => $this->_stats->recent(),
+			'enabled' => true,
+		];
+		$context['stats_blocks']['last_purchased'] = [
+			'call' => $this->_stats->last_purchased(),
+			'enabled' => true,
+		];
+		$context['stats_blocks'] += $this->_stats->home_stats();
 	}
 
 	/**
@@ -236,9 +232,14 @@ class Home
 	 * @param boolean $return decide between returning a string or append it to a known context var.
 	 * @return string A link for copyright notice
 	 */
-	public function copyright($return = false)
+	public function copyright()
 	{
 		return '
-			<br /><div style="text-align: center;"><span class="smalltext">Powered by <a href="https://smftricks.com" target="_blank" rel="noopener">ST Shop</a></span></div>';
+			<br />
+			<div style="text-align: center;">
+				<span class="smalltext">
+					Powered by <a href="https://smftricks.com" target="_blank" rel="noopener">ST Shop</a>
+				</span>
+			</div>';
 	}
 }
