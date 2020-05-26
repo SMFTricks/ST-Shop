@@ -129,10 +129,8 @@ class Buy
 						'class' => 'lefttext',
 					],
 					'data' => [
-						'function' => function($row)
+						'function' => function($row) use ($scripturl)
 						{
-							global $scripturl;
-
 							// Category
 							$details = '<strong>' . Shop::getText('item_category') . ': </strong>' . (!empty($row['catid']) ? $row['category'] : Shop::getText('item_uncategorized'));
 
@@ -160,7 +158,7 @@ class Buy
 					'data' => [
 						'function' => function($row)
 						{
-							return (empty($row['price']) ? '<i>' .Shop::getText('item_free').'</i>' : Format::cash($row['price']));
+							return (empty($row['price']) ? '<i>' . Shop::getText('item_free') . '</i>' : Format::cash($row['price']));
 						},
 						'class' => 'centertext',
 					],
@@ -175,10 +173,8 @@ class Buy
 						'class' => 'centertext',
 					],
 					'data' => [
-						'function' => function($row)
+						'function' => function($row) use ($context, $scripturl)
 						{
-							global $context, $scripturl;
-
 							// If we don\'t have stock... Sold out!
 							if (empty($row['stock']))
 								return Shop::getText('buy_soldout');

@@ -225,7 +225,7 @@ $txt['Shop_cats_save'] = 'Save category';
 
 // Games
 $txt['Shop_tab_games'] = 'Games Settings';
-$txt['Shop_settings_slots_desc'] = 'Here you can define how much the user will win or lose in Slots';
+$txt['Shop_games_desc'] = 'Here you can define how much the user will win or lose in the games';
 $txt['Shop_games_slots'] = 'Slots';
 $txt['Shop_games_lucky2'] = 'Lucky2';
 $txt['Shop_games_number'] = 'Number Slots';
@@ -317,3 +317,9 @@ $txt['Shop_file_too_large'] = 'Sorry, your file is too large.';
 // Scheduled tasks
 $txt['scheduled_task_shop_bank_interest'] = 'Shop Bank interest';
 $txt['scheduled_task_desc_shop_bank_interest'] = 'The magic task that will create bank ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' out of nowhere for the users.';
+
+// Packages types
+$txt['shop_modules_package'] = 'ST Shop Modules';
+$txt['install_shop_modules'] = 'Install Shop Module';
+$txt['shop_games_package'] = 'ST Shop Games';
+$txt['install_shop_games'] = 'Install Shop Game';

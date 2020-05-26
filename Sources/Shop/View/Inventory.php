@@ -140,7 +140,7 @@ class Inventory
 
 	public function inventory_list($memberResult, $form_url, $notin = false, $trading = false)
 	{
-		global $modSettings, $user_info, $context;
+		global $modSettings, $user_info, $context, $settings, $scripturl;
 
 		$listOptions = [
 			'id' => 'inventory',
@@ -231,9 +231,8 @@ class Inventory
 						'class' => 'centertext',
 					],
 					'data' => [
-						'function' => function($row)
+						'function' => function($row) use ($scripturl)
 						{
-							global $context, $scripturl;
 							// Is item usable?
 							if ($row['can_use_item'] == 1)
 								$message = '<a href="'. $scripturl. '?action=shop;sa=invuse;id='. $row['id']. '">' . Shop::getText('item_useit') . '</a>';
@@ -255,10 +254,8 @@ class Inventory
 						'class' => 'centertext',
 					],
 					'data' => [
-						'function' => function($row)
-						{ 
-							global $scripturl, $context, $settings;
-
+						'function' => function($row) use ($scripturl, $context, $settings)
+						{
 							// Is item usable?
 							$fav = '<a href="'. $scripturl. '?action=shop;sa=invfav;id='. $row['id']. ';fav='. (($row['fav'] == 1) ? 0 : 1). ';'. $context['session_var'] .'='. $context['session_id'] .'">							
 										<img src="'. $settings['default_images_url']. '/icons/shop/fav'. (($row['fav'] == 1) ? '' : '-empty'). '.png" />
@@ -279,10 +276,8 @@ class Inventory
 						'class' => 'centertext',
 					],
 					'data' => [
-						'function' => function($row)
+						'function' => function($row) use ($scripturl)
 						{
-							global $scripturl;
-
 							return '<a href="'. $scripturl. '?action=shop;sa=invtrade;id='. $row['id']. '">'. Shop::getText('item_trade_go'). '</a>';
 						},
 						'class' => 'centertext',

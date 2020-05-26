@@ -34,6 +34,7 @@ $txt['Shop_games_loser'] = 'Sorry, you lost %s';
 $txt['Shop_games_winner'] = 'Congratulations, you won %s';
 $txt['Shop_games_spin'] = 'Spin the wheel';
 $txt['Shop_games_roll'] = 'Roll the dice';
+$txt['Shop_games_deal'] = 'Deal the cards';
 $txt['Shop_games_again'] = 'Try again!';
 $txt['Shop_games_youhave'] = 'You have: ';
 $txt['Shop_games_slots_desc'] = 'On this game you have to try to get exactly the same three images. Good luck!';
@@ -47,6 +48,7 @@ $txt['Shop_games_pairs_desc'] = 'This game is quite hard, you need to get the ex
 $txt['Shop_games_dice_desc'] = 'On this game you need to get the same numbers in both dices, let\'s roll the dice. Good luck!';
 
 // Games settings
+$txt['Shop_settings_slots_desc'] = 'Here you can define how much the user will win or lose in Slots';
 $txt['Shop_settings_slots_losing'] = 'How much the user will lose';
 $txt['Shop_settings_slots_7'] = '7\'s payout';
 $txt['Shop_settings_slots_bell'] = 'Bells payout';

@@ -177,21 +177,21 @@ $txt['Shop_gift_notification_message2'] = '[url=' . $scripturl . '?action=profil
 
 // Stats
 $txt['Shop_stats_desc'] = 'Welcome to the Stats site, here you can keep track of the most relevant information about the Shop';
-$txt['Shop_stats_most_bought'] = 'Most bought';
+$txt['Shop_stats_most_purchased'] = 'Most purchased';
 $txt['Shop_stats_most_traded'] = 'Top traded';
 $txt['Shop_stats_top_cats'] = 'Best categories';
 $txt['Shop_stats_top_buyers'] = 'Top buyers';
 $txt['Shop_stats_top_inventories'] = 'Top inventories';
-$txt['Shop_stats_top_gifts_sent'] = 'Gifts sent';
-$txt['Shop_stats_top_gifts_received'] = 'Gifts received';
-$txt['Shop_stats_top_money_sent'] = 'Money sent';
-$txt['Shop_stats_top_money_received'] = 'Money received';
+$txt['Shop_stats_gifts_sent'] = 'Gifts sent';
+$txt['Shop_stats_gifts_received'] = 'Gifts received';
+$txt['Shop_stats_money_sent'] = 'Money sent';
+$txt['Shop_stats_money_received'] = 'Money received';
 $txt['Shop_stats_traders'] = 'Best Traders';
 $txt['Shop_stats_sellers'] = 'Best Sellers';
 $txt['Shop_stats_richest_bank'] = 'Richest bank';
 $txt['Shop_stats_richest_pocket'] = 'Richest pocket';
 $txt['Shop_stats_last_added'] = 'Last items added';
-$txt['Shop_stats_last_bought'] = 'Last items bought or traded';
+$txt['Shop_stats_last_purchased'] = 'Last items purchased or traded';
 $txt['Shop_stats_top_profit'] = 'Top profit';
 $txt['Shop_stats_top_spent'] = 'Top spent';
 $txt['Shop_stats_most_expensive'] = 'Most expensive';
