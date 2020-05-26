@@ -31,9 +31,9 @@ class Format
 		global $modSettings;
 
 		if (empty($formal))
-			$disp = (!empty($modSettings['Shop_credits_prefix']) ? $modSettings['Shop_credits_prefix'] : '') . ($money) . ' ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : '');
+			$disp = (!empty($modSettings['Shop_credits_prefix']) ? $modSettings['Shop_credits_prefix'] : '') . (!is_numeric($money) ? $money : comma_format($money)) . ' ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : '');
 		else
-			$disp = ($money) . (!empty($modSettings['Shop_credits_prefix']) ? $modSettings['Shop_credits_prefix'] : '');
+			$disp = (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : '') . ':' . (!empty($modSettings['Shop_credits_prefix']) ? $modSettings['Shop_credits_prefix'] : '') . (!is_numeric($money) ? $money : comma_format($money));
 
 		return $disp;
 	}
