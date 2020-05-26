@@ -55,6 +55,23 @@ class Inventory extends Dashboard
 			'restock' => 'restock',
 			'restock2' => 'restock2',
 		];
+
+		// Disabled sections?
+		if (empty($modSettings['Shop_enable_shop']))
+		{
+			unset($this->_subactions['search']);
+			unset($this->_subactions['search2']);
+			unset($this->_subactions['userinv']);
+			unset($this->_subactions['delete']);
+			unset($this->_subactions['restock']);
+			unset($this->_subactions['restock2']);
+		}
+		if (empty($modSettings['Shop_enable_shop']) || empty($modSettings['Shop_enable_gift']))
+		{
+			unset($this->_subactions['useritems']);
+			unset($this->_subactions['useritems2']);
+		}
+
 		$this->_sa = isset($_GET['sa'], $this->_subactions[$_GET['sa']]) ? $_GET['sa'] : 'usercredits';
 	}
 
