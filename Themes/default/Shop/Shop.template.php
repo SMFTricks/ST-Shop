@@ -16,7 +16,7 @@ function template_shop_above()
 
 	// Check for avoid errors
 	if (!empty($modSettings['Shop_enable_shop']) && !empty($modSettings['Shop_enable_maintenance']) && allowedTo('shop_canAccess') && !allowedTo('shop_canManage'))
-		return false;
+		return;
 
 	// Shop is in maintenance??
 	if (!empty($modSettings['Shop_enable_maintenance']))
@@ -31,6 +31,7 @@ function template_shop_above()
 				</dd>
 			</dl>
 		</div>
+		<br class="clear" />
 		<div class="clear"></div>';
 
 	echo '
