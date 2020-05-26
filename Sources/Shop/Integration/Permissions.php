@@ -50,13 +50,14 @@ class Permissions
 		global $modSettings;
 
 		// Shop permissions
-		$permissionGroups['membergroup'] = array_merge($permissionGroups['membergroup'], ['shop']);
+		$permissionGroups['membergroup'][] = 'shop';
 		foreach ($this->shop_permissions as $p)
 			$permissionList['membergroup'][$p] = [false,'shop'];
 
 		// Shop disabled? No permissions then
 		if (empty($modSettings['Shop_enable_shop']))
-			$hiddenPermissions = array_merge($hiddenPermissions, $this->shop_permissions);
+			foreach ($this->shop_permissions as $p)
+				$hiddenPermissions[] = $p;
 	}
 
 	/**
@@ -70,7 +71,8 @@ class Permissions
 		global $context;
 
 		// Guests do not play nicely with this mod
-		$context['non_guest_permissions'] = array_merge($context['non_guest_permissions'], $this->shop_permissions);
+		foreach ($this->shop_permissions as $permission)
+			$context['non_guest_permissions'][] = $permission;
 	}
 
 	/**

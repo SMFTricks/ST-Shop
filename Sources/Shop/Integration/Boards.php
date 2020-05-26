@@ -24,11 +24,6 @@ class Boards
 	var $_columns;
 
 	/**
-	 * @var array Will provide the board columns with prefix if needed.
-	 */
-	protected $_columns_db;
-
-	/**
 	 * Boards::__construct()
 	 *
 	 * Build our column array with the board columns
@@ -37,12 +32,12 @@ class Boards
 	{
 		// Add the columns when needed
 		$this->_columns = ['Shop_credits_count', 'Shop_credits_topic', 'Shop_credits_post', 'Shop_credits_bonus'];
-		$this->_columns_db = ['b.Shop_credits_count', 'b.Shop_credits_topic', 'b.Shop_credits_post', 'b.Shop_credits_bonus'];
 	}
 
 	public function pre_boardtree(&$boardColumns, &$boardParameters, &$boardJoins, &$boardWhere, &$boardOrder)
 	{
-		$boardColumns = array_merge($boardColumns, $this->_columns_db);
+		foreach ($this->_columns as $column)
+			$boardColumns[] = 'b.' . $column;
 	}
 
 	public function boardtree_board($row)

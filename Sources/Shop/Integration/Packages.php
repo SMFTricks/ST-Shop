@@ -24,11 +24,6 @@ class Packages
 	var $_types;
 
 	/**
-	 * @var array Will provide the typs of packages we want to add.
-	 */
-	var $_sorting;
-
-	/**
 	 * @var string Just a handy help var.
 	 */
 	var $_key;
@@ -45,10 +40,6 @@ class Packages
 			'shop_modules',
 			'shop_games',
 		];
-
-		// Sorting
-		foreach ($this->_types as $type)
-			$this->_sorting[$type] = 1;
 	}
 
 	public function package_downupload()
@@ -64,12 +55,9 @@ class Packages
 	{
 		global $context;
 
-		// Remove unknown. Sorry father.
-		if (($this->_key = array_search('unknown', $context['modification_types'])) !== false) 
-			unset($context['modification_types'][$this->_key]);
-
-		// Add my types
-		$context['modification_types'] = array_merge($context['modification_types'], array_merge($this->_types, ['unknown']));
+		// Add new types
+		foreach ($this->_types as $type)
+			$context['modification_types'][] = $type;
 
 		// Set the types
 		$context['available_shop_modules'] = [];
@@ -78,6 +66,10 @@ class Packages
 
 	public function packages_sort(&$sort_id, &$packages)
 	{
-		$sort_id = array_merge($sort_id, $this->_sorting);
+		foreach ($this->_types as $type)
+		{
+			$sort_id[$type] = 1;
+			$packages[$type] = [];
+		}
 	}
 }

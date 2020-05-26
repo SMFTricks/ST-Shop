@@ -237,7 +237,6 @@ class Categories extends Dashboard
 				'description' => sprintf(Shop::getText('cats_edit_desc'), $context['shop_category']['name']),
 			];
 		}
-
 		// Title
 		$context['page_title'] = $context[$context['admin_menu_name']]['tab_data']['title'];
 	}

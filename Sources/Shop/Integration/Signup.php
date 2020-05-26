@@ -19,8 +19,6 @@ class Signup
 	{
 		global $modSettings;
 
-		$regOptions['register_vars'] += array(
-			'shopMoney' => !empty($modSettings['Shop_credits_register']) ? $modSettings['Shop_credits_register'] : 0,
-		);
+		$regOptions['register_vars']['shopMoney'] = !empty($modSettings['Shop_credits_register']) ? $modSettings['Shop_credits_register'] : 0;
 	}
 }

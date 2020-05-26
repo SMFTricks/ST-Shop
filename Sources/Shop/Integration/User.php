@@ -90,12 +90,10 @@ class User
 	{
 		global $user_info, $user_settings;
 
-		$user_info = array_merge($user_info, [
-			'shopMoney' => isset($user_settings['shopMoney']) ? $user_settings['shopMoney'] : 0,
-			'shopBank' => isset($user_settings['shopBank']) ? $user_settings['shopBank'] : 0,
-			'shopInventory_hide' => isset($user_settings['shopInventory_hide']) ? $user_settings['shopInventory_hide'] : 0,
-			'gamesPass' => isset($user_settings['gamesPass']) ? $user_settings['gamesPass'] : 0,
-		]);
+		$user_info['shopMoney'] = isset($user_settings['shopMoney']) ? $user_settings['shopMoney'] : 0;
+		$user_info['shopBank'] = isset($user_settings['shopBank']) ? $user_settings['shopBank'] : 0;
+		$user_info['shopInventory_hide'] = isset($user_settings['shopInventory_hide']) ? $user_settings['shopInventory_hide'] : 0;
+		$user_info['gamesPass'] = isset($user_settings['gamesPass']) ? $user_settings['gamesPass'] : 0;
 	}
 
 	 /**
@@ -145,13 +143,10 @@ class User
 
 		// Set the data
 		$this->_profile = $user_profile[$user];
-
-		$data = array_merge($data, [
-			'shopMoney' => $this->_profile['shopMoney'],
-			'shopBank' => $this->_profile['shopBank'],
-			'shopInventory_hide' => $this->_profile['shopInventory_hide'],
-			'gamesPass' => $this->_profile['gamesPass'],
-		]);
+		$data['shopMoney'] = $this->_profile['shopMoney'];
+		$data['shopBank'] = $this->_profile['shopBank'];
+		$data['shopInventory_hide'] = $this->_profile['shopInventory_hide'];
+		$data['gamesPass'] = $this->_profile['gamesPass'];
 
 		// Pocket credits
 		if ($modSettings['Shop_display_pocket'] == 1 || $modSettings['Shop_display_pocket'] == 3)
