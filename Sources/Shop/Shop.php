@@ -41,10 +41,9 @@ class Shop
 
 		$defaults = [
 			'Shop_enable_shop' => 0,
-			'Shop_stats_refresh' => 900,
-			'Shop_credits_register' => 200,
-			'Shop_credits_topic' => 25,
-			'Shop_credits_post' => 10,
+			'Shop_credits_register' => 5,
+			'Shop_credits_topic' => 10,
+			'Shop_credits_post' => 2,
 			//'Shop_credits_likes_post' => 0,
 			'Shop_credits_word' => 0,
 			'Shop_credits_character' => 0,

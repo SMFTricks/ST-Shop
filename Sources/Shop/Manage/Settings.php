@@ -73,8 +73,6 @@ class Settings extends Dashboard
 				['check', 'Shop_enable_trade'],
 				['check', 'Shop_enable_stats'],
 				'',
-				['int', 'Shop_stats_refresh', 'subtext' => Shop::getText('stats_refresh_desc'), 'disabled' => empty($modSettings['Shop_enable_stats'])],
-				'',
 				['check', 'Shop_enable_maintenance', 'subtext' => Shop::getText('enable_maintenance_desc')]
 			];
 		$config_vars = array_merge($config_vars, $this->_shop_vars);
