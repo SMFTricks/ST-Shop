@@ -24,7 +24,6 @@ $txt['Shop_games_blackjack'] = 'Blackjack';
 // Games Room
 $txt['Shop_games_welcome'] = 'Welcome to the Games Room';
 $txt['Shop_games_welcome_desc'] = 'Here you can play some games and win some money, or lose it... Good luck and enjoy!<br />You currently have %d days left to play in the Games Room.';
-$txt['Shop_games_setting1'] = 'Days until games room pass expires:';
 $txt['Shop_games_list'] = 'List of games available';
 $txt['Shop_games_playgame'] = 'Play the game!';
 $txt['Shop_games_letsplay'] = 'Let\'s play ';

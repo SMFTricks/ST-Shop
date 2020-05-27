@@ -848,7 +848,7 @@
 						'file' => 'DecreasePost',
 					],
 					[
-						'name' => 'GGames Room Pass',
+						'name' => 'Games Room Pass',
 						'description' => 'Gives access to Games Room for \'x\' days',
 						'price' => 50,
 						'author' => 'Sleepy Arcade',

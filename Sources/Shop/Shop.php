@@ -325,7 +325,7 @@ class Shop
 	 *
 	 * Gets a string key, and returns the associated text string.
 	 */
-	public function getText($text, $pattern = true)
+	public static function getText($text, $pattern = true)
 	{
 		global $txt;
 
