@@ -73,7 +73,7 @@ class Logs extends Dashboard
 
 	public function main()
 	{
-		global $context, $txt, $modSettings, $sourcedir;
+		global $context, $modSettings, $sourcedir;
 
 		// Everything in here is a list, so...
 		require_once($sourcedir . '/Subs-List.php');
