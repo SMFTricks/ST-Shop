@@ -704,13 +704,11 @@
 			$smcFunc['db_insert'](
 				'ignore',
 				'{db_prefix}shop_categories',
-				// Fields
 				[
 					'name' => 'string',
 					'image' => 'string',
 					'description' => 'string',
 				],
-				// Values
 				[
 					// Default category
 					[
@@ -737,7 +735,6 @@
 			$smcFunc['db_insert'](
 				'ignore',
 				'{db_prefix}shop_items',
-				// Fields
 				[
 					'name' => 'string',
 					'image' => 'string',
@@ -748,12 +745,11 @@
 					'catid' => 'int',
 					'status' => 'int',
 				],
-				// Values
 				[
 					// Sample item
 					[
 						'name' => 'Default item',
-						'image' => 'Bear.gif',
+						'image' => 'bear.png',
 						'description' => 'The very first item of your shop',
 						'price' => 75,
 						'count' => 50,
@@ -780,7 +776,6 @@
 			$smcFunc['db_insert'](
 				'ignore',
 				'{db_prefix}shop_modules',
-				// Fields
 				[
 					'name' => 'string',
 					'description' => 'string',
@@ -793,7 +788,6 @@
 					'web' => 'string',
 					'file' => 'string',
 				],
-				// Values
 				[
 					[
 						'name' => 'Increase Post Count',
