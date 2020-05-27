@@ -75,7 +75,7 @@ class Profile
 				];
 				$temp_buttons['mytrades'] = [
 					'label' => Shop::getText('trade_mytrades'),
-					'custom_url' => $scripturl . '?action=shop;sa=mytrades',
+					'custom_url' => $scripturl . '?action=shop;sa=tradelist',
 					'file' => 'Shop/Shop-Trade.php',
 					'function' => 'ShopTrade::Profile',
 					'icon' => 'inbox',

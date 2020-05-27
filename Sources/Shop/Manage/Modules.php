@@ -20,8 +20,16 @@ if (!defined('SMF'))
 
 class Modules extends Dashboard
 {
+	/**
+	 * @var object We will create an object for the specified item if needed.
+	 */
 	private $_item_module = 'Shop\\Modules\\';
 
+	/**
+	 * Modules::__construct()
+	 *
+	 * Create the array of subactions and load necessary extra language files
+	 */
 	function __construct()
 	{
 		// Required languages

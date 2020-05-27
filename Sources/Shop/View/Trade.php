@@ -287,7 +287,9 @@ class Trade
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'inventory';
 		$context['linktree'][] = [
-			'url' => $scripturl . '?action=shop;sa=' . $_REQUEST['sa'],
+			'url' => $scripturl . '?action=shop;sa=' . $_REQUEST['sa'] . ($_REQUEST['sa'] == 'mytrades' ? '' : (!isset($_REQUEST['u']) ? '' : ';u=' . $_REQUEST['u'])),
+
+
 			'name' => ($_REQUEST['sa'] == 'mytrades' ? Shop::getText('trade_myprofile') : (!isset($_REQUEST['u']) ? Shop::getText('trade_list') : sprintf(Shop::getText('trade_profile'), $memberContext[$memID]['name']))),
 		];
 		// Sub-menu tabs
@@ -599,7 +601,7 @@ class Trade
 					'data' => [
 						'function' => function($row)
 						{
-							 return Format::image($row['image']);
+							 return Format::image($row['image'], $row['description']);
 						},
 						'style' => 'width: 10%',
 						'class' => 'centertext',

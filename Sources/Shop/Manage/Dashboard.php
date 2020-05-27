@@ -179,10 +179,6 @@ class Dashboard
 							Shop::getText('logs_admin_items'),
 							'enabled' => !empty($modSettings['Shop_enable_shop']),
 						],
-						'buy' => [
-							Shop::getText('logs_buy'),
-							'enabled' => !empty($modSettings['Shop_enable_shop'])
-						],
 						'money' => [
 							Shop::getText('logs_money'),
 							'enabled' => !empty($modSettings['Shop_enable_gift']) && !empty($modSettings['Shop_enable_shop']),
@@ -190,6 +186,10 @@ class Dashboard
 						'items' => [
 							Shop::getText('logs_items'),
 							'enabled' => !empty($modSettings['Shop_enable_gift']) && !empty($modSettings['Shop_enable_shop']),
+						],
+						'buy' => [
+							Shop::getText('logs_buy'),
+							'enabled' => !empty($modSettings['Shop_enable_shop'])
 						],
 						'trade' => [
 							Shop::getText('logs_trade'),

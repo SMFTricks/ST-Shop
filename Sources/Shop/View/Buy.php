@@ -99,7 +99,7 @@ class Buy
 					'data' => [
 						'function' => function($row)
 						{
-							return Format::image($row['image']);
+							return Format::image($row['image'], $row['name']);
 						},
 						'style' => 'width: 10%',
 						'class' => 'centertext',

@@ -59,6 +59,7 @@ $txt['Shop_dp_success'] = 'Successfully decreased <i>%1$s</i>\'s posts by <stron
 // Games Pass
 $txt['Shop_gp_name'] = 'Games Room Pass';
 $txt['Shop_gp_desc'] = 'Gives access to Games Room for \'x\' days';
+$txt['Shop_gp_success'] = 'Successfully set Games Room Pass to expire in %d days!';
 // Increase Total Time Logged In
 $txt['Shop_itli_name'] = 'Increase Total Time logged In';
 $txt['Shop_itli_desc'] = 'Increase your total time logged in by \'x\' hours';

@@ -18,8 +18,16 @@ if (!defined('SMF'))
 
 class Settings extends Dashboard
 {
+	/**
+	 * @var array Settings that are shop related only.
+	 */
 	var $_shop_vars = [];
 
+	/**
+	 * Settings::__construct()
+	 *
+	 * Create the array of subactions and load necessary extra language files
+	 */
 	function __construct()
 	{
 		// Array of sections

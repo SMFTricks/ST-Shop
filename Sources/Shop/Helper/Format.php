@@ -54,7 +54,7 @@ class Format
 		// Item images...
 		self::$items_url = $boardurl . Shop::$itemsdir;
 
-		$formatname = '<img' .(!empty($class) ? ' class="'.$class.'" id="'.$class.'"' : ''). ' src="'. self::$items_url . $image. '" alt="'.$description.'" title="'.$description.'" width="'.$modSettings['Shop_images_width'].'" height="'.$modSettings['Shop_images_height'].'" style="vertical-align: middle;" />';
+		$formatname = '<img' . (!empty($class) ? ' class="' . $class . '" id="' . $class . '"' : ''). ' src="' . self::$items_url . $image . '" alt="' . $description . '" title="' . $description . '" width="' . $modSettings['Shop_images_width'] . '" height="' . $modSettings['Shop_images_height'] . '" style="vertical-align: middle;" />';
 
 		return $formatname;
 	}

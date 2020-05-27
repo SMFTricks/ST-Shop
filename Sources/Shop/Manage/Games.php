@@ -18,6 +18,11 @@ if (!defined('SMF'))
 
 class Games extends Dashboard
 {
+	/**
+	 * Games::__construct()
+	 *
+	 * Create the array of subactions and load necessary extra language files
+	 */
 	function __construct()
 	{
 		// Load Games language

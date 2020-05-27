@@ -454,7 +454,7 @@ function template_send_above()
 {
 	global $txt, $scripturl;
 
-	$_REQUEST['sa'] = isset($_REQUEST['sa']) && !empty($_REQUEST['sa']) ? $_REQUEST['sa'] : 'groupcredits';
+	$_REQUEST['sa'] = isset($_REQUEST['sa']) && !empty($_REQUEST['sa']) ? $_REQUEST['sa'] : 'usercredits';
 
 	// Updated message
 	if (isset($_REQUEST['updated']))

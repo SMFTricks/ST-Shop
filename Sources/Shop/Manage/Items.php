@@ -37,6 +37,11 @@ class Items extends Dashboard
 	 */
 	private $_item_module = 'Shop\\Modules\\';
 
+	/**
+	 * Items::__construct()
+	 *
+	 * Create the array of subactions and load necessary extra language files
+	 */
 	function __construct()
 	{
 		// Required languages

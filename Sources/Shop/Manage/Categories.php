@@ -21,6 +21,11 @@ if (!defined('SMF'))
 
 class Categories extends Dashboard
 {
+	/**
+	 * Categories::__construct()
+	 *
+	 * Create the array of subactions and load necessary extra language files
+	 */
 	function __construct()
 	{
 		// Required languages

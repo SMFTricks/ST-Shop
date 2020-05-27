@@ -32,6 +32,11 @@ class Inventory extends Dashboard
 	 */
 	private $_log;
 
+	/**
+	 * Inventory::__construct()
+	 *
+	 * Create the array of subactions and load necessary extra language files
+	 */
 	function __construct()
 	{
 		// Notify
@@ -190,7 +195,7 @@ class Inventory extends Dashboard
 
 				// Deploy alert?
 				if (!empty($modSettings['Shop_noty_credits']))
-					$this->_notify->alert($members, 'credits', $user_info['id'], ['item_icon' => 'top_money_r', 'amount' => Format::cash($amount)]);
+					$this->_notify->alert($members, 'credits', $user_info['id'], ['item_icon' => 'money_received', 'amount' => Format::cash($amount)]);
 
 				// Redirect to a nice message of success
 				redirectexit('action=admin;area=shopinventory;sa=usercredits;updated');
@@ -259,7 +264,7 @@ class Inventory extends Dashboard
 
 			// Deploy alert?
 			if (!empty($modSettings['Shop_noty_credits']))
-				$this->_notify->alert($members, 'credits', $user_info['id'], ['item_icon' => 'top_money_r', 'amount' => Format::cash($amount)]);
+				$this->_notify->alert($members, 'credits', $user_info['id'], ['item_icon' => 'money_received', 'amount' => Format::cash($amount)]);
 
 			// Redirect to a nice message of successful
 			redirectexit('action=admin;area=shopinventory;sa=groupcredits;success');
