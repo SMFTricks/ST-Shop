@@ -26,7 +26,7 @@ class Format
 	 * @param $formal It will put the suffix at the beginning if enabled
 	 * @return string A text containing the specified money/string with format
 	 */
-	public static function cash($money, $formal = false)
+	public function cash($money, $formal = false)
 	{
 		global $modSettings;
 
@@ -47,7 +47,7 @@ class Format
 	 * @param $class Optional parameter for including class and id
 	 * @return string A formatted image
 	 */
-	public static function image($image, $description = '', $class = '')
+	public function image($image, $description = '', $class = '')
 	{
 		global $modSettings, $boardurl;
 
@@ -66,7 +66,7 @@ class Format
 	 * @param $days The days the user has on his subscription to the gamespass
 	 * @return string Days left of gamespass
 	 */
-	public static function gamespass($days)
+	public function gamespass($days)
 	{
 		return round((($days - time()) / 86400));
 	}
