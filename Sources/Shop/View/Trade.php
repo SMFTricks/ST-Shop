@@ -167,7 +167,7 @@ class Trade
 	{
 		global $context, $scripturl;
 
-		// Check if he is allowed to access this section
+		// Check if user is allowed to access this section
 		if (!allowedTo('shop_canManage'))
 			isAllowedTo('shop_viewInventory');
 
@@ -203,7 +203,7 @@ class Trade
 	{
 		global $context, $scripturl;
 
-		// Check if he is allowed to access this section
+		// Check if user is allowed to access this section
 		if (!allowedTo('shop_canManage'))
 			isAllowedTo('shop_viewInventory');
 

@@ -132,7 +132,7 @@ class Gift
 		}
 
 		// Load suggest.js
-		loadJavaScriptFile('suggest.js', array('default_theme' => true, 'defer' => false, 'minimize' => true), 'smf_suggest');
+		loadJavaScriptFile('suggest.js', ['default_theme' => true, 'defer' => false, 'minimize' => true], 'smf_suggest');
 	}
 
 	public function tabs()

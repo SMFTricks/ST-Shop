@@ -49,7 +49,7 @@ class Alerts extends SMF_BackgroundTask
 
 		// User is on that group, let's remove it
 		if (in_array($author['id_member'], $members))
-			$members = array_diff($members, array($author['id_member']));
+			$members = array_diff($members, [$author['id_member']]);
 
 		// We had any luck?
 		if (empty($members))

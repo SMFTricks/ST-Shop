@@ -70,7 +70,7 @@ class ChangeUserTitle extends Module
 		$this->_title = Database::sanitize($_REQUEST['newtitle']);
 
 		// Update the information
-		updateMemberData($user_info['id'], array('usertitle' => $this->_title));
+		updateMemberData($user_info['id'], ['usertitle' => $this->_title]);
 
 		return '
 			<div class="infobox">

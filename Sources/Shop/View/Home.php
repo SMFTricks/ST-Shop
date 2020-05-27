@@ -95,7 +95,7 @@ class Home
 		$this->_sa = isset($_GET['sa'], $this->_actions[$_GET['sa']]) ? $_GET['sa'] : 'home';
 
 		// More sections?
-		call_integration_hook('integrate_shop_home_actions', array(&$this->_actions, &$this->_sa));
+		call_integration_hook('integrate_shop_home_actions', [&$this->_actions, &$this->_sa]);
 	}
 
 	public function tabs()
@@ -160,10 +160,10 @@ class Home
 
 		// Set all the page stuff
 		$context['page_title'] = Shop::getText('main_button');
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'url' => $scripturl . '?action=shop',
 			'name' => Shop::getText('main_button'),
-		);
+		];
 
 		// What if the Shop is disabled? User shouldn't be able to access the Shop
 		if (empty($modSettings['Shop_enable_shop']))
@@ -197,10 +197,10 @@ class Home
 		// Set all the page stuff
 		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('main_home');
 		$context['sub_template'] = 'home';
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'url' => $scripturl . '?action=shop;sa=home',
 			'name' => Shop::getText('main_home'),
-		);
+		];
 
 		// Forum name + Shop
 		$context['shop']['forum_welcome'] = sprintf(Shop::getText('welcome_to'), $context['forum_name']);

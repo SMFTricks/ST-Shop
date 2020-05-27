@@ -130,7 +130,7 @@ class DecreasePostCount extends Module
 				fatal_error(Shop::getText('cot_dp_yourself'), false);
 
 			// Update post count
-			updateMemberData($memResult['id_member'], array('posts' => ($memResult['posts'] - $this->item_info[1])));
+			updateMemberData($memResult['id_member'], ['posts' => ($memResult['posts'] - $this->item_info[1])]);
 
 			return '
 				<div class="infobox">

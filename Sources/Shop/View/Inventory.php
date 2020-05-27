@@ -305,17 +305,17 @@ class Inventory
 		$context['template_layers'][] = 'options';
 		$context['template_layers'][] = 'shop_inventory_search';
 		$context['sub_template'] = 'shop_inventory_search';
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'url' => $scripturl . '?action=shop;sa=search',
 			'name' => Shop::getText('inventory_search_i'),
-		);
+		];
 		// Sub-menu tabs
 		$context['section_tabs'] = $this->_tabs;
 		// Form
 		$context['form_url'] = '?action=shop;sa=search2';
 
 		// Load suggest.js
-		loadJavaScriptFile('suggest.js', array('default_theme' => true, 'defer' => false, 'minimize' => true), 'smf_suggest');
+		loadJavaScriptFile('suggest.js', ['default_theme' => true, 'defer' => false, 'minimize' => true], 'smf_suggest');
 	}
 
 	public function search_inventory()
@@ -327,10 +327,10 @@ class Inventory
 
 		// Improve it's look just for the shop action
 		if ($_REQUEST['action'] == 'shop')
-			$context['linktree'][] = array(
+			$context['linktree'][] = [
 				'url' => $scripturl . '?action=shop;sa='. $_REQUEST['sa'],
 				'name' => Shop::getText('inventory_search_i'),
-			);
+			];
 
 		checkSession();
 		$member_query = [];
@@ -421,7 +421,7 @@ class Inventory
 		$context['shop']['use']['input'] = $itemModel->getUseInput();
 
 		// Load suggest.js for special cases
-		loadJavaScriptFile('suggest.js', array('default_theme' => true, 'defer' => false, 'minimize' => true), 'smf_suggest');
+		loadJavaScriptFile('suggest.js', ['default_theme' => true, 'defer' => false, 'minimize' => true], 'smf_suggest');
 	}
 
 	public function used()

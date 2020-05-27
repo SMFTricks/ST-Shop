@@ -275,7 +275,7 @@ class Inventory extends Dashboard
 	{
 		global $context;
 
-		// Check if he is allowed to access this section
+		// Check if user is allowed to access this section
 		if (!allowedTo('shop_canManage'))
 			isAllowedTo('shop_viewInventory');
 
@@ -558,7 +558,7 @@ class Inventory extends Dashboard
 		$context['page_title'] =  Shop::getText('tab_inventory') . ' - '. Shop::getText('inventory_restock');
 		$context[$context['admin_menu_name']]['current_subsection'] = 'restock';
 
-		// If he selected some specific items, we should have at least one...
+		// If user selected some specific items, we should have at least one...
 		if (($_REQUEST['whatitems'] == 'selected') && (!isset($_REQUEST['restockitem']) || empty($_REQUEST['restockitem'])))
 			fatal_error(Shop::getText('restock_error_noitems'), false);
 

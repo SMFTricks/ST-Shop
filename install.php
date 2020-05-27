@@ -58,561 +58,561 @@
 		$smcFunc['db_insert'](
 			'ignore',
 			'{db_prefix}scheduled_tasks',
-			array(
+			[
 				'time_offset' => 'int',
 				'time_regularity' => 'int',
 				'time_unit' => 'string',
 				'disabled' => 'int',
 				'task' => 'string',
 				'callable' => 'string',
-			),
-			array(
-				array(
+			],
+			[
+				[
 					'0',
 					'1',
 					'd',
 					'0',
 					'shop_bank_interest',
 					'Shop\Tasks\Scheduled::bank_interest#',
-				),
-			),
-			array('')
+				],
+			],
+			['']
 		);
 
 		// Shop items
-		$tables[] = array(
+		$tables[] = [
 			'table_name' => '{db_prefix}shop_items',
-			'columns' => array(
-				array(
+			'columns' => [
+				[
 					'name' => 'itemid',
 					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'name',
 					'type' => 'varchar',
 					'size' => 50,
 					'null' => false,
-				),	
-				array(
+				],	
+				[
 					'name' => 'image',
 					'type' => 'tinytext',
 					'null' => true,
-				),
-				array(
+				],
+				[
 					'name' => 'description',
 					'type' => 'varchar',
 					'size' => 255,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'price',
 					'type' => 'int',
 					'null' => false,
 					'default' => 0,
-				),
-				array(
+				],
+				[
 					'name' => 'stock',
 					'type' => 'smallint',
 					'null' => false,
 					'default' => 0,
-				),
-				array(
+				],
+				[
 					'name' => 'module',
 					'type' => 'tinyint',
 					'null' => false,
 					'size' => 10,
 					'default' => 0,
-				),
-				array(
+				],
+				[
 					'name' => 'info1',
 					'type' => 'int',
 					'null' => true,
-				),
-				array(
+				],
+				[
 					'name' => 'info2',
 					'type' => 'int',
 					'null' => true,
-				),
-				array(
+				],
+				[
 					'name' => 'info3',
 					'type' => 'int',
 					'null' => true,
-				),
-				array(
+				],
+				[
 					'name' => 'info4',
 					'type' => 'int',
 					'null' => true,
-				),
-				array(
+				],
+				[
 					'name' => 'input_needed',
 					'type' => 'tinyint',
 					'size' => 1,
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'can_use_item',
 					'type' => 'tinyint',
 					'size' => 1,
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'delete_after_use',
 					'type' => 'tinyint',
 					'size' => 1,
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'catid',
 					'type' => 'int',
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'status',
 					'type' => 'smallint',
 					'default' => 1,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'itemlimit',
 					'type' => 'int',
 					'default' => 0,
 					'null' => false,
-				),
-			),
-			'indexes' => array(
-				array(
+				],
+			],
+			'indexes' => [
+				[
 					'type' => 'primary',
-					'columns' => array('itemid'),
-				),
-			),
+					'columns' => ['itemid'],
+				],
+			],
 			'if_exists' => 'ignore',
 			'error' => 'fatal',
-			'parameters' => array(),
-		);
+			'parameters' => [],
+		];
 		// Shop modules
-		$tables[] = array(
+		$tables[] = [
 			'table_name' => '{db_prefix}shop_modules',
-			'columns' => array(
-				array(
+			'columns' => [
+				[
 					'name' => 'id',
 					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'name',
 					'type' => 'varchar',
 					'size' => 50,
 					'null' => false,
-				),	
-				array(
+				],	
+				[
 					'name' => 'description',
 					'type' => 'varchar',
 					'size' => 255,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'price',
 					'type' => 'int',
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'author',
 					'type' => 'varchar',
 					'size' => 80,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'email',
 					'type' => 'varchar',
 					'size' => 255,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'require_input',
 					'type' => 'tinyint',
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'can_use_item',
 					'type' => 'tinyint',
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'editable_input',
 					'type' => 'tinyint',
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'web',
 					'type' => 'varchar',
 					'size' => 255,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'file',
 					'type' => 'tinytext',
 					'null' => false,
-				),
-			),
-			'indexes' => array(
-				array(
+				],
+			],
+			'indexes' => [
+				[
 					'type' => 'primary',
-					'columns' => array('id'),
-				),
-			),
+					'columns' => ['id'],
+				],
+			],
 			'if_exists' => 'ignore',
 			'error' => 'fatal',
-			'parameters' => array(),
-		);
+			'parameters' => [],
+		];
 		// User inventory
-		$tables[] = array(
+		$tables[] = [
 			'table_name' => '{db_prefix}shop_inventory',
-			'columns' => array(
-				array(
+			'columns' => [
+				[
 					'name' => 'id',
 					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'userid',
 					'type' => 'int',
 					'size' => 10,
 					'null' => false,
-				),	
-				array(
+				],	
+				[
 					'name' => 'itemid',
 					'type' => 'int',
 					'size' => 10,
-				),
-				array(
+				],
+				[
 					'name' => 'trading',
 					'type' => 'tinyint',
 					'size' => 1,
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'tradecost',
 					'type' => 'int',
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'date',
 					'type' => 'int',
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'tradedate',
 					'type' => 'int',
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'fav',
 					'type' => 'int',
 					'default' => 0,
 					'null' => false,
-				),
-			),
-			'indexes' => array(
-				array(
+				],
+			],
+			'indexes' => [
+				[
 					'type' => 'primary',
-					'columns' => array('id'),
-				),
-			),
+					'columns' => ['id'],
+				],
+			],
 			'if_exists' => 'ignore',
 			'error' => 'fatal',
-			'parameters' => array(),
-		);
+			'parameters' => [],
+		];
 		// Shop Categories
-		$tables[] = array(
+		$tables[] = [
 			'table_name' => '{db_prefix}shop_categories',
-			'columns' => array(
-				array(
+			'columns' => [
+				[
 					'name' => 'catid',
 					'type' => 'smallint',
 					'size' => 5,
 					'auto' => true,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'name',
 					'type' => 'varchar',
 					'size' => 50,
 					'null' => false,
-				),	
-				array(
+				],	
+				[
 					'name' => 'image',
 					'type' => 'tinytext',
 					'null' => true,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'description',
 					'type' => 'varchar',
 					'size' => 255,
 					'null' => false,
-				),
-			),
-			'indexes' => array(
-				array(
+				],
+			],
+			'indexes' => [
+				[
 					'type' => 'primary',
-					'columns' => array('catid'),
-				),
-			),
+					'columns' => ['catid'],
+				],
+			],
 			'if_exists' => 'ignore',
 			'error' => 'fatal',
-			'parameters' => array(),
-		);
+			'parameters' => [],
+		];
 		// Shop logs
-		$tables[] = array(
+		$tables[] = [
 			'table_name' => '{db_prefix}shop_log_buy',
-			'columns' => array(
-				array(
+			'columns' => [
+				[
 					'name' => 'id',
 					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'itemid',
 					'type' => 'int',
 					'size' => 10,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'invid',
 					'type' => 'int',
 					'size' => 10,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'userid',
 					'type' => 'int',
 					'size' => 10,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'sellerid',
 					'type' => 'int',
 					'size' => 10,
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'amount',
 					'type' => 'int',
 					'size' => 10,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'fee',
 					'type' => 'int',
 					'size' => 10,
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'date',
 					'type' => 'int',
 					'null' => false,
-				),
-			),
-			'indexes' => array(
-				array(
+				],
+			],
+			'indexes' => [
+				[
 					'type' => 'primary',
-					'columns' => array('id'),
-				),
-			),
+					'columns' => ['id'],
+				],
+			],
 			'if_exists' => 'ignore',
 			'error' => 'fatal',
-			'parameters' => array(),
-		);
-		$tables[] = array(
+			'parameters' => [],
+		];
+		$tables[] = [
 			'table_name' => '{db_prefix}shop_log_gift',
-			'columns' => array(
-				array(
+			'columns' => [
+				[
 					'name' => 'id',
 					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'userid',
 					'type' => 'int',
 					'size' => 10,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'receiver',
 					'type' => 'int',
 					'size' => 10,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'amount',
 					'type' => 'int',
 					'size' => 10,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'itemid',
 					'type' => 'int',
 					'size' => 10,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'invid',
 					'type' => 'int',
 					'size' => 10,
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'message',
 					'type' => 'varchar',
 					'size' => 255,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'is_admin',
 					'type' => 'tinyint',
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'date',
 					'type' => 'int',
 					'null' => false,
-				),
-			),
-			'indexes' => array(
-				array(
+				],
+			],
+			'indexes' => [
+				[
 					'type' => 'primary',
-					'columns' => array('id'),
-				),
-			),
+					'columns' => ['id'],
+				],
+			],
 			'if_exists' => 'ignore',
 			'error' => 'fatal',
-			'parameters' => array(),
-		);
-		$tables[] = array(
+			'parameters' => [],
+		];
+		$tables[] = [
 			'table_name' => '{db_prefix}shop_log_bank',
-			'columns' => array(
-				array(
+			'columns' => [
+				[
 					'name' => 'id',
 					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'userid',
 					'type' => 'int',
 					'size' => 10,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'amount',
 					'type' => 'int',
 					'size' => 10,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'fee',
 					'type' => 'int',
 					'size' => 10,
 					'default' => 0,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'action',
 					'type' => 'tinytext',
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'type',
 					'type' => 'smallint',
 					'size' => 10,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'date',
 					'type' => 'int',
 					'null' => false,
-				),
-			),
-			'indexes' => array(
-				array(
+				],
+			],
+			'indexes' => [
+				[
 					'type' => 'primary',
-					'columns' => array('id'),
-				),
-			),
+					'columns' => ['id'],
+				],
+			],
 			'if_exists' => 'ignore',
 			'error' => 'fatal',
-			'parameters' => array(),
-		);
-		$tables[] = array(
+			'parameters' => [],
+		];
+		$tables[] = [
 			'table_name' => '{db_prefix}shop_log_games',
-			'columns' => array(
-				array(
+			'columns' => [
+				[
 					'name' => 'id',
 					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'userid',
 					'type' => 'int',
 					'size' => 10,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'amount',
 					'type' => 'int',
 					'size' => 10,
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'game',
 					'type' => 'tinytext',
 					'null' => false,
-				),
-				array(
+				],
+				[
 					'name' => 'date',
 					'type' => 'int',
 					'null' => false,
-				),
-			),
-			'indexes' => array(
-				array(
+				],
+			],
+			'indexes' => [
+				[
 					'type' => 'primary',
-					'columns' => array('id'),
-				),
-			),
+					'columns' => ['id'],
+				],
+			],
 			'if_exists' => 'ignore',
 			'error' => 'fatal',
-			'parameters' => array(),
-		);
+			'parameters' => [],
+		];
 
 		// Installing
 		foreach ($tables as $table)
@@ -622,79 +622,79 @@
 		// Add some columns for board options
 		$smcFunc['db_add_column'](
 			'{db_prefix}boards', 
-			array(
+			[
 				'name' => 'Shop_credits_count',
 				'type' => 'tinyint',
 				'default' => 1,
-			)
+			]
 		);
 		$smcFunc['db_add_column'](
 			'{db_prefix}boards', 
-			array(
+			[
 				'name' => 'Shop_credits_topic',
 				'type' => 'int',
 				'default' => 0,
-			)
+			]
 		);
 		$smcFunc['db_add_column'](
 			'{db_prefix}boards', 
-			array(
+			[
 				'name' => 'Shop_credits_post',
 				'type' => 'int',
 				'default' => 0,
-			)
+			]
 		);
 		$smcFunc['db_add_column'](
 			'{db_prefix}boards', 
-			array(
+			[
 				'name' => 'Shop_credits_bonus',
 				'type' => 'tinyint',
 				'default' => 0,
-			)
+			]
 		);
 
 		// Add a column for money
 		$smcFunc['db_add_column'](
 			'{db_prefix}members', 
-			array(
+			[
 				'name' => 'shopMoney',
 				'type' => 'int',
 				'default' => 0,
-			)
+			]
 		);
 		// Add a column for banked money
 		$smcFunc['db_add_column'](
 			'{db_prefix}members', 
-			array(
+			[
 				'name' => 'shopBank',
 				'type' => 'bigint',
 				'default' => 0,
-			)
+			]
 		);
 		// Add a column for hide inventory
 		$smcFunc['db_add_column'](
 			'{db_prefix}members',
-			array(
+			[
 				'name' => 'shopInventory_hide',
 				'type' => 'int',
 				'default' => 0,
-			)
+			]
 		);
 		// Add a column for games pass
 		$smcFunc['db_add_column'](
 			'{db_prefix}members', 
-			array(
+			[
 				'name' => 'gamesPass',
 				'type' => 'int',
 				'default' => 0,
-			)
+			]
 		);
 
 		// Check for any categories, or create a 'default' category
 		$categories = $smcFunc['db_query']('', '
 			SELECT catid
 			FROM {db_prefix}shop_categories',
-			array()
+			[]
 		);
 		$has_categories = $smcFunc['db_num_rows']($categories);
 		$smcFunc['db_free_result']($categories);
@@ -705,21 +705,21 @@
 				'ignore',
 				'{db_prefix}shop_categories',
 				// Fields
-				array(
+				[
 					'name' => 'string',
 					'image' => 'string',
 					'description' => 'string',
-				),
+				],
 				// Values
-				array(
+				[
 					// Default category
-					array(
+					[
 						'Default',
 						'Boardarrow.gif',
 						'This is the default category'
-					),
-				),
-				array()
+					],
+				],
+				[]
 			);
 		}
 
@@ -727,7 +727,7 @@
 		$items = $smcFunc['db_query']('', '
 			SELECT itemid
 			FROM {db_prefix}shop_items',
-			array()
+			[]
 		);
 		$has_items = $smcFunc['db_num_rows']($items);
 		$smcFunc['db_free_result']($items);
@@ -738,7 +738,7 @@
 				'ignore',
 				'{db_prefix}shop_items',
 				// Fields
-				array(
+				[
 					'name' => 'string',
 					'image' => 'string',
 					'description' => 'string',
@@ -747,11 +747,11 @@
 					'function' => 'string',
 					'catid' => 'int',
 					'status' => 'int',
-				),
+				],
 				// Values
-				array(
+				[
 					// Sample item
-					array(
+					[
 						'name' => 'Default item',
 						'image' => 'Bear.gif',
 						'description' => 'The very first item of your shop',
@@ -760,9 +760,9 @@
 						'function' => 'Default',
 						'catid' => 1,
 						'status' => 1,
-					),
-				),
-				array()
+					],
+				],
+				[]
 			);
 		}
 
@@ -770,7 +770,7 @@
 		$modules = $smcFunc['db_query']('', '
 			SELECT id
 			FROM {db_prefix}shop_modules',
-			array()
+			[]
 		);
 		$has_modules = $smcFunc['db_num_rows']($modules);
 		$smcFunc['db_free_result']($modules);
@@ -781,7 +781,7 @@
 				'ignore',
 				'{db_prefix}shop_modules',
 				// Fields
-				array(
+				[
 					'name' => 'string',
 					'description' => 'string',
 					'price' => 'int',
@@ -792,10 +792,10 @@
 					'editable_input' => 'int',
 					'web' => 'string',
 					'file' => 'string',
-				),
+				],
 				// Values
-				array(
-					array(
+				[
+					[
 						'name' => 'Increase Post Count',
 						'description' => 'Increase the post count by \'x\'',
 						'price' => 50,
@@ -806,8 +806,8 @@
 						'can_use' => 1,
 						'web' => 'https://github.com/Daniel15',
 						'file' => 'IncreasePostCount',
-					),
-					array(
+					],
+					[
 						'name' => 'Change Display Name',
 						'description' => 'Change your display name',
 						'price' => 50,
@@ -818,8 +818,8 @@
 						'can_use' => 1,
 						'web' => 'https://github.com/Daniel15',
 						'file' => 'ChangeDisplayName',
-					),
-					array(
+					],
+					[
 						'name' => 'Random Money',
 						'description' => 'Get a random amount of money betwen \'x\' and \'y\'',
 						'price' => 75,
@@ -830,8 +830,8 @@
 						'can_use' => 1,
 						'web' => 'https://github.com/Daniel15',
 						'file' => 'RandomMoney',
-					),
-					array(
+					],
+					[
 						'name' => 'Steal Credits',
 						'description' => 'Attempt to steal from another member',
 						'price' => 50,
@@ -842,8 +842,8 @@
 						'can_use' => 1,
 						'web' => 'https://smftricks.com',
 						'file' => 'Steal',
-					),
-					array(
+					],
+					[
 						'name' => 'Decrease Posts by xxx',
 						'description' => 'Decrease <i>Someone else\'s</i> post count by xxx!!',
 						'price' => 200,
@@ -854,8 +854,8 @@
 						'can_use' => 1,
 						'web' => 'https://github.com/Daniel15',
 						'file' => 'DecreasePost',
-					),
-					array(
+					],
+					[
 						'name' => 'GGames Room Pass',
 						'description' => 'Gives access to Games Room for \'x\' days',
 						'price' => 50,
@@ -866,8 +866,8 @@
 						'can_use' => 1,
 						'web' => 'https://www.simplemachines.org/community/index.php?action=profile;u=84438',
 						'file' => 'GamesPass',
-					),
-					array(
+					],
+					[
 						'name' => 'Increase Total Time logged In',
 						'description' => 'Increase your total time logged in by \'x\' hours',
 						'price' => 50,
@@ -878,8 +878,8 @@
 						'can_use' => 1,
 						'web' => 'https://github.com/Daniel15',
 						'file' => 'IncreaseTimeLoggedIn',
-					),
-					array(
+					],
+					[
 						'name' => 'Sticky Topic',
 						'description' => 'Make any one of your topics a sticky',
 						'price' => 400,
@@ -890,8 +890,8 @@
 						'can_use' => 1,
 						'web' => 'https://smftricks.com',
 						'file' => 'StickyTopic',
-					),
-					array(
+					],
+					[
 						'name' => 'Change User Title',
 						'description' => 'Allows you to change your title',
 						'price' => 50,
@@ -902,8 +902,8 @@
 						'can_use' => 1,
 						'web' => 'https://github.com/Daniel15',
 						'file' => 'ChangeUserTitle',
-					),
-					array(
+					],
+					[
 						'name' => 'Change Username',
 						'description' => 'Change your username',
 						'price' => 50,
@@ -914,8 +914,8 @@
 						'can_use' => 1,
 						'web' => 'https://github.com/Daniel15',
 						'file' => 'ChangeUsername',
-					),
-					array(
+					],
+					[
 						'name' => 'Change Someone Else\'s Title',
 						'description' => 'Allows you to change someone else\'s title',
 						'price' => 200,
@@ -926,8 +926,8 @@
 						'can_use' => 1,
 						'web' => 'https://smftricks.com',
 						'file' => 'ChangeOtherTitle',
-					),
-				),
+					],
+				],
 				[]
 			);
 

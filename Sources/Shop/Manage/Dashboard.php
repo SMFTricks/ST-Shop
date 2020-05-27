@@ -208,7 +208,7 @@ class Dashboard
 			],
 		];
 		// Add more sections?
-		call_integration_hook('integrate_shop_admin_areas', array(&$admin_areas['shop']['areas']));
+		call_integration_hook('integrate_shop_admin_areas', [&$admin_areas['shop']['areas']]);
 	}
 
 	public function main()
@@ -221,11 +221,10 @@ class Dashboard
 		// Set all the page stuff
 		$context['page_title'] = Shop::getText('admin_button') . ' - '. Shop::getText('tab_info');
 		$context['sub_template'] = 'dashboard';
-		$context[$context['admin_menu_name']]['tab_data'] = array(
+		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => $context['page_title'],
 			'description' => sprintf(Shop::getText('tab_info_desc'), $user_info['name']),
-		);
-
+		];
 		$context['Shop']['version'] = Shop::$version;
 		$context['Shop']['support'] = Shop::$supportSite;
 		$context['Shop']['credits'] = $this->credits();

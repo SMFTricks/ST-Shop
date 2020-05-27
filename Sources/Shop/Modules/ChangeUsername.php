@@ -90,7 +90,7 @@ class ChangeUsername extends Module
 		}
 
 		// Update the username
-		updateMemberData($user_info['id'], array('member_name' => $this->_username));
+		updateMemberData($user_info['id'], ['member_name' => $this->_username]);
 
 		return '
 			<div class="infobox">

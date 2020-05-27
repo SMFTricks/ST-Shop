@@ -172,8 +172,8 @@ $txt['Shop_gift_money_sent'] = 'The ' . (!empty($modSettings['Shop_credits_suffi
 $txt['Shop_gift_message'] = 'Message to send to the member';
 $txt['Shop_gift_message_desc'] = 'User will still receive a notification, but you can leave the box blank.';
 $txt['Shop_gift_notification_subject'] = 'You have received a gift.';
-$txt['Shop_gift_notification_message1'] = '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has sent you an item! He has gifted you the item %3$s.' . "\n" . 'If they left an additional message, will be shown below.' . "\n\n" . '%4$s' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
-$txt['Shop_gift_notification_message2'] = '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has sent you %3$s! He has gifted you [i]%4$s[/i].' . "\n" . 'You now have %5$s' . "\n" . 'If they left an additional message, will be shown below.' . "\n\n" . '%6$s' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
+$txt['Shop_gift_notification_message1'] = '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has sent you an item! They have gifted you the item %3$s.' . "\n" . 'If they left an additional message, will be shown below.' . "\n\n" . '%4$s' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
+$txt['Shop_gift_notification_message2'] = '[url=' . $scripturl . '?action=profile;u=%1$d]%2$s[/url] has sent you %3$s! They have  gifted you [i]%4$s[/i].' . "\n" . 'You now have %5$s' . "\n" . 'If they left an additional message, will be shown below.' . "\n\n" . '%6$s' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
 
 // Stats
 $txt['Shop_stats_desc'] = 'Welcome to the Stats site, here you can keep track of the most relevant information about the Shop';

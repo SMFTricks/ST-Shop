@@ -75,11 +75,11 @@ class IncreaseTimeLoggedIn extends Module
 
 		checkSession();
 
-		// Add the time to his current total
+		// Add the time to their current total
 		$this->_time = (int) ($user_info['total_time_logged_in'] + ($this->item_info[1] * $this->_day));
 
 		// Update total time logged in
-		updateMemberData($user_info['id'], array('total_time_logged_in' => $this->_time));
+		updateMemberData($user_info['id'], ['total_time_logged_in' => $this->_time]);
 		
 		return '
 			<div class="infobox">

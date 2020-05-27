@@ -468,10 +468,10 @@ class Items extends Dashboard
 
 		// Set all the page stuff
 		$context['page_title'] = Shop::getText('tab_items') . ' - '. Shop::getText('items_delete');
-		$context[$context['admin_menu_name']]['tab_data'] = array(
+		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => $context['page_title'],
 			'description' => Shop::getText('items_delete_desc'),
-		);
+		];
 		$context['sub_template'] = 'delete';
 		$context['delete_description'] = Shop::getText('item_delete_also');
 
@@ -549,7 +549,7 @@ class Items extends Dashboard
 			// Get the filesize
 			$filesize = $_FILES['newitem']['size'];
 			// Filename Member Id + Day + Month + Year + 24 hour, Minute Seconds
-			$extensions = array(
+			$extensions = [
 				1 => 'gif',
 				2 => 'jpeg',
 				3 => 'png',
@@ -558,7 +558,7 @@ class Items extends Dashboard
 				8 => 'tiff',
 				9 => 'jpeg',
 				14 => 'iff',
-			);
+			];
 			$extension = isset($extensions[$sizes[2]]) ? $extensions[$sizes[2]] : '.bmp';
 			$filename = basename($_FILES['newitem']['name']);
 			$target_file = $boarddir.Shop::$itemsdir.$filename;

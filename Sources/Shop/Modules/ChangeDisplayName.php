@@ -112,7 +112,7 @@ class ChangeDisplayName extends Module
 		}
 
 		// Update the display name
-		updateMemberData($user_info['id'], array('real_name' => $this->display_name));
+		updateMemberData($user_info['id'], ['real_name' => $this->display_name]);
 
 		return '
 			<div class="infobox">

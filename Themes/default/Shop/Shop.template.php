@@ -537,7 +537,7 @@ function template_stats()
 	// Store Stats
 	foreach ($context['stats_blocks'] as $stat => $block)
 	{
-		// Check if he has enough privileges to show him this information
+		// Check if user has enough privileges to show them this information
 		if (empty($block['enabled']))
 			continue;
 

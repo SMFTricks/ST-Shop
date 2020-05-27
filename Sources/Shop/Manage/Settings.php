@@ -148,20 +148,20 @@ class Settings extends Dashboard
 		$context[$context['admin_menu_name']]['tab_data']['title'] = $context['page_title'];
 
 		// Shop do not play nice with guests. Permissions are already hidden for them, let's exterminate any hint of them in this section.
-		$context['permissions_excluded'] = array(-1);
+		$context['permissions_excluded'] = [-1];
 
-		$config_vars = array(
-			array('permissions', 'shop_canAccess', 'subtext' => Shop::getText('permissionhelp_shop_canAccess', false)),
-			array('permissions', 'shop_canBuy', 'subtext' => Shop::getText('permissionhelp_shop_canBuy', false)),
-			array('permissions', 'shop_viewInventory', 'subtext' => Shop::getText('permissionhelp_shop_viewInventory', false)),
-			array('permissions', 'shop_canGift', 'subtext' => Shop::getText('permissionhelp_shop_canGift', false), 'disabled' => empty($modSettings['Shop_enable_gift'])),
-			array('permissions', 'shop_canTrade', 'subtext' => Shop::getText('permissionhelp_shop_canTrade', false), 'disabled' => empty($modSettings['Shop_enable_trade'])),
-			array('permissions', 'shop_canBank', 'subtext' => Shop::getText('permissionhelp_shop_canBank', false), 'disabled' => empty($modSettings['Shop_enable_bank'])),
-			array('permissions', 'shop_viewStats', 'subtext' => Shop::getText('permissionhelp_shop_viewStats', false), 'disabled' => empty($modSettings['Shop_enable_stats'])),
-			array('permissions', 'shop_playGames', 'subtext' => Shop::getText('permissionhelp_shop_playGames', false), 'disabled' => empty($modSettings['Shop_enable_games'])),
+		$config_vars = [
+			['permissions', 'shop_canAccess', 'subtext' => Shop::getText('permissionhelp_shop_canAccess', false)],
+			['permissions', 'shop_canBuy', 'subtext' => Shop::getText('permissionhelp_shop_canBuy', false)],
+			['permissions', 'shop_viewInventory', 'subtext' => Shop::getText('permissionhelp_shop_viewInventory', false)],
+			['permissions', 'shop_canGift', 'subtext' => Shop::getText('permissionhelp_shop_canGift', false), 'disabled' => empty($modSettings['Shop_enable_gift'])],
+			['permissions', 'shop_canTrade', 'subtext' => Shop::getText('permissionhelp_shop_canTrade', false), 'disabled' => empty($modSettings['Shop_enable_trade'])],
+			['permissions', 'shop_canBank', 'subtext' => Shop::getText('permissionhelp_shop_canBank', false), 'disabled' => empty($modSettings['Shop_enable_bank'])],
+			['permissions', 'shop_viewStats', 'subtext' => Shop::getText('permissionhelp_shop_viewStats', false), 'disabled' => empty($modSettings['Shop_enable_stats'])],
+			['permissions', 'shop_playGames', 'subtext' => Shop::getText('permissionhelp_shop_playGames', false), 'disabled' => empty($modSettings['Shop_enable_games'])],
 			'',
-			array('permissions', 'shop_canManage', 'subtext' => Shop::getText('permissionhelp_shop_canManage', false)),
-		);
+			['permissions', 'shop_canManage', 'subtext' => Shop::getText('permissionhelp_shop_canManage', false)],
+		];
 
 		Database::Save($config_vars, $return_config, 'permissions');
 	}

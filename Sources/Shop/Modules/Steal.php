@@ -185,9 +185,9 @@ class Steal extends Module
 				$this->_credits = mt_rand(1, $memResult['shopMoney']);
 
 				// Stolen!
-				updateMemberData($memResult['id_member'], array('shopMoney' => $memResult['shopMoney'] - $this->_credits));
+				updateMemberData($memResult['id_member'], ['shopMoney' => $memResult['shopMoney'] - $this->_credits]);
 				// Robbed!
-				updateMemberData($user_info['id'], array('shopMoney' => $user_info['shopMoney'] + $this->_credits));
+				updateMemberData($user_info['id'], ['shopMoney' => $user_info['shopMoney'] + $this->_credits]);
 
 				// Send a PM?
 				if (!empty($this->item_info[2]))

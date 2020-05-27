@@ -41,7 +41,7 @@ class Format
 	/**
 	 * Format::item()
 	 *
-	 * Gives the provided item format with his image
+	 * Gives the provided item format with its image
 	 * @param $image The image of an item
 	 * @param $description Optional parameter for including the description in the title/alt
 	 * @param $class Optional parameter for including class and id

@@ -93,7 +93,7 @@ class GamesPass extends Module
 		// Get the time in seconds
 		$this->_days = ($this->_seconds * $this->item_info[1]);
 
-		// He still have access?
+		// User still have access?
 		if (!empty($user_info['gamesPass']) && $user_info['gamesPass'] > time())
 			$this->_time = $user_info['gamesPass'] + $this->_days;
 		// Expired.. Then calculate from this moment
@@ -101,9 +101,9 @@ class GamesPass extends Module
 			$this->_time = time() + $this->_days;
 
 		// Update the gamespass days
-		updateMemberData($user_info['id'], array('gamesPass' => $this->_time));
+		updateMemberData($user_info['id'], ['gamesPass' => $this->_time]);
 
-		// Give him the exact amount of days he now has
+		// Give them the exact amount of days user now has
 		$this->_expires = Format::gamespass($user_info['gamesPass']) + $this->item_info[1];
 		
 		return '

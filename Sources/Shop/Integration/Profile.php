@@ -161,7 +161,7 @@ class Profile
 						if (!is_numeric($value))
 							return 'digits_only';
 						else
-							$value = $value != '' ? strtr($value, array(',' => '', '.' => '', ' ' => '')) : 0;
+							$value = $value != '' ? strtr($value, [',' => '', '.' => '', ' ' => '']) : 0;
 						return true;
 					},
 				];
@@ -290,10 +290,10 @@ class Profile
 		global $modSettings;
 
 		if (!empty($modSettings['Shop_noty_credits']))
-			$alert_types['shop']['shop_usercredits'] = array('alert' => 'yes', 'email' => 'never');
+			$alert_types['shop']['shop_usercredits'] = ['alert' => 'yes', 'email' => 'never'];
 		if (!empty($modSettings['Shop_noty_items']))
-			$alert_types['shop']['shop_useritems'] = array('alert' => 'yes', 'email' => 'never');
+			$alert_types['shop']['shop_useritems'] = ['alert' => 'yes', 'email' => 'never'];
 		if (!empty($modSettings['Shop_noty_trade']))
-			$alert_types['shop']{'shop_usertraded'} = array('alert' => 'yes', 'email' => 'never');
+			$alert_types['shop']{'shop_usertraded'} = ['alert' => 'yes', 'email' => 'never'];
 	}
 }

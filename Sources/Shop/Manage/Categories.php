@@ -302,10 +302,10 @@ class Categories extends Dashboard
 
 		// Set all the page stuff
 		$context['page_title'] = Shop::getText('tab_cats') . ' - '. Shop::getText('cats_delete');
-		$context[$context['admin_menu_name']]['tab_data'] = array(
+		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => $context['page_title'],
 			'description' => Shop::getText('cats_delete_desc'),
-		);
+		];
 		$context['sub_template'] = 'delete';
 		$context['delete_description'] = Shop::getText('cats_delete_desc');
 

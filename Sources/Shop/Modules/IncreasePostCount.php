@@ -63,7 +63,7 @@ class IncreasePostCount extends Module
 		checkSession();
 
 		// Increase posts
-		updateMemberData($user_info['id'], array('posts' => ($this->item_info[1] + $user_info['posts'])));
+		updateMemberData($user_info['id'], ['posts' => ($this->item_info[1] + $user_info['posts'])]);
 		
 		return '
 			<div class="infobox">

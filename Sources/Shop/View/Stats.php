@@ -115,10 +115,10 @@ class Stats
 				'call' => $this->gifts(),
 				'enabled' => allowedTo('shop_canGift'),
 			],
-			'gifts_received' => array(
+			'gifts_received' => [
 				'call' => $this->gifts(false),
 				'enabled' => allowedTo('shop_canGift'),
-			),
+			],
 			'money_sent' => [
 				'call' => $this->gifts(true, true),
 				'enabled' => allowedTo('shop_canGift'),
@@ -136,7 +136,7 @@ class Stats
 		$this->_stats = array_merge($this->_stats, $this->home_stats());
 
 		// Add more stats?
-		call_integration_hook('integrate_shop_stats', array(&$this->_stats));
+		call_integration_hook('integrate_shop_stats', [&$this->_stats]);
 
 		return $this->_stats;
 	}
@@ -148,10 +148,10 @@ class Stats
 		// Set all the page stuff
 		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('main_stats');
 		$context['sub_template'] = 'stats';
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'url' => $scripturl . '?action=shop;sa=stats',
 			'name' => Shop::getText('main_stats'),
-		);
+		];
 
 		// Get the stats
 		$context['stats_blocks'] = $this->full_stats();

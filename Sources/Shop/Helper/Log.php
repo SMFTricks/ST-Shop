@@ -152,7 +152,7 @@ class Log
 		// Remove the credits from the buyer
 		Database::Update('members', ['user' => $userid, 'credits' => $amount], 'shopMoney = shopMoney - {int:credits},', 'WHERE id_member = {int:user}');
 
-		// Is he purchasing an item fro items list?
+		// Is user purchasing an item fro items list?
 		if (empty($seller))
 		{
 			// Insert in inventory

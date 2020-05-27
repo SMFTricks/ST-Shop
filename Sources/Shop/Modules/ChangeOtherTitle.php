@@ -131,7 +131,7 @@ class ChangeOtherTitle extends Module
 				fatal_error(Shop::getText('cot_notown_title'), false);
 
 			// Update the title
-			updateMemberData($memResult['id_member'], array('usertitle' => $this->_title));
+			updateMemberData($memResult['id_member'], ['usertitle' => $this->_title]);
 
 			return '
 				<div class="infobox">

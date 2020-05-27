@@ -28,14 +28,14 @@ class Images
 		global $boarddir;
 
 		// Start with an empty array
-		$imageList = array();
+		$imageList = [];
 		// Try to open the images directory
 		
 		if ($handle = opendir($boarddir. Shop::$itemsdir)) {
 			// For each file in the directory...
 			while (false !== ($file = readdir($handle))) {
 				// ...if it's a valid file, add it to the list
-				if (!in_array($file, array('.', '..', 'blank.gif')))
+				if (!in_array($file, ['.', '..', 'blank.gif']))
 					$imageList[] = $file;
 			}
 			// Sort the list

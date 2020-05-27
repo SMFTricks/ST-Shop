@@ -80,9 +80,9 @@ class RandomMoney extends Module
 		// Get a random value between our limits
 		$this->_credits = mt_rand($this->item_info[1], $this->item_info[2]);
 
-		// Did he lose money?
+		// Did user lose money?
 		if ($this->_credits != 0)
-			updateMemberData($user_info['id'], array('shop' . ($user_info['shopMoney'] < abs($this->_credits) && $this->_credits < 0 ? 'Bank' : 'Money') => ($user_info['shop' . ($user_info['shopMoney'] < abs($this->_credits) && $this->_credits < 0 ? 'Bank' : 'Money')] + $this->_credits)));
+			updateMemberData($user_info['id'], ['shop' . ($user_info['shopMoney'] < abs($this->_credits) && $this->_credits < 0 ? 'Bank' : 'Money') => ($user_info['shop' . ($user_info['shopMoney'] < abs($this->_credits) && $this->_credits < 0 ? 'Bank' : 'Money')] + $this->_credits)]);
 
 		return '
 			<div class="' . ($this->_credits > 0 ? 'info' : 'error') . 'box">
