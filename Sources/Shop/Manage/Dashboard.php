@@ -327,7 +327,11 @@ class Dashboard
 				'users' => [
 					'fugue' => [
 						'name' => 'Fugue Icons',
-						'site' => 'https://p.yusukekamiyamane.com/',
+						'site' => 'https://p.yusukekamiyamane.com',
+					],
+					'farmfresh' => [
+						'name' => 'Farm Fresh Icons',
+						'site' => 'https://www.fatcow.com/free-icons',
 					],
 				],
 			],
