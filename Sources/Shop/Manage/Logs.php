@@ -2,928 +2,687 @@
 
 /**
  * @package ST Shop
- * @version 3.2
+ * @version 4.0
  * @author Diego Andrés <diegoandres_cortes@outlook.com>
  * @copyright Copyright (c) 2020, SMF Tricks
  * @license https://www.mozilla.org/en-US/MPL/2.0/
  */
 
+namespace Shop\Manage;
+
+use Shop\Shop;
+use Shop\Helper\Database;
+use Shop\Helper\Delete;
+use Shop\Helper\Format;
+use Shop\Helper\Images;
+
 if (!defined('SMF'))
 	die('No direct access...');
 
-class AdminShopLogs extends AdminShop
+class Logs extends Dashboard
 {
-	public static function Main()
+	/**
+	 * @var bool Check if the log is for admin actions.
+	 */
+	private $_is_admin = false;
+
+	/**
+	 * Logs::__construct()
+	 *
+	 * Create the array of subactions and load necessary extra language files
+	 */
+	function __construct()
 	{
-		global $context, $txt, $modSettings;
+		global $modSettings;
 
-		loadTemplate('ShopAdmin');
+		// Required languages
+		loadLanguage('Shop/Shop');
 
-		$context['items_url'] = Shop::$itemsdir;
-
-		$subactions = array(
-			'admin_money' => 'AdminShopLogs::Money',
-			'admin_items' => 'AdminShopLogs::Items',
-			'buy' => 'AdminShopLogs::Buy',
-			'money' => 'AdminShopLogs::Money',
-			'items' => 'AdminShopLogs::Items',
-			'trade' => 'AdminShopLogs::Trade',
-			'bank' => 'AdminShopLogs::Bank',
-			'games' => 'AdminShopLogs::Games',
-		);
+		// Array of sections
+		$this->_subactions = [
+			'admin_money' => 'money',
+			'admin_items' => 'items',
+			'money' => 'money',
+			'items' => 'items',
+			'buy' => 'purchase',
+			'trade' => 'purchase',
+			'bank' => 'bank',
+			'games' => 'games',
+		];
 
 		// Disabled sections?
 		if (empty($modSettings['Shop_enable_shop']))
 		{
-			unset($subactions['buy']);
-			unset($subactions['admin_items']);
-			if (empty($modSettings['Shop_enable_trade']))
-				unset($subactions['trade']);
+			unset($this->_subactions['buy']);
+			unset($this->_subactions['admin_items']);
 		}
-		if (empty($modSettings['Shop_enable_gift']))
+		if (empty($modSettings['Shop_enable_shop']) || empty($modSettings['Shop_enable_gift']))
 		{
-			unset($subactions['money']);
-			unset($subactions['items']);
+			unset($this->_subactions['money']);
+			unset($this->_subactions['items']);
 		}
-		if (empty($modSettings['Shop_enable_bank']))
-			unset($subactions['bank']);
-		if (empty($modSettings['Shop_enable_games']))
-			unset($subactions['games']);
+		if (empty($modSettings['Shop_enable_shop']) || empty($modSettings['Shop_enable_trade']))
+			unset($this->_subactions['trade']);
+		if (empty($modSettings['Shop_enable_shop']) || empty($modSettings['Shop_enable_bank']))
+			unset($this->_subactions['bank']);
+		if (empty($modSettings['Shop_enable_shop']) || empty($modSettings['Shop_enable_games']))
+			unset($this->_subactions['games']);
 
-		$sa = isset($_GET['sa'], $subactions[$_GET['sa']]) ? $_GET['sa'] : 'admin_money';
+		$this->_sa = isset($_GET['sa'], $this->_subactions[$_GET['sa']]) ? $_GET['sa'] : 'admin_money';
+	}
+
+	public function main()
+	{
+		global $context, $txt, $modSettings, $sourcedir;
+
+		// Everything in here is a list, so...
+		require_once($sourcedir . '/Subs-List.php');
+		$context['page_title'] = Shop::getText('tab_logs') . ' - ' . Shop::getText('logs_' . (!isset($_REQUEST['sa']) ? 'admin_money' : $_REQUEST['sa']));
+		$context['sub_template'] = 'show_list';
+		$context['default_list'] = 'loglist';
 
 		// Create the tabs for the template.
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['Shop_tab_logs'],
-			'description' => $txt['Shop_tab_logs_desc'],
-			'tabs' => array(
-				'admin_money' => array('description' => sprintf($txt['Shop_logs_money_desc'], $modSettings['Shop_credits_suffix'])),
-				'admin_items' => array('description' => $txt['Shop_logs_items_desc']),
-				'buy' => array('description' => $txt['Shop_logs_buy_desc']),
-				'money' => array('description' => sprintf($txt['Shop_logs_money_desc'], $modSettings['Shop_credits_suffix'])),
-				'items' => array('description' => $txt['Shop_logs_items_desc']),
-				'trade' => array('description' => $txt['Shop_logs_trade_desc']),
-				'bank' => array('description' => $txt['Shop_logs_bank_desc']),
-				'games' => array('description' => sprintf($txt['Shop_logs_games_desc'], $modSettings['Shop_credits_suffix'])),
-			),
-		);
-
-		// Disabled sections?
-		if (empty($modSettings['Shop_enable_shop']))
-		{
-			$context[$context['admin_menu_name']]['tab_data']['tabs']['buy']['disabled'] = true;
-			$context[$context['admin_menu_name']]['tab_data']['tabs']['admin_items']['disabled'] = true;
-			if (empty($modSettings['Shop_enable_trade']))
-				$context[$context['admin_menu_name']]['tab_data']['tabs']['trade']['disabled'] = true;
-		}
-		if (empty($modSettings['Shop_enable_gift']))
-		{
-			$context[$context['admin_menu_name']]['tab_data']['tabs']['money']['disabled'] = true;
-			$context[$context['admin_menu_name']]['tab_data']['tabs']['items']['disabled'] = true;
-		}
-		if (empty($modSettings['Shop_enable_bank']))
-			$context[$context['admin_menu_name']]['tab_data']['tabs']['bank']['disabled'] = true;
-		if (empty($modSettings['Shop_enable_games']))
-			$context[$context['admin_menu_name']]['tab_data']['tabs']['games']['disabled'] = true;
-
-		$subactions[$sa]();
+		$context[$context['admin_menu_name']]['tab_data'] = [
+			'title' => Shop::getText('tab_logs') . ' - ' . Shop::getText('logs_' . (!isset($_REQUEST['sa']) ? 'admin_money' : $_REQUEST['sa'])),
+			'description' => Shop::getText('tab_logs_desc'),
+			'tabs' => [
+				'admin_money' => ['description' => sprintf(Shop::getText('logs_admin_money_desc'), $modSettings['Shop_credits_suffix'])],
+				'admin_items' => ['description' => Shop::getText('logs_admin_items_desc')],
+				'money' => ['description' => sprintf(Shop::getText('logs_money_desc'), $modSettings['Shop_credits_suffix'])],
+				'items' => ['description' => Shop::getText('logs_items_desc')],
+				'buy' => ['description' => Shop::getText('logs_buy_desc')],
+				'trade' => ['description' => Shop::getText('logs_trade_desc')],
+				'bank' => ['description' => Shop::getText('logs_bank_desc')],
+				'games' => ['description' => sprintf(Shop::getText('logs_games_desc'), $modSettings['Shop_credits_suffix'])],
+			],
+		];
+		call_helper(__CLASS__ . '::' . $this->_subactions[$this->_sa] . '#');
 	}
 
-	public static function Count($type, $is_admin = false)
+	public function money()
 	{
-		global $smcFunc;
+		global $scripturl, $modSettings;
 
-		// Sent money or item
-		if ($type == 'items' || $type == 'money') {
-			// Count the log entries
-			$logs = $smcFunc['db_query']('', '
-				SELECT l.id, l.amount, l.is_admin, l.itemid, s.status
-				FROM {db_prefix}shop_log_gift AS l
-				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = l.itemid)
-				WHERE '.($type == 'money' ? ' l.itemid = 0' : ' l.amount = 0 AND s.status = 1') . (!empty($is_admin) ? ' AND l.is_admin = 1' : ''),
-				array()
-			);
-		}
-		// Bought items from the actual shop or traded
-		elseif ($type == 'buy' || $type == 'trade') {
-			// Count the log entries
-			$logs = $smcFunc['db_query']('', '
-				SELECT l.id, l.sellerid, s.status
-				FROM {db_prefix}shop_log_buy AS l
-				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = l.itemid)
-				WHERE '. ($type == 'buy' ? ' l.sellerid = 0' : ' l.invid <> 0'). ' AND s.status = 1',
-				array()
-			);
-		}
-		// Transactions in the bank
-		elseif ($type == 'bank') {
-			// Count the log entries
-			$logs = $smcFunc['db_query']('', '
-				SELECT id
-				FROM {db_prefix}shop_log_bank',
-				array()
-			);
-		}
-		// Playing in the games room
-		elseif ($type == 'games') {
-			// Count the log entries
-			$logs = $smcFunc['db_query']('', '
-				SELECT id
-				FROM {db_prefix}shop_log_games',
-				array()
-			);
-		}
-		
-		$count = $smcFunc['db_num_rows']($logs);
-		$smcFunc['db_free_result']($logs);
-
-		return $count;
-	}
-
-	public static function Get($start, $items_per_page, $sort, $type, $is_admin = false)
-	{
-		global $context, $smcFunc;
-
-		// Sent money or item
-		if ($type == 'items' || $type == 'money') {
-			// Get a list of all the item
-			$result = $smcFunc['db_query']('', '
-				SELECT l.userid, l.receiver, l.amount, l.is_admin, l.itemid, l.invid, l.message, l.date, m1.real_name AS name_sender, m2.real_name AS name_receiver,
-					s.name, s.image, s.status
-				FROM {db_prefix}shop_log_gift AS l
-				LEFT JOIN {db_prefix}members AS m1 ON (m1.id_member = l.userid)
-				LEFT JOIN {db_prefix}members AS m2 ON (m2.id_member = l.receiver)
-				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = l.itemid)
-				WHERE'. ($type == 'money' ? ' l.itemid = 0' : ' l.amount = 0 AND s.status = 1') . (!empty($is_admin) ? ' AND l.is_admin = 1' : ''). '
-				ORDER by {raw:sort}
-				LIMIT {int:start}, {int:maxindex}',
-				array(
-					'start' => $start,
-					'maxindex' => $items_per_page,
-					'sort' => $sort,
-				)
-			);
-		}
-		// Bought item in shop or traded item
-		elseif ($type == 'buy' || $type == 'trade') {
-			// Get a list of all the item
-			$result = $smcFunc['db_query']('', '
-				SELECT l.itemid, l.userid, l.sellerid, l.amount, l.fee, l.date, m1.real_name AS name_buyer, m2.real_name AS name_seller,
-					s.name, s.image, s.status
-				FROM {db_prefix}shop_log_buy AS l
-				LEFT JOIN {db_prefix}members AS m1 ON (m1.id_member = l.userid)
-				LEFT JOIN {db_prefix}members AS m2 ON (m2.id_member = l.sellerid)
-				LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = l.itemid)
-				WHERE'. ($type == 'buy' ? ' l.sellerid = 0' : ' l.invid <> 0'). ' AND s.status = 1
-				ORDER by {raw:sort}
-				LIMIT {int:start}, {int:maxindex}',
-				array(
-					'start' => $start,
-					'maxindex' => $items_per_page,
-					'sort' => $sort,
-				)
-			);
-		}
-		// Bank log for withdraws and deposits
-		elseif ($type == 'bank') {
-			// Get a list of all the item
-			$result = $smcFunc['db_query']('', '
-				SELECT l.userid, l.amount, l.fee, l.type, l.date, m.real_name
-				FROM {db_prefix}shop_log_bank AS l
-				LEFT JOIN {db_prefix}members AS m ON (m.id_member = l.userid)
-				ORDER by {raw:sort}
-				LIMIT {int:start}, {int:maxindex}',
-				array(
-					'start' => $start,
-					'maxindex' => $items_per_page,
-					'sort' => $sort,
-				)
-			);
-		}
-		// Money lost or won in the games
-		elseif ($type == 'games') {
-			// Get a list of all the item
-			$result = $smcFunc['db_query']('', '
-				SELECT l.userid, l.amount, l.game, l.date, m.real_name
-				FROM {db_prefix}shop_log_games AS l
-				LEFT JOIN {db_prefix}members AS m ON (m.id_member = l.userid)
-				ORDER by {raw:sort}
-				LIMIT {int:start}, {int:maxindex}',
-				array(
-					'start' => $start,
-					'maxindex' => $items_per_page,
-					'sort' => $sort,
-				)
-			);
-		}
-
-		// Return the data
-		$context['shop_logs_list'] = array();
-		while ($row = $smcFunc['db_fetch_assoc']($result))
-			$context['shop_logs_list'][] = $row;
-		$smcFunc['db_free_result']($result);
-
-		return $context['shop_logs_list'];
-	}
-
-	public static function Money()
-	{
-		global $context, $scripturl, $sourcedir, $modSettings, $txt;
-
-		require_once($sourcedir . '/Subs-List.php');
-		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'moneylist';
-		$context['page_title'] = $txt['Shop_tab_logs']. ' - ' . $txt['Shop_logs_money'];
-
-		// Admin log?
-		if ((isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'admin_money') || !isset($_REQUEST['sa']))
-			$is_admin = true;
-		else
-			$is_admin = false;
-
-		// The entire list
-		$listOptions = array(
-			'id' => 'moneylist',
-			'title' => $txt['Shop_logs_money'],
+		$listOptions = [
+			'id' => 'loglist',
+			'title' => Shop::getText('logs_' . (!isset($_REQUEST['sa']) || $_REQUEST['sa'] == 'admin_money' ? 'admin_' : '') . 'money'),
 			'items_per_page' => !empty($modSettings['Shop_items_perpage']) ? $modSettings['Shop_items_perpage'] : 15,
-			'base_href' => '?action=admin;area=shoplogs;sa=money',
+			'base_href' => '?action=admin;area=shoplogs;sa=' . (!isset($_REQUEST['sa']) || $_REQUEST['sa'] == 'admin_money' ? 'admin_' : '') . 'money',
 			'default_sort_col' => 'date',
-			'get_items' => array(
-				'function' => 'AdminShopLogs::Get',
-				'params' => array('money', $is_admin),
-			),
-			'get_count' => array(
-				'function' => 'AdminShopLogs::Count',
-				'params' => array('money', $is_admin),
-			),
-			'no_items_label' => $txt['Shop_logs_empty'],
+			'get_items' => [
+				'function' => 'Shop\Helper\Database::Get',
+				'params' => ['shop_log_gift AS lg', array_merge(Database::$log_gift, ['m1.real_name AS name_sender', 'm2.real_name AS name_receiver']), 'WHERE lg.itemid = 0 AND lg.amount > 0 AND lg.is_admin = {int:admin}', false, 'LEFT JOIN {db_prefix}members AS m1 ON (m1.id_member = lg.userid) LEFT JOIN {db_prefix}members AS m2 ON (m2.id_member = lg.receiver)', ['admin' => (!isset($_REQUEST['sa']) || $_REQUEST['sa'] == 'admin_money' ? 1 : 0)]],
+			],
+			'get_count' => [
+				'function' => 'Shop\Helper\Database::Count',
+				'params' => ['shop_log_gift AS lg', Database::$log_gift, 'WHERE lg.itemid = 0 AND lg.amount > 0 AND lg.is_admin = {int:admin}', '', ['admin' => (!isset($_REQUEST['sa']) || $_REQUEST['sa'] == 'admin_money' ? 1 : 0)]],
+			],
+			'no_items_label' => Shop::getText('logs_empty'),
 			'no_items_align' => 'center',
-			'columns' => array(
-				'from_user' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_user_sending'],
+			'columns' => [
+				'from_user' => [
+					'header' => [
+						'value' => Shop::getText('logs_user_sending'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="'. $scripturl . '?action=profile;u=%1$d">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'userid' => false,
 								'name_sender' => true,
-							),
-						),
-						'style' => 'width: 18%',
-					),
-					'sort' =>  array(
+							],
+						],
+						'style' => 'width: 22%',
+					],
+					'sort' =>  [
 						'default' => 'name_sender DESC',
 						'reverse' => 'name_sender',
-					),
-				),
-				'amount' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_amount'],
+					],
+				],
+				'amount' => [
+					'header' => [
+						'value' => Shop::getText('logs_amount'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ return Shop::formatCash($row['amount']);},
-						'style' => 'width: 18%'
-					),
-					'sort' =>  array(
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							return Format::cash($row['amount']);
+						},
+						'style' => 'width: 34%'
+					],
+					'sort' => [
 						'default' => 'amount DESC',
 						'reverse' => 'amount',
-					),
-				),
-				'for_user' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_user_receiving'],
+					],
+				],
+				'for_user' => [
+					'header' => [
+						'value' => Shop::getText('logs_user_receiving'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="'. $scripturl . '?action=profile;u=%1$d">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'receiver' => false,
 								'name_receiver' => true,
-							),
-						),
-						'style' => 'width: 18%',
-					),
-					'sort' =>  array(
+							],
+						],
+						'style' => 'width: 22%',
+					],
+					'sort' => [
 						'default' => 'name_receiver DESC',
 						'reverse' => 'name_receiver',
-					),
-				),
-				'date' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_date'],
+					],
+				],
+				'date' => [
+					'header' => [
+						'value' => Shop::getText('logs_date'),
 						'class' => ' lefttext',
-					),
-					'data' => array(
-						'function' => function($row) {return timeformat($row['date']);},
-						'style' => 'width: 25%',
-					),
-					'sort' =>  array(
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							return timeformat($row['date']);
+						},
+						'style' => 'width: 22%',
+					],
+					'sort' => [
 						'default' => 'date DESC',
 						'reverse' => 'date',
-					),
-				),
-			),
-			'additional_rows' => array(
-			),
-		);
+					],
+				],
+			],
+		];
 		// Let's finishem
 		createList($listOptions);
 	}
 
-	public static function Items()
+	public function items()
 	{
-		global $context, $scripturl, $sourcedir, $modSettings, $txt;
+		global $scripturl, $modSettings;
 
-		require_once($sourcedir . '/Subs-List.php');
-		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'itemslist';
-		$context['page_title'] = $txt['Shop_tab_logs']. ' - ' . $txt['Shop_logs_items'];
-
-		// Admin log?
-		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'admin_items')
-			$is_admin = true;
-		else
-			$is_admin = false;
-
-		// The entire list
-		$listOptions = array(
-			'id' => 'itemslist',
-			'title' => $txt['Shop_logs_items'],
+		$listOptions = [
+			'id' => 'loglist',
+			'title' => Shop::getText('logs_' . (!isset($_REQUEST['sa']) || $_REQUEST['sa'] == 'admin_items' ? 'admin_' : '') . 'items'),
 			'items_per_page' => !empty($modSettings['Shop_items_perpage']) ? $modSettings['Shop_items_perpage'] : 15,
-			'base_href' => '?action=admin;area=shoplogs;sa=items',
+			'base_href' => '?action=admin;area=shoplogs;sa=' . ($_REQUEST['sa'] == 'admin_items' ? 'admin_' : '') . 'items',
 			'default_sort_col' => 'date',
-			'get_items' => array(
-				'function' => 'AdminShopLogs::Get',
-				'params' => array('items', $is_admin),
-			),
-			'get_count' => array(
-				'function' => 'AdminShopLogs::Count',
-				'params' => array('items', $is_admin),
-			),
-			'no_items_label' => $txt['Shop_logs_empty'],
+			'get_items' => [
+				'function' => 'Shop\Helper\Database::Get',
+				'params' => ['shop_log_gift AS lg', array_merge(Database::$log_gift, ['m1.real_name AS name_sender', 'm2.real_name AS name_receiver', 's.itemid', 's.status', 's.name', 's.image', 's.description']), 'WHERE lg.itemid <> 0 AND lg.amount = 0 AND s.status = 1 AND lg.is_admin = {int:admin}', false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = lg.itemid) LEFT JOIN {db_prefix}members AS m1 ON (m1.id_member = lg.userid) LEFT JOIN {db_prefix}members AS m2 ON (m2.id_member = lg.receiver)', ['admin' => ($_REQUEST['sa'] == 'admin_items' ? 1 : 0)]],
+			],
+			'get_count' => [
+				'function' => 'Shop\Helper\Database::Count',
+				'params' => ['shop_log_gift AS lg', array_merge(Database::$log_gift, ['s.itemid', 's.status', 's.name']), 'WHERE lg.itemid <> 0 AND lg.amount = 0 AND s.status = 1 AND lg.is_admin = {int:admin}', 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = lg.itemid)', ['admin' => ($_REQUEST['sa'] == 'admin_items' ? 1 : 0)]],
+			],
+			'no_items_label' => Shop::getText('logs_empty'),
 			'no_items_align' => 'center',
-			'columns' => array(
-				'item_image' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_image'],
+			'columns' => [
+				'item_image' => [
+					'header' => [
+						'value' => Shop::getText('item_image'),
 						'class' => 'centertext',
-					),
-					'data' => array(
-						'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
-						'style' => 'width: 9%',
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							return Format::image($row['image'], $row['description']);
+						},
+						'style' => 'width: 8%',
 						'class' => 'centertext',
-					),
-				),
-				'item_name' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_name'],
+					],
+				],
+				'item_name' => [
+					'header' => [
+						'value' => Shop::getText('item_name'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'name',
-						'style' => 'width: 25%'
-					),
-					'sort' =>  array(
+						'style' => 'width: 23%',
+					],
+					'sort' =>  [
 						'default' => 'name DESC',
 						'reverse' => 'name',
-					),
-				),
-				'from_user' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_user_sending'],
+					],
+				],
+				'from_user' => [
+					'header' => [
+						'value' => Shop::getText('logs_user_sending'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="'. $scripturl . '?action=profile;u=%1$d">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'userid' => false,
 								'name_sender' => true,
-							),
-						),
-						'style' => 'width: 16%',
-					),
-					'sort' =>  array(
+							],
+						],
+						'style' => 'width: 23%',
+					],
+					'sort' =>  [
 						'default' => 'name_sender DESC',
 						'reverse' => 'name_sender',
-					),
-				),
-				'for_user' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_user_receiving'],
+					],
+				],
+				'for_user' => [
+					'header' => [
+						'value' => Shop::getText('logs_user_receiving'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="'. $scripturl . '?action=profile;u=%1$d">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'receiver' => false,
 								'name_receiver' => true,
-							),
-						),
-						'style' => 'width: 16%',
-					),
-					'sort' =>  array(
+							],
+						],
+						'style' => 'width: 23%',
+					],
+					'sort' => [
 						'default' => 'name_receiver DESC',
 						'reverse' => 'name_receiver',
-					),
-				),
-				'date' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_date'],
+					],
+				],
+				'date' => [
+					'header' => [
+						'value' => Shop::getText('logs_date'),
 						'class' => ' lefttext',
-					),
-					'data' => array(
-						'function' => function($row) {return timeformat($row['date']);},
-						'style' => 'width: 25%',
-					),
-					'sort' =>  array(
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							return timeformat($row['date']);
+						},
+						'style' => 'width: 23%',
+					],
+					'sort' => [
 						'default' => 'date DESC',
 						'reverse' => 'date',
-					),
-				),
-			),
-			'additional_rows' => array(
-			),
-		);
+					],
+				],
+			],
+		];
 		// Let's finishem
 		createList($listOptions);
 	}
 
-	public static function Buy()
+	public function purchase()
 	{
-		global $context, $scripturl, $sourcedir, $modSettings, $txt;
+		global $scripturl, $modSettings;
 
-		require_once($sourcedir . '/Subs-List.php');
-		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'buylist';
-		$context['page_title'] = $txt['Shop_tab_logs']. ' - ' . $txt['Shop_logs_buy'];
-
-		// The entire list
-		$listOptions = array(
-			'id' => 'buylist',
-			'title' => $txt['Shop_logs_buy'],
+		$listOptions = [
+			'id' => 'loglist',
+			'title' => Shop::getText('logs_' . $_REQUEST['sa']),
 			'items_per_page' => !empty($modSettings['Shop_items_perpage']) ? $modSettings['Shop_items_perpage'] : 15,
-			'base_href' => '?action=admin;area=shoplogs;sa=buy',
+			'base_href' => '?action=admin;area=shoplogs;sa=' . $_REQUEST['sa'],
 			'default_sort_col' => 'date',
-			'get_items' => array(
-				'function' => 'AdminShopLogs::Get',
-				'params' => array('buy'),
-			),
-			'get_count' => array(
-				'function' => 'AdminShopLogs::Count',
-				'params' => array('buy'),
-			),
-			'no_items_label' => $txt['Shop_logs_empty'],
+			'get_items' => [
+				'function' => 'Shop\Helper\Database::Get',
+				'params' => ['shop_log_buy AS lb', array_merge(Database::$log_buy, ['m1.real_name AS name_buyer', 'm2.real_name AS name_seller']), 'WHERE lb.sellerid ' . ($_REQUEST['sa'] == 'buy' ? '= 0' : '<>') . '0 AND s.status = 1', false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = lb.itemid) LEFT JOIN {db_prefix}members AS m1 ON (m1.id_member = lb.userid) LEFT JOIN {db_prefix}members AS m2 ON (m2.id_member = lb.sellerid)'],
+			],
+			'get_count' => [
+				'function' => 'Shop\Helper\Database::Count',
+				'params' => ['shop_log_buy AS lb', Database::$log_buy, 'WHERE lb.sellerid ' . ($_REQUEST['sa'] == 'buy' ? '= 0' : '<>') . '0 AND s.status = 1', 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = lb.itemid)'],
+			],
+			'no_items_label' => Shop::getText('logs_empty'),
 			'no_items_align' => 'center',
-			'columns' => array(
-				'item_image' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_image'],
+			'columns' => [
+				'item_image' => [
+					'header' => [
+						'value' => Shop::getText('item_image'),
 						'class' => 'centertext',
-					),
-					'data' => array(
-						'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
-						'style' => 'width: 9%',
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							return Format::image($row['image'], $row['description']);
+						},
+						'style' => 'width: 8%',
 						'class' => 'centertext',
-					),
-				),
-				'item_name' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_name'],
+					],
+				],
+				'item_name' => [
+					'header' => [
+						'value' => Shop::getText('item_name'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'name',
-						'style' => 'width: 25%'
-					),
-					'sort' =>  array(
+						'style' => 'width: 22%',
+					],
+					'sort' =>  [
 						'default' => 'name DESC',
 						'reverse' => 'name',
-					),
-				),
-				'buyer' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_buyer'],
+					],
+				],
+				'buyer' => [
+					'header' => [
+						'value' => Shop::getText('logs_buyer'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="'. $scripturl . '?action=profile;u=%1$d">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'userid' => false,
 								'name_buyer' => true,
-							),
-						),
-						'style' => 'width: 16%',
-					),
-					'sort' =>  array(
+							],
+						],
+						'style' => 'width: 14%',
+					],
+					'sort' =>  [
 						'default' => 'name_buyer DESC',
 						'reverse' => 'name_buyer',
-					),
-				),
-				'amount' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_amount'],
+					],
+				],
+				'amount' => [
+					'header' => [
+						'value' => Shop::getText('logs_amount'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ return Shop::formatCash($row['amount']);},
-						'style' => 'width: 16%'
-					),
-					'sort' =>  array(
-						'default' => 'amount DESC',
-						'reverse' => 'amount',
-					),
-				),
-				'date' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_date'],
-						'class' => ' lefttext',
-					),
-					'data' => array(
-						'function' => function($row) {return timeformat($row['date']);},
-						'style' => 'width: 25%',
-					),
-					'sort' =>  array(
-						'default' => 'date DESC',
-						'reverse' => 'date',
-					),
-				),
-			),
-			'additional_rows' => array(
-			),
-		);
-		// Let's finishem
-		createList($listOptions);
-	}
-
-	public static function Trade()
-	{
-		global $context, $scripturl, $sourcedir, $modSettings, $txt;
-
-		require_once($sourcedir . '/Subs-List.php');
-		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'tradelist';
-		$context['page_title'] = $txt['Shop_tab_logs']. ' - ' . $txt['Shop_logs_trade'];
-
-		// The entire list
-		$listOptions = array(
-			'id' => 'tradelist',
-			'title' => $txt['Shop_logs_trade'],
-			'items_per_page' => !empty($modSettings['Shop_items_perpage']) ? $modSettings['Shop_items_perpage'] : 15,
-			'base_href' => '?action=admin;area=shoplogs;sa=trade',
-			'default_sort_col' => 'date',
-			'get_items' => array(
-				'function' => 'AdminShopLogs::Get',
-				'params' => array('trade'),
-			),
-			'get_count' => array(
-				'function' => 'AdminShopLogs::Count',
-				'params' => array('trade'),
-			),
-			'no_items_label' => $txt['Shop_logs_empty'],
-			'no_items_align' => 'center',
-			'columns' => array(
-				'item_image' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_image'],
-						'class' => 'centertext',
-					),
-					'data' => array(
-						'function' => function($row){ return Shop::ShopImageFormat($row['image']);},
-						'style' => 'width: 9%',
-						'class' => 'centertext',
-					),
-				),
-				'item_name' => array(
-					'header' => array(
-						'value' => $txt['Shop_item_name'],
-						'class' => 'lefttext',
-					),
-					'data' => array(
-						'db' => 'name',
-						'style' => 'width: 20%'
-					),
-					'sort' =>  array(
-						'default' => 'name DESC',
-						'reverse' => 'name',
-					),
-				),
-				'buyer' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_buyer'],
-						'class' => 'lefttext',
-					),
-					'data' => array(
-						'sprintf' => array(
-							'format' => '<a href="'. $scripturl . '?action=profile;u=%1$d">%2$s</a>',
-							'params' => array(
-								'userid' => false,
-								'name_buyer' => true,
-							),
-						),
-						'style' => 'width: 12%',
-					),
-					'sort' =>  array(
-						'default' => 'name_buyer DESC',
-						'reverse' => 'name_buyer',
-					),
-				),
-				'amount' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_amount'],
-						'class' => 'lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ return Shop::formatCash($row['amount']);},
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							return Format::cash($row['amount']);
+						},
 						'style' => 'width: 15%'
-					),
-					'sort' =>  array(
+					],
+					'sort' => [
 						'default' => 'amount DESC',
 						'reverse' => 'amount',
-					),
-				),
-				'fee' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_fee'],
+					],
+				],
+				'fee' => [
+					'header' => [
+						'value' => Shop::getText('logs_fee'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ return Shop::formatCash($row['fee']);},
-						'style' => 'width: 12%'
-					),
-					'sort' =>  array(
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							return Format::cash($row['fee']);
+						},
+						'style' => 'width: 10%'
+					],
+					'sort' => [
 						'default' => 'fee DESC',
 						'reverse' => 'fee',
-					),
-				),
-				'seller' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_seller'],
+					],
+				],
+				'seller' => [
+					'header' => [
+						'value' => Shop::getText('logs_seller'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="'. $scripturl . '?action=profile;u=%1$d">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'sellerid' => false,
 								'name_seller' => true,
-							),
-						),
-						'style' => 'width: 12%',
-					),
-					'sort' =>  array(
+							],
+						],
+						'style' => 'width: 15%',
+					],
+					'sort' => [
 						'default' => 'name_seller DESC',
 						'reverse' => 'name_seller',
-					),
-				),
-				'date' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_date'],
+					],
+				],
+				'date' => [
+					'header' => [
+						'value' => Shop::getText('logs_date'),
 						'class' => ' lefttext',
-					),
-					'data' => array(
-						'function' => function($row) {return timeformat($row['date']);},
-						'style' => 'width: 25%',
-					),
-					'sort' =>  array(
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							return timeformat($row['date']);
+						},
+						'style' => 'width: 16%',
+					],
+					'sort' => [
 						'default' => 'date DESC',
 						'reverse' => 'date',
-					),
-				),
-			),
-			'additional_rows' => array(
-			),
-		);
+					],
+				],
+			],
+		];
+
+		// Remove seller if it's not trade
+		if ($_REQUEST['sa'] == 'buy')
+		{
+			unset($listOptions['columns']['fee']);
+			unset($listOptions['columns']['seller']);
+		}
+
 		// Let's finishem
 		createList($listOptions);
 	}
 
-	public static function Bank()
+	public function bank()
 	{
-		global $context, $scripturl, $sourcedir, $modSettings, $txt;
+		global $scripturl, $modSettings;
 
-		require_once($sourcedir . '/Subs-List.php');
-		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'banklist';
-		$context['page_title'] = $txt['Shop_tab_logs']. ' - ' . $txt['Shop_logs_bank'];
-
-		// The entire list
-		$listOptions = array(
-			'id' => 'banklist',
-			'title' => $txt['Shop_logs_bank'],
+		$listOptions = [
+			'id' => 'loglist',
+			'title' => Shop::getText('logs_bank'),
 			'items_per_page' => !empty($modSettings['Shop_items_perpage']) ? $modSettings['Shop_items_perpage'] : 15,
 			'base_href' => '?action=admin;area=shoplogs;sa=bank',
 			'default_sort_col' => 'date',
-			'get_items' => array(
-				'function' => 'AdminShopLogs::Get',
-				'params' => array('bank'),
-			),
-			'get_count' => array(
-				'function' => 'AdminShopLogs::Count',
-				'params' => array('bank'),
-			),
-			'no_items_label' => $txt['Shop_logs_empty'],
+			'get_items' => [
+				'function' => 'Shop\Helper\Database::Get',
+				'params' => ['shop_log_bank AS lb', array_merge(Database::$log_bank, ['m.real_name']), '', false, 'LEFT JOIN {db_prefix}members AS m ON (m.id_member = lb.userid)'],
+			],
+			'get_count' => [
+				'function' => 'Shop\Helper\Database::Count',
+				'params' => ['shop_log_bank AS lb', Database::$log_bank],
+			],
+			'no_items_label' => Shop::getText('logs_empty'),
 			'no_items_align' => 'center',
-			'columns' => array(
-				'from_user' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_user'],
+			'columns' => [
+				'from_user' => [
+					'header' => [
+						'value' => Shop::getText('logs_user'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="'. $scripturl . '?action=profile;u=%1$d">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'userid' => false,
 								'real_name' => true,
-							),
-						),
-						'style' => 'width: 12%',
-					),
-					'sort' =>  array(
+							],
+						],
+						'style' => 'width: 20%',
+					],
+					'sort' =>  [
 						'default' => 'real_name DESC',
 						'reverse' => 'real_name',
-					),
-				),
-				'trans_type' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_transaction'],
+					],
+				],
+				'trans_type' => [
+					'header' => [
+						'value' => Shop::getText('logs_transaction'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ global $txt;
-							if ($row['type'] == 0 || $row['type'] == 1)
-								return $txt['Shop_logs_trans_deposit'];
-							else
-								return $txt['Shop_logs_trans_withdraw'];
+					],
+					'data' => [
+						'function' => function($row)
+						{
+								return Shop::getText('logs_trans_' . $row['action']);
 						},
-						'style' => 'width: 7%',
-					),
-					'sort' => array(
+						'style' => 'width: 14%',
+					],
+					'sort' => [
 						'default' => 'type DESC',
 						'reverse' => 'type',
-					),
-				),
-				'amount' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_amount'],
+					],
+				],
+				'amount' => [
+					'header' => [
+						'value' => Shop::getText('logs_amount'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ return Shop::formatCash($row['amount']);},
-						'style' => 'width: 17%'
-					),
-					'sort' =>  array(
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							return '
+							<span style="color: ' . ($row['action'] == 'withdrawal' ? 'red">- ' : 'green">+ ') . Format::cash($row['amount']) . '</span>';
+
+
+							//return Format::cash($row['amount']);
+						},
+						'style' => 'width: 21%'
+					],
+					'sort' => [
 						'default' => 'amount DESC',
 						'reverse' => 'amount',
-					),
-				),
-				'fee' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_fee'],
+					],
+				],
+				'fee' => [
+					'header' => [
+						'value' => Shop::getText('logs_fee'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ global $txt;
-							$fee = Shop::formatCash($row['fee']);
-							if ($row['fee'] != 0)
-								if ($row['type'] == 0 || $row['type'] == 2)
-									$fee .= $txt['Shop_logs_fee_type1'];
-								else
-									$fee .= $txt['Shop_logs_fee_type2'];
-							return $fee;
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							return Format::cash($row['fee']) . Shop::getText('logs_fee_type_' . $row['type']);
 						},
-						'style' => 'width: 18%'
-					),
-					'sort' =>  array(
+						'style' => 'width: 24%'
+					],
+					'sort' => [
 						'default' => 'fee DESC',
 						'reverse' => 'fee',
-					),
-				),
-				'date' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_date'],
+					],
+				],
+				'date' => [
+					'header' => [
+						'value' => Shop::getText('logs_date'),
 						'class' => ' lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ return timeformat($row['date']);},
-						'style' => 'width: 21%',
-					),
-					'sort' =>  array(
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							return timeformat($row['date']);
+						},
+						'style' => 'width: 20%',
+					],
+					'sort' => [
 						'default' => 'date DESC',
 						'reverse' => 'date',
-					),
-				),
-			),
-			'additional_rows' => array(
-			),
-		);
+					],
+				],
+			],
+		];
 		// Let's finishem
 		createList($listOptions);
 	}
 
-	public static function Games()
+	public function games()
 	{
-		global $context, $scripturl, $sourcedir, $modSettings, $txt;
+		global $scripturl, $modSettings;
 
-		require_once($sourcedir . '/Subs-List.php');
-		$context['sub_template'] = 'show_list';
-		$context['default_list'] = 'gameslist';
-		$context['page_title'] = $txt['Shop_tab_logs']. ' - ' . $txt['Shop_logs_games'];
+		// Games
+		loadLanguage('Shop/Games');
 
-		// The entire list
-		$listOptions = array(
-			'id' => 'gameslist',
-			'title' => $txt['Shop_logs_bank'],
+		$listOptions = [
+			'id' => 'loglist',
+			'title' => Shop::getText('logs_games'),
 			'items_per_page' => !empty($modSettings['Shop_items_perpage']) ? $modSettings['Shop_items_perpage'] : 15,
 			'base_href' => '?action=admin;area=shoplogs;sa=games',
 			'default_sort_col' => 'date',
-			'get_items' => array(
-				'function' => 'AdminShopLogs::Get',
-				'params' => array('games'),
-			),
-			'get_count' => array(
-				'function' => 'AdminShopLogs::Count',
-				'params' => array('games'),
-			),
-			'no_items_label' => $txt['Shop_logs_empty'],
+			'get_items' => [
+				'function' => 'Shop\Helper\Database::Get',
+				'params' => ['shop_log_games AS lg', array_merge(Database::$log_games, ['m.real_name']), '', false, 'LEFT JOIN {db_prefix}members AS m ON (m.id_member = lg.userid)'],
+			],
+			'get_count' => [
+				'function' => 'Shop\Helper\Database::Count',
+				'params' => ['shop_log_games AS lg', Database::$log_games],
+			],
+			'no_items_label' => Shop::getText('logs_empty'),
 			'no_items_align' => 'center',
-			'columns' => array(
-				'from_user' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_user'],
+			'columns' => [
+				'from_user' => [
+					'header' => [
+						'value' => Shop::getText('logs_user'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="'. $scripturl . '?action=profile;u=%1$d">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'userid' => false,
 								'real_name' => true,
-							),
-						),
-						'style' => 'width: 12%',
-					),
-					'sort' =>  array(
+							],
+						],
+						'style' => 'width: 25%',
+					],
+					'sort' =>  [
 						'default' => 'real_name DESC',
 						'reverse' => 'real_name',
-					),
-				),
-				'game' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_games_type'],
+					],
+				],
+				'game' => [
+					'header' => [
+						'value' => Shop::getText('logs_games_type'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ global $scripturl;
-							return '<a href="'. $scripturl. '?action=shop;sa=games;play='.$row['game'].'">'.ucfirst($row['game']).'</a>';
+					],
+					'data' => [
+						'function' => function($row) use ($scripturl)
+						{
+							return '<a href="'. $scripturl . '?action=shop;sa=games;play=' . $row['game'] . '">' . Shop::getText('games_' . $row['game']) . '</a>';
 						},
-						'style' => 'width: 7%',
-					),
-					'sort' => array(
+						'style' => 'width: 25%',
+					],
+					'sort' => [
 						'default' => 'type DESC',
 						'reverse' => 'type',
-					),
-				),
-				'amount' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_amount'],
+					],
+				],
+				'amount' => [
+					'header' => [
+						'value' => Shop::getText('logs_amount'),
 						'class' => 'lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ return Shop::formatCash($row['amount']);},
-						'style' => 'width: 17%'
-					),
-					'sort' =>  array(
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							// Show a sign and color depending on the user
+							return '<span style="color: ' . ($row['amount'] <= 0 ? 'red">- ' : 'green">+ ') . Format::cash(abs($row['amount'])) . '</span>';
+						},
+						'style' => 'width: 25%'
+					],
+					'sort' => [
 						'default' => 'amount DESC',
 						'reverse' => 'amount',
-					),
-				),
-				'date' => array(
-					'header' => array(
-						'value' => $txt['Shop_logs_date'],
+					],
+				],
+				'date' => [
+					'header' => [
+						'value' => Shop::getText('logs_date'),
 						'class' => ' lefttext',
-					),
-					'data' => array(
-						'function' => function($row){ return timeformat($row['date']);},
-						'style' => 'width: 21%',
-					),
-					'sort' =>  array(
+					],
+					'data' => [
+						'function' => function($row)
+						{
+							return timeformat($row['date']);
+						},
+						'style' => 'width: 25%',
+					],
+					'sort' => [
 						'default' => 'date DESC',
 						'reverse' => 'date',
-					),
-				),
-			),
-			'additional_rows' => array(
-			),
-		);
+					],
+				],
+			],
+		];
 		// Let's finishem
 		createList($listOptions);
 	}

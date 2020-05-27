@@ -23,7 +23,10 @@ class Database
 	public static $profile_inventory = ['si.userid', 'si.itemid', 'si.trading', 'si.date', 's.name', 's.image', 's.description', 's.status'];
 
 	// Logs
-	public static $log_buy = ['lb.id', 'lb.itemid', 'lb.invid', 'lb.userid', 'lb.sellerid', 'lb.amount', 'lb.fee', 'lb.date', 's.name', 's.image', 's.status', 's.catid'];
+	public static $log_buy = ['lb.id', 'lb.itemid', 'lb.invid', 'lb.userid', 'lb.sellerid', 'lb.amount', 'lb.fee', 'lb.date', 's.name', 's.image', 's.description', 's.status', 's.catid'];
+	public static $log_gift = ['lg.id', 'lg.userid', 'lg.receiver', 'lg.amount', 'lg.itemid', 'lg.invid', 'lg.is_admin', 'lg.date'];
+	public static $log_bank = ['lb.id', 'lb.userid', 'lb.amount', 'lb.fee', 'lb.action', 'lb.type', 'lb.date'];
+	public static $log_games = ['lg.id', 'lg.userid', 'lg.amount', 'lg.game', 'lg.date'];
 
 	public function Save($config_vars, $return_config, $sa, $area = 'shopsettings')
 	{
@@ -69,6 +72,13 @@ class Database
 		global $smcFunc;
 
 		return $smcFunc['json_encode']($add);
+	}
+
+	public function json_decode($add = [], $param = false)
+	{
+		global $smcFunc;
+
+		return $smcFunc['json_decode']($add, $param);
 	}
 
 	public function Count($table, $columns, $additional_query = '', $additional_columns = '', $more_values = [])
