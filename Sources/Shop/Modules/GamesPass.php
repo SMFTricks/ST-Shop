@@ -108,7 +108,7 @@ class GamesPass extends Module
 		
 		return '
 			<div class="infobox">
-				' . sprintf(Shop::getText('games_success'), $this->_expires) . '
+				' . sprintf(Shop::getText('gp_success'), $this->_expires) . '
 			</div>';
 	}
 }
