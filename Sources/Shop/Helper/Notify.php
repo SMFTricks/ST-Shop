@@ -17,12 +17,36 @@ if (!defined('SMF'))
 
 class Notify
 {
+	/**
+	 * @var array Eho sends the PM.
+	 */
 	var $from = [];
+
+	/**
+	 * @var array Who receives the PM.
+	 */
 	var $to = [];
+
+	/**
+	 * @var array Details provided to the Alert to use on the background task.
+	 */
 	var $_details = [];
+
+	/**
+	 * @var array Type of values.
+	 */
 	var $types = [];
+
+	/**
+	 * @var array Columns for the background task.
+	 */
 	var $columns = [];
 
+	/**
+	 * Notify::__construct()
+	 *
+	 * Set the apropiate types for the background task
+	 */
 	function __construct()
 	{
 		$this->types = [

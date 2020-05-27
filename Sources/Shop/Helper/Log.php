@@ -17,15 +17,31 @@ if (!defined('SMF'))
 
 class Log
 {
+	/**
+	 * @var array Gift columns.
+	 */
 	private $_gift;
+
+	/**
+	 * @var array Buy columns.
+	 */
 	private $_buy;
+
+	/**
+	 * @var array Inventory columns.
+	 */
 	private $_inventory;
 
-	
-	private $types = [];
-
+	/**
+	 * @var array Helper array for inserting multiple values.
+	 */
 	private $insert_rows = [];
 
+	/**
+	 * Log::__construct()
+	 *
+	 * Set the apropiate types vand values for the columns
+	 */
 	function __construct()
 	{
 		// Gift
