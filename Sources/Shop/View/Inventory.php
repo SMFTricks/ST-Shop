@@ -47,7 +47,7 @@ class Inventory
 		$this->tabs();
 
 		// Check if user is allowed to access this section
-		if (!allowedTo('shop_canManage'))
+		if (!allowedTo('shop_canManage') && (!isset($_REQUEST['action']) || $_REQUEST['action'] != 'profile'))
 			isAllowedTo('shop_viewInventory');
 	}
 
