@@ -538,7 +538,8 @@ function template_stats()
 	foreach ($context['stats_blocks'] as $stat => $block)
 	{
 		// Check if user has enough privileges to show them this information
-		if (empty($block['enabled']))
+		// Or if the block contains stuff
+		if (empty($block['enabled']) || empty($block['call']))
 			continue;
 
 		echo '

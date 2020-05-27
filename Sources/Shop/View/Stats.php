@@ -164,28 +164,34 @@ class Stats
 	 */
 	public function format($link = false)
 	{
-		$this->_max = 1;
-		foreach ($this->_result as $row)
+		// We actually got something?
+		if (!empty($this->_result))
 		{
-			$this->_final[] = [
-				'name' => $row['stat_name'],
-				'id' => $row['stat_id'],
-				'image' => isset($row['image']) ? Format::image($row['image']) : '',
-				'link' => $link,
-				'count' => isset($row['count']) ? $row['count'] : NULL,
-			];
-			if (isset($row['count']))
-				if ($this->_max < $row['count'])
-					$this->_max = $row['count'];
-		}
-		foreach ($this->_final as $row => $value)
-		{
-			if ($value['count'] == NULL)
-				continue;
+			$this->_max = 1;
+			foreach ($this->_result as $row)
+			{
+				$this->_final[] = [
+					'name' => $row['stat_name'],
+					'id' => $row['stat_id'],
+					'image' => isset($row['image']) ? Format::image($row['image']) : '',
+					'link' => $link,
+					'count' => isset($row['count']) ? $row['count'] : NULL,
+				];
+				if (isset($row['count']))
+					if ($this->_max < $row['count'])
+						$this->_max = $row['count'];
+			}
+			foreach ($this->_final as $row => $value)
+			{
+				if ($value['count'] == NULL)
+					continue;
 
-			$this->_final[$row]['percent'] = round(($value['count'] * 100) / $this->_max);
-			$this->_final[$row]['num'] = comma_format($value['count']);
+				$this->_final[$row]['percent'] = round(($value['count'] * 100) / $this->_max);
+				$this->_final[$row]['num'] = comma_format($value['count']);
+			}
 		}
+		else
+			$this->_final = false;
 	}
 
 	/**
