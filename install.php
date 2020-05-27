@@ -713,7 +713,7 @@
 					// Default category
 					[
 						'Default',
-						'Boardarrow.gif',
+						'bookshelf.png',
 						'This is the default category'
 					],
 				],
