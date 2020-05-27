@@ -195,7 +195,7 @@ class Steal extends Module
 
 				// Alert??
 				if (!empty($this->item_info[3]))
-					$this->_notify->alert($memResult['id_member'], 'module_steal', $user_info['id'], ['item_icon' => 'steal', 'amount' => Format::cash($this->_credits), 'ignore_prefs' => true, 'module' => true]);
+					$this->_notify->alert($memResult['id_member'], 'module_steal', $user_info['id'], ['item_icon' => 'steal', 'amount' => Format::cash($this->_credits), 'ignore_prefs' => true, 'language' => 'Modules']);
 			}
 			// Success!
 			return '

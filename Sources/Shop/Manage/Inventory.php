@@ -264,7 +264,7 @@ class Inventory extends Dashboard
 
 			// Deploy alert?
 			if (!empty($modSettings['Shop_noty_credits']))
-				$this->_notify->alert($members, 'credits', $user_info['id'], ['item_icon' => 'money_received', 'amount' => Format::cash($amount)]);
+				$this->_notify->alert($members, 'credits', $user_info['id'], ['item_icon' => 'money_received', 'amount' => Format::cash($amount), 'allow_self' => true]);
 
 			// Redirect to a nice message of successful
 			redirectexit('action=admin;area=shopinventory;sa=groupcredits;success');

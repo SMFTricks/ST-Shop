@@ -31,7 +31,7 @@ class Alerts extends SMF_BackgroundTask
 		$smcFunc['db_free_result']($request);
 
 		// Just rule out a self-alert or a non-existent user...
-		if (!is_array($this->_details['receivers']) && (empty($author) || $author['id_member'] == $this->_details['receivers']))
+		if (!is_array($this->_details['receivers']) && (empty($author) || $author['id_member'] == $this->_details['receivers']) && (empty($this->_details['extra_items']['allow_self']) || !isset($this->_details['extra_items']['allow_self'])))
 			return true;
 
 		// Find the users that are receiving the alert then
@@ -48,7 +48,7 @@ class Alerts extends SMF_BackgroundTask
 		$smcFunc['db_free_result']($request);
 
 		// User is on that group, let's remove it
-		if (in_array($author['id_member'], $members))
+		if (in_array($author['id_member'], $members) && (empty($this->_details['extra_items']['allow_self']) || !isset($this->_details['extra_items']['allow_self'])))
 			$members = array_diff($members, [$author['id_member']]);
 
 		// We had any luck?
@@ -63,7 +63,7 @@ class Alerts extends SMF_BackgroundTask
 		$notifies = [];
 
 		// Check preferences?
-		if (empty($this->_details['ignore_prefs']) || !isset($this->_details['ignore_prefs']))
+		if (empty($this->_details['extra_items']['ignore_prefs']) || !isset($this->_details['extra_items']['ignore_prefs']))
 		{
 			require_once($sourcedir . '/Subs-Notify.php');
 			$prefs = getNotifyPrefs($members, 'shop_user'.$this->_details['action'], true);
@@ -75,7 +75,7 @@ class Alerts extends SMF_BackgroundTask
 		}
 		// Just fire up these notifications
 		else
-			foreach ($members as $member => $pref_option)
+			foreach ($members as $member)
 				$notifies['alert'][] = $member;
 
 		// Deploy alerts

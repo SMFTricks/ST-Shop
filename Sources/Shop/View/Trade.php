@@ -548,7 +548,7 @@ class Trade
 
 		// Alert?
 		if (!empty($modSettings['Shop_noty_trade']))
-			$this->_notify->alert($this->_item['userid'], 'traded', $this->_item['id'], ['shop_href' => ';sa=inventory', 'item_icon' => $this->_item['image'], 'trade' => true, 'item_name' => $this->_item['name']]);
+			$this->_notify->alert($this->_item['userid'], 'traded', $this->_item['id'], ['shop_href' => ';sa=inventory', 'item_icon' => $this->_item['image'], 'use_item' => true, 'item_name' => $this->_item['name']]);
 			
 		// Redirect to the inventory?
 		redirectexit('action=shop;sa=inventory;sort=item_date;purchased');

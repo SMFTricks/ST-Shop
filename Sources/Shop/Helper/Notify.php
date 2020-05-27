@@ -20,12 +20,12 @@ class Notify
 	/**
 	 * @var array Eho sends the PM.
 	 */
-	var $from = [];
+	var $_from = [];
 
 	/**
 	 * @var array Who receives the PM.
 	 */
-	var $to = [];
+	var $_to = [];
 
 	/**
 	 * @var array Details provided to the Alert to use on the background task.
@@ -35,12 +35,12 @@ class Notify
 	/**
 	 * @var array Type of values.
 	 */
-	var $types = [];
+	var $_types = [];
 
 	/**
 	 * @var array Columns for the background task.
 	 */
-	var $columns = [];
+	var $_columns = [];
 
 	/**
 	 * Notify::__construct()
@@ -49,14 +49,14 @@ class Notify
 	 */
 	function __construct()
 	{
-		$this->types = [
+		$this->_types = [
 			'task_file' => 'string',
 			'task_class' => 'string',
 			'task_data' => 'string',
 			'claimed_time' => 'int'
 		];
 
-		$this->columns = [
+		$this->_columns = [
 			'$sourcedir/Shop/Tasks/Alerts.php',
 			'Alerts'
 		];
@@ -70,23 +70,23 @@ class Notify
 		require_once($sourcedir . '/Subs-Post.php');
 
 		// Who is sending the message
-		$this->from = [
+		$this->_from = [
 			'id' => 0,
 			'name' => Shop::getText('notification_sold_from'),
 			'username' => Shop::getText('notification_sold_from'),
 		];
 
 		// Who receives the message
-		$this->to = [
+		$this->_to = [
 			'to' => is_array($user) ? $user : [$user],
 			'bcc' => [],
 		];
 
 		// Send the PM
-		sendpm($this->to, $subject, $body, false, $this->from);
+		sendpm($this->_to, $subject, $body, false, $this->_from);
 	}
 
-	public function alert($user, $action, $content, $extra_items = [])
+	public function alert($user, $action, $content, $extra_items = [], $sender = [])
 	{
 		global $user_info, $scripturl;
 
@@ -99,8 +99,8 @@ class Notify
 
 		// Insert the required details first
 		$this->_details = [
-			'sender_id' => $user_info['id'],
-			'sender_name' => $user_info['name'],
+			'sender_id' => !empty($sender) ? $sender['id'] : $user_info['id'],
+			'sender_name' => !empty($sender) ? $sender['name'] : $user_info['name'],
 			'receivers' => $user,
 			'time' => time(),
 			'action' => $action,
@@ -109,9 +109,9 @@ class Notify
 		];
 
 		// Include these details in the values
-		$this->columns = array_merge($this->columns, [Database::json_encode($this->_details), 0]);
+		$this->_columns = array_merge($this->_columns, [Database::json_encode($this->_details), 0]);
 		
 		// Just adding the background task, don't mind me
-		Database::Insert('background_tasks', $this->columns, $this->types, ['id_task']);
+		Database::Insert('background_tasks', $this->_columns, $this->_types, ['id_task']);
 	}
 }
