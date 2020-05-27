@@ -72,7 +72,7 @@ class GamesPass extends Module
 		return '
 			<dl class="settings">
 				<dt>
-					' . Shop::getText('games_setting1') . '
+					' . Shop::getText('gp_setting1') . '
 				</dt>
 				<dd>
 					<input type="number" min="1" id="info1" name="info1" value="' . $this->item_info[1] . '" />
