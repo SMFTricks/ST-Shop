@@ -219,8 +219,8 @@ class Shop
 				break;
 			// Who actions
 			case 'who':
-				add_integration_function('who_allowed', __NAMESPACE__ . '\Integration\Who::who_allowed', false);
-				add_integration_function('integrate_whos_online', __NAMESPACE__ . '\Integration\Who::whos_online', false);
+				add_integration_function('who_allowed', __NAMESPACE__ . '\Integration\Who::who_allowed#', false);
+				add_integration_function('whos_online_after', __NAMESPACE__ . '\Integration\Who::whos_online_after#', false);
 				break;
 			// Profile
 			case 'profile':

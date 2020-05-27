@@ -11,6 +11,7 @@
 namespace Shop\Integration;
 
 use Shop\Shop;
+use Shop\Helper\Database;
 
 if (!defined('SMF'))
 	die('No direct access...');
@@ -18,128 +19,194 @@ if (!defined('SMF'))
 class Who
 {
 	/**
+	 * @var array Receives the database query for different scenarios.
+	 */
+	var $_query;
+
+	/**
+	 * @var array Formats $_query to user the member ID as the key.
+	 */
+	var $_result;
+
+	/**
+	 * @var array Stores the ID's for inventories.
+	 */
+	var $_inventory_ids = [];
+
+	/**
+	 * @var array Stores the ID's for trade center.
+	 */
+	var $_trade_ids = [];
+
+	/**
 	 * Who::who_allowed()
 	 *
 	 * Used in the who's online action.
-	 * @param $allowedActions is the array of actions that require a specific permission.
+	 * 
+	 * @param array $allowedActions is the array of actions that require a specific permission, using ACTION as the key.
 	 * @return void
 	 */
 	public static function who_allowed(&$allowedActions)
 	{
-		$allowedActions = array_merge($allowedActions, [
-			'shop' => ['shop_canAccess', 'shop_canManage'],
-			'shopinfo' => ['shop_canManage'],
-			'shopsettings' => ['shop_canManage'],
-			'shopitems' => ['shop_canManage'],
-			'shopmodules' => ['shop_canManage'],
-			'shopcategories' => ['shop_canManage'],
-			'shopgames' => ['shop_canManage'],
-			'shopinventory' => ['shop_canManage'],
-			'shoplogs' => ['shop_canManage'],
-		]);
+		$allowedActions['shop'] = ['shop_canAccess', 'shop_canManage'];
+		$allowedActions['shopinfo'] = ['shop_canManage'];
+		$allowedActions['shopsettings'] = ['shop_canManage'];
+		$allowedActions['shopitems'] = ['shop_canManage'];
+		$allowedActions['shopmodules'] = ['shop_canManage'];
+		$allowedActions['shopcategories'] = ['shop_canManage'];
+		$allowedActions['shopgames'] = ['shop_canManage'];
+		$allowedActions['shopinventory'] = ['shop_canManage'];
+		$allowedActions['shoplogs'] = ['shop_canManage'];
 	}
 
 	/**
-	 * Who::whos_online()
+	 * Who::whos_online_after()
 	 *
 	 * Used in the who's online action.
-	 * @param $action It gets the request parameters 
-	 * @return string A text for the current action
+	 * @param mixed $urls a single url (string) or an array of arrays, each inner array being (JSON-encoded request data, id_member)
+	 * @param array $data Returns the correct strings for each action
+	 * @return void
 	 */
-	public static function whos_online($actions)
+	public function whos_online_after(&$urls, &$data)
 	{
-		global $memberContext, $txt, $modSettings;
+		global $modSettings;
 
-		if (isset($actions['action']) && $actions['action'] === 'shop')
+		// We do nothing if shop is disabled or user can't see it
+		if (empty($modSettings['Shop_enable_shop']) || !allowedTo('shop_canAccess'))
+			return;
+
+		foreach ($urls as $k => $url)
 		{
-			if (isset($actions['sa']))
+			// Get the request parameters..
+			$actions = Database::json_decode($url[0], true);
+			if ($actions === false)
+				continue;
+
+			// Only shop actions
+			if (isset($actions['action']) && $actions['action'] === 'shop' && allowedTo('shop_canAccess'))
 			{
-				// Buying items
-				if ($actions['sa'] == 'buy' && allowedTo('shop_canBuy'))
-					$who = $txt['whoallow_shop_buy'];
-				// Gift items / Send money
-				elseif (($actions['sa'] == 'gift' || $actions['sa'] == 'sendmoney') && allowedTo('shop_canGift'))
+				// Subsections
+				if (isset($actions['sa']))
 				{
-					$who = $txt['whoallow_shop_gift'];
-					if ($actions['sa'] == 'sendmoney')
-						$who = sprintf($txt['whoallow_shop_sendmoney'], $modSettings['Shop_credits_suffix']);
-				}
-				// Viewing Inventory
-				elseif (($actions['sa'] == 'inventory' || $actions['sa'] == 'search') && allowedTo('shop_viewInventory'))
-				{
+					// Buying items
+					if ($actions['sa'] == 'buy' && allowedTo('shop_canBuy'))
+						$data[$k] = Shop::getText('who_buy');
+					// Gift items / Send money
+					elseif (($actions['sa'] == 'gift' || $actions['sa'] == 'sendmoney') && allowedTo('shop_canGift') && !empty($modSettings['Shop_enable_gift']))
+					{
+						// Regular gift
+						$data[$k] = Shop::getText('who_gift');
+
+						// Money
+						if ($actions['sa'] == 'sendmoney')
+							$data[$k] = sprintf(Shop::getText('who_sendmoney'), $modSettings['Shop_credits_suffix']);
+					}
+					// Bank
+					elseif ($actions['sa'] == 'bank' && allowedTo('shop_canBank') && !empty($modSettings['Shop_enable_bank']))
+						$data[$k] = Shop::getText('who_bank');
+					// Stats
+					elseif ($actions['sa'] == 'stats' && allowedTo('shop_viewStats') && !empty($modSettings['Shop_enable_stats']))
+						$data[$k] = Shop::getText('who_stats');
+					// Games Room
+					elseif ($actions['sa'] == 'games' && allowedTo('shop_playGames') && !empty($modSettings['Shop_enable_games']))
+					{
+						$data[$k] = Shop::getText('who_games');
+						// Playing a game?
+						if (isset($actions['play']))
+							$data[$k] = Shop::getText('who_games_' . $actions['play']);
+					}
 					// Searching
-					if ($actions['sa'] == 'search')
-						$who = $txt['whoallow_shop_search'];
-					// Viewing
-					else
+					elseif ($actions['sa'] == 'search' && allowedTo('shop_viewInventory'))
+						$data[$k] = Shop::getText('who_search');
+					// Viewing Inventory
+					elseif ($actions['sa'] == 'inventory' && allowedTo('shop_viewInventory'))
 					{
-						$who = $txt['whoallow_shop_owninventory'];
-						if (!empty($actions['u']))
-						{
-							$temp = loadMemberData($actions['u'], false, 'profile');
-							loadMemberContext($actions['u']);
-							$membername = $memberContext[$actions['u']]['name'];
-							$who = sprintf($txt['whoallow_shop_inventory'], $membername, $actions['u']);
-						}
+						// Whose?  Their own?
+						if (empty($actions['u']))
+							$actions['u'] = $url[1];
+
+						$this->_inventory_ids[(int) $actions['u']][$k] = $actions['u'] == $url[1] ? Shop::getText('who_owninventory') : Shop::getText('who_inventory');
 					}
-				}
-				// Bank
-				elseif ($actions['sa'] == 'bank' && allowedTo('shop_canBank'))
-					$who = $txt['whoallow_shop_bank'];
-				// Trade center
-				elseif ($actions['sa'] == 'trade' && allowedTo('shop_canTrade'))
-					$who = $txt['whoallow_shop_trade'];
-				// Trade list
-				elseif ($actions['sa'] == 'tradelist' && allowedTo('shop_canTrade'))
-					$who = $txt['whoallow_shop_tradelist'];
-				// Trade list
-				elseif ($actions['sa'] == 'tradelog' && allowedTo('shop_canTrade'))
-					$who = $txt['whoallow_shop_tradelog'];
-				// Personal trade list
-				elseif ($actions['sa'] == 'mytrades' && allowedTo('shop_canTrade'))
-				{
-					$who = $txt['whoallow_shop_owntrades'];
-					if (!empty($actions['u']))
+					// Trade center
+					elseif ($actions['sa'] == 'trade' && allowedTo('shop_canTrade'))
+						$data[$k] = Shop::getText('who_trade');
+					// Trade list
+					elseif (($actions['sa'] == 'tradelist' || $actions['sa'] == 'mytrades') && allowedTo('shop_canTrade'))
 					{
-						$temp = loadMemberData($actions['u'], false, 'profile');
-						loadMemberContext($actions['u']);
-						$membername = $memberContext[$actions['u']]['name'];
-						$who = sprintf($txt['whoallow_shop_othertrades'], $membername, $actions['u']);
+						// Whose?  Their own?
+						if (empty($actions['u']))
+							$actions['u'] = $url[1];
+
+						$this->_trade_ids[(int) $actions['u']][$k] = $actions['u'] == $url[1] ? Shop::getText('who_tradelist' . ($actions['sa'] == 'mytrades' ? '_own' : '')) : Shop::getText('who_tradelist_other');
 					}
+					// Trade list
+					elseif ($actions['sa'] == 'tradelog' && allowedTo('shop_canTrade'))
+						$data[$k] = Shop::getText('who_tradelog');
 				}
-				// Stats
-				elseif ($actions['sa'] == 'stats' && allowedTo('shop_viewStats'))
-					$who = $txt['whoallow_shop_stats'];
-				// Games Room
-				elseif ($actions['sa'] == 'games' && allowedTo('shop_playGames'))
-				{
-					$who = $txt['whoallow_shop_games'];
-					// Playing a game?
-					if (isset($actions['play']))
-					{
-						// Slots
-						if ($actions['play'] == 'slots')
-							$who = $txt['whoallow_shop_games_slots'];
-						// Lucky2
-						elseif ($actions['play'] == 'lucky2')
-							$who = $txt['whoallow_shop_games_lucky2'];
-						// Number Slots
-						elseif ($actions['play'] == 'number')
-							$who = $txt['whoallow_shop_games_number'];
-						// Pairs
-						elseif ($actions['play'] == 'pairs')
-							$who = $txt['whoallow_shop_games_pairs'];
-						// Pairs
-						elseif ($actions['play'] == 'dice')
-							$who = $txt['whoallow_shop_games_dice'];
-					}
-				}
+
 			}
 		}
 
-		if (!isset($who))
-			return false;
-		else
-			return $who;
+		// Fix strings for inventory
+		$this->inventory($data);
+		// Fix strings for trade
+		$this->trade($data);
 	}
+
+	/**
+	 * Who::inventory()
+	 *
+	 * Formats the inventory actions
+	 * 
+	 * @param array $data Returns the correct strings for each action
+	 * @return void
+	 */
+	public function inventory(&$data)
+	{		
+		if (!empty($this->_inventory_ids) && allowedTo('shop_viewInventory'))
+		{
+			$this->_query = Database::Get(0, count($this->_inventory_ids), 'id_member', 'members', ['id_member', 'real_name'], 'WHERE id_member IN ({array_int:member_list})', false, '', ['member_list' => array_keys($this->_inventory_ids)]);
+
+			// Provide proper key
+			foreach ($this->_query as $row)
+				$this->_result[$row['id_member']] = $row;
+
+			// Set their action on each - session/text to sprintf.
+			foreach ($this->_result as $row)
+				foreach ($this->_inventory_ids[$row['id_member']] as $k => $session_text)
+					$data[$k] = sprintf($session_text, $row['id_member'], $row['real_name']);
+
+			// Destroy results for this section
+			unset($this->_result);
+		}
+	}
+
+	/**
+	 * Who::trade()
+	 *
+	 * Formats the trade actions
+	 * 
+	 * @param array $data Returns the correct strings for each action
+	 * @return void
+	 */
+	public function trade(&$data)
+	{		
+		if (!empty($this->_trade_ids) && allowedTo('shop_canTrade'))
+		{
+			$this->_query = Database::Get(0, count($this->_trade_ids), 'id_member', 'members', ['id_member', 'real_name'], 'WHERE id_member IN ({array_int:member_list})', false, '', ['member_list' => array_keys($this->_trade_ids)]);
+
+			// Provide proper key
+			foreach ($this->_query as $row)
+				$this->_result[$row['id_member']] = $row;
+
+			// Set their action on each - session/text to sprintf.
+			foreach ($this->_result as $row)
+				foreach ($this->_trade_ids[$row['id_member']] as $k => $session_text)
+					$data[$k] = sprintf($session_text, $row['id_member'], $row['real_name']);
+
+			// Destroy results for this section
+			unset($this->_result);
+		}
+	}
+
 }
