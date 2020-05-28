@@ -38,8 +38,8 @@ class ChangeUserTitle extends Module
 		$this->authorName = 'Daniel15';
 		$this->authorWeb = 'https://github.com/Daniel15';
 		$this->authorEmail = 'dansoft@dansoftaustralia.net';
-		$this->name = Shop::getText('ut_name');
-		$this->desc = Shop::getText('ut_desc');
+		$this->name = Shop::getText('cut_name');
+		$this->desc = Shop::getText('cut_desc');
 		$this->price = 50;
 	}
 
@@ -74,7 +74,7 @@ class ChangeUserTitle extends Module
 
 		return '
 			<div class="infobox">
-				' . sprintf(Shop::getText('ut_success'), $this->_title) . '
+				' . sprintf(Shop::getText('cut_success'), $this->_title) . '
 			</div>';
 	}
 }

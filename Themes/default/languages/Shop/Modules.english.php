@@ -35,9 +35,9 @@ $txt['Shop_cot_find_desc'] = 'Type the name of the user you want to change their
 $txt['Shop_cot_empty_title'] = 'You need to enter a new title to use!';
 $txt['Shop_cot_notown_title'] = 'You cannot use this item on yourself';
 $txt['Shop_cot_success'] = 'Successfully changed <i>%1$s</i>\'s title to <strong>%2$s</strong>';
-$txt['Shop_ut_name'] = 'Change User Title';
-$txt['Shop_ut_desc'] = 'Allows you to change your title';
-$txt['Shop_ut_success'] = 'Successfully changed title to <strong>%2$s</strong>';
+$txt['Shop_cut_name'] = 'Change User Title';
+$txt['Shop_cut_desc'] = 'Allows you to change your title';
+$txt['Shop_cut_success'] = 'Successfully changed title to <strong>%2$s</strong>';
 // Change Username
 $txt['Shop_cu_name'] = 'Change Username';
 $txt['Shop_cu_desc'] = 'Change your username';
@@ -108,3 +108,7 @@ $txt['Shop_steal_error_yourself'] = 'What are you doing? You cannot steal from y
 $txt['Shop_steal_notification_robbed'] = 'You just got robbed!';
 $txt['Shop_steal_notification_pm'] = 'We are sorry to inform you that you just have been robbed!' . "\n" . '[url=%1$s]%2$s[/url] has stripped you of [i]%3$s[/i] from your pocket. You now have [i]%4$s[/i] remaining in your pocket.' . "\n\n" . ' Next time put your money safe in the Shop Bank.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
 $txt['alert_shop_module_steal'] = '{member_link} just robbed you {amount} from your pocket!';
+// Battle Pass
+$txt['Shop_blc_name'] = 'Battle Life Card';
+$txt['Shop_blc_desc'] = 'Revive your character in Battle';
+$txt['Shop_blc_success'] = 'You have successfully revived in Battle';
