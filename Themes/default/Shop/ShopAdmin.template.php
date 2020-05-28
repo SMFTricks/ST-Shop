@@ -82,11 +82,11 @@ function template_dashboard()
 
 			foreach ($c['users'] as $u)
 				echo '
-						<dd>
-							<a href="', $u['site'] ,'">', $u['name'] ,'</a>', (isset($u['desc']) ? ' - <span class="smalltext">'. $u['desc']. '</span>' : ''), '
-						</dd>';
+					<dd>
+						<a href="', $u['site'] ,'">', $u['name'] ,'</a>', (isset($u['desc']) ? ' - <span class="smalltext">'. $u['desc']. '</span>' : ''), '
+					</dd>';
 			echo '
-					</dl>';
+				</dl>';
 		}
 	echo '
 			</div></div>
