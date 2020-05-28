@@ -39,6 +39,8 @@ class Inventory extends Dashboard
 	 */
 	function __construct()
 	{
+		global $modSettings;
+
 		// Notify
 		$this->_notify = new Notify;
 

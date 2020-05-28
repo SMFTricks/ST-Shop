@@ -10,8 +10,6 @@
 
 namespace Shop\Helper;
 
-use Shop\Shop;
-
 if (!defined('SMF'))
 	die('No direct access...');
 
@@ -35,7 +33,7 @@ class Log
 	/**
 	 * @var array Helper array for inserting multiple values.
 	 */
-	private $insert_rows = [];
+	private $_insert_rows = [];
 
 	/**
 	 * Log::__construct()

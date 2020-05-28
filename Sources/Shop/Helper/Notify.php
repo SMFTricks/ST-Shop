@@ -18,7 +18,7 @@ if (!defined('SMF'))
 class Notify
 {
 	/**
-	 * @var array Eho sends the PM.
+	 * @var array Who sends the PM.
 	 */
 	var $_from = [];
 
@@ -113,5 +113,9 @@ class Notify
 		
 		// Just adding the background task, don't mind me
 		Database::Insert('background_tasks', $this->_columns, $this->_types, ['id_task']);
+
+		// If they called this object multitple times for some reason...
+		unset($this->_columns[2]);
+		unset($this->_columns[3]);
 	}
 }

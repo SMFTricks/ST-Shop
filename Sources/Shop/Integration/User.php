@@ -51,7 +51,7 @@ class User
 		loadLanguage('Shop/Shop');
 	}
 
-	 /**
+	/**
 	 * User::load_member_data()
 	 *
 	 * Include our shop columns in loadMemberData
@@ -79,7 +79,7 @@ class User
 		}
 	}
 
-	 /**
+	/**
 	 * User::user_info()
 	 *
 	 * Used for adding new elements to the $user_info array
@@ -96,7 +96,7 @@ class User
 		$user_info['gamesPass'] = isset($user_settings['gamesPass']) ? $user_settings['gamesPass'] : 0;
 	}
 
-	 /**
+	/**
 	 * User::simple_actions()
 	 *
 	 * Load new elements to $context['user'] array in case we want to handle stuff from templates
@@ -127,7 +127,7 @@ class User
 			}
 	}
 
-	 /**
+	/**
 	 * User::member_context()
 	 *
 	 * Shop custom profile fields
@@ -176,7 +176,7 @@ class User
 			];
 	}
 
-	 /**
+	/**
 	 * User::fetch_alerts()
 	 *
 	 * Tweaks the final alert sent by a shop action
