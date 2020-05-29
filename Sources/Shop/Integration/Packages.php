@@ -55,21 +55,13 @@ class Packages
 	{
 		global $context;
 
-		// Add new types
 		foreach ($this->_types as $type)
 			$context['modification_types'][] = $type;
-
-		// Set the types
-		$context['available_shop_modules'] = [];
-		$context['available_shop_games'] = [];
 	}
 
 	public function packages_sort(&$sort_id, &$packages)
 	{
 		foreach ($this->_types as $type)
-		{
 			$sort_id[$type] = 1;
-			$packages[$type] = [];
-		}
 	}
 }
