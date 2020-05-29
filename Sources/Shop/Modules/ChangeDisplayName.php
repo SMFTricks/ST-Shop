@@ -57,7 +57,7 @@ class ChangeDisplayName extends Module
 					' . Shop::getText('cdn_setting1') . '
 				</dt>
 				<dd>
-					<input type="number" min="1" id="info1" name="info1" this->display_name="' . $this->item_info[1] . '" />
+					<input type="number" min="1" id="info1" name="info1" value="' . $this->item_info[1] . '" />
 				</dd>
 			</dl>';
 	}
@@ -71,7 +71,7 @@ class ChangeDisplayName extends Module
 				<span class="smalltext">' . sprintf(Shop::getText('dn_new_display_name_desc'), $this->item_info[1]) . '</span>
 			</dt>
 			<dd>
-			<input type="text" id="newDisplayName" name="newDisplayName" size="60" />
+				<input type="text" id="newDisplayName" name="newDisplayName" size="60" />
 			</dd>
 		</dl>';
 	}
