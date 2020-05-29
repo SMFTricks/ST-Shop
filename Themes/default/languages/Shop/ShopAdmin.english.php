@@ -236,7 +236,7 @@ $txt['Shop_games_seven'] = 'Seven';
 $txt['Shop_games_blackjack'] = 'Blackjack';
 
 // Logs
-$txt['Shop_tab_logs'] = 'Shop logs';
+$txt['Shop_tab_logs'] = 'Shop Logs';
 $txt['Shop_tab_logs_desc'] = 'Here you can check all the logs, including sent money, trading, gifts, and more.';
 $txt['Shop_logs_admin_money'] = 'Admin Money';
 $txt['Shop_logs_admin_money_desc'] = 'Log for the sent %s by admin.';
@@ -323,3 +323,8 @@ $txt['shop_modules_package'] = 'ST Shop Modules';
 $txt['install_shop_modules'] = 'Install Shop Module';
 $txt['shop_games_package'] = 'ST Shop Games';
 $txt['install_shop_games'] = 'Install Shop Game';
+
+// Maintenance
+$txt['Shop_tab_maint'] = 'Maintenance';
+$txt['Shop_tab_maint_desc'] = 'Here you can use some maintenance utilities for the shop, like converting from other shops.';
+$txt['Shop_maint_import'] = 'Import data';
