@@ -86,7 +86,7 @@ class Inventory
 		$context['items_url'] = $boardurl . Shop::$itemsdir;
 		$context['shop_images_list'] = Images::list();
 		// ... and categories
-		$context['shop_categories_list'] = Database::Get(0, 1000, 'sc.name', 'shop_categories AS sc', Database::$categories);
+		$context['shop_categories_list'] = Database::Get(0, 1000, 'sc.name', 'stshop_categories AS sc', Database::$categories);
 		$context['form_url'] = '?action=shop;sa=inventory'. (!empty($context['user']['is_owner']) ? '' : ';u='. $context['member']['id']) . (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ';cat='.$_REQUEST['cat'] : '');
 
 		// The entire list
@@ -150,11 +150,11 @@ class Inventory
 			'default_sort_dir' => 'DESC',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_inventory AS si', array_merge(Database::$inventory, array_merge(Database::$items, ['sc.name AS category', 'mem.real_name'])), 'WHERE si.userid '. (empty($notin) ? '=' : '<>') . ' {int:user} AND si.trading = {int:trading} AND s.status = 1'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ' AND s.catid = {int:cat}' : ''), false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid) LEFT JOIN {db_prefix}shop_categories AS sc ON (s.catid = sc.catid) LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = si.userid)', ['cat' => isset($_REQUEST['cat']) ? $_REQUEST['cat'] : 0, 'user' => $memberResult['id'], 'trading' => empty($trading) ? 0 : 1]],
+				'params' => ['stshop_inventory AS si', array_merge(Database::$inventory, array_merge(Database::$items, ['sc.name AS category', 'mem.real_name'])), 'WHERE si.userid '. (empty($notin) ? '=' : '<>') . ' {int:user} AND si.trading = {int:trading} AND s.status = 1'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ' AND s.catid = {int:cat}' : ''), false, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid) LEFT JOIN {db_prefix}stshop_categories AS sc ON (s.catid = sc.catid) LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = si.userid)', ['cat' => isset($_REQUEST['cat']) ? $_REQUEST['cat'] : 0, 'user' => $memberResult['id'], 'trading' => empty($trading) ? 0 : 1]],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_inventory AS si', array_merge(Database::$inventory, Database::$items), 'WHERE si.userid '. (empty($notin) ? '=' : '<>') . ' {int:user} AND si.trading = {int:trading} AND s.status = 1'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ' AND s.catid = {int:cat}' : ''), 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['cat' => isset($_REQUEST['cat']) ? $_REQUEST['cat'] : 0, 'user' => $memberResult['id'], 'trading' => empty($trading) ? 0 : 1]],
+				'params' => ['stshop_inventory AS si', array_merge(Database::$inventory, Database::$items), 'WHERE si.userid '. (empty($notin) ? '=' : '<>') . ' {int:user} AND si.trading = {int:trading} AND s.status = 1'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ' AND s.catid = {int:cat}' : ''), 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid)', ['cat' => isset($_REQUEST['cat']) ? $_REQUEST['cat'] : 0, 'user' => $memberResult['id'], 'trading' => empty($trading) ? 0 : 1]],
 			],
 			'no_items_label' => !empty($trading) ? Shop::getText('no_items_trade') : (($user_info['id'] == $memberResult['id']) ? Shop::getText('inventory_no_items') : Shop::getText('inventory_other_no_items')),
 			'no_items_align' => 'center',
@@ -380,7 +380,7 @@ class Inventory
 		$use = (int) $_REQUEST['id'];
 
 		// Item details
-		$item = Database::Get('', '', '', 'shop_inventory AS si', array_merge(array_merge(Database::$inventory, Database::$items), ['sm.file']), 'WHERE si.id = {int:use} AND s.status = 1', true, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid) LEFT JOIN {db_prefix}shop_modules AS sm ON (sm.id = s.module)', ['use' => $use]);
+		$item = Database::Get('', '', '', 'stshop_inventory AS si', array_merge(array_merge(Database::$inventory, Database::$items), ['sm.file']), 'WHERE si.id = {int:use} AND s.status = 1', true, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid) LEFT JOIN {db_prefix}stshop_modules AS sm ON (sm.id = s.module)', ['use' => $use]);
 
 		// Validate info
 		$this->use_validate($item);
@@ -402,7 +402,7 @@ class Inventory
 		if (!class_exists($this->_item_module))
 		{
 			// Disable this item?
-			Database::Update('shop_items', ['id' => $item['itemid']], 'status = 0,', 'WHERE itemid = {int:id}');
+			Database::Update('stshop_items', ['id' => $item['itemid']], 'status = 0,', 'WHERE itemid = {int:id}');
 
 			// Notify the user
 			fatal_error(Shop::getText('module_notfound_admin'), false);
@@ -436,7 +436,7 @@ class Inventory
 		$use = (int) $_REQUEST['id'];
 
 		// Item details
-		$item = Database::Get('', '', '', 'shop_inventory AS si', array_merge(array_merge(Database::$inventory, Database::$items), ['sm.file']), 'WHERE si.id = {int:use} AND s.status = 1', true, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid) LEFT JOIN {db_prefix}shop_modules AS sm ON (sm.id = s.module)', ['use' => $use]);
+		$item = Database::Get('', '', '', 'stshop_inventory AS si', array_merge(array_merge(Database::$inventory, Database::$items), ['sm.file']), 'WHERE si.id = {int:use} AND s.status = 1', true, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid) LEFT JOIN {db_prefix}stshop_modules AS sm ON (sm.id = s.module)', ['use' => $use]);
 
 		// Validate info
 		$this->use_validate($item);
@@ -469,7 +469,7 @@ class Inventory
 
 		// Dow we need to remove the item after use?
 		if (!empty($item['delete_after_use']))
-			Database::Delete('shop_inventory', 'id', $use);
+			Database::Delete('stshop_inventory', 'id', $use);
 	}
 
 	public function use_validate($data)
@@ -507,7 +507,7 @@ class Inventory
 		checkSession('get');
 
 		// Item details
-		$item = Database::Get('', '', '', 'shop_inventory AS si', array_merge(Database::$inventory, Database::$items), 'WHERE si.id = {int:id} AND si.trading = 0 AND s.status = 1', true, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['id' => $itemid]);
+		$item = Database::Get('', '', '', 'stshop_inventory AS si', array_merge(Database::$inventory, Database::$items), 'WHERE si.id = {int:id} AND si.trading = 0 AND s.status = 1', true, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid)', ['id' => $itemid]);
 
 		// Lil hack
 		$item['can_use_item'] = 1;
@@ -516,7 +516,7 @@ class Inventory
 		$this->use_validate($item);
 
 		// Update it's FAValue
-		Database::Update('shop_inventory', ['id' => $itemid, 'fav' => $fav], 'fav = {int:fav},', 'WHERE id = {int:id}');
+		Database::Update('stshop_inventory', ['id' => $itemid, 'fav' => $fav], 'fav = {int:fav},', 'WHERE id = {int:id}');
 
 		// Out!
 		redirectexit('action=shop;sa=inventory');
@@ -534,7 +534,7 @@ class Inventory
 		$itemid = $_REQUEST['id'];
 
 		// Is that a real item?
-		$item = Database::Get('', '', '', 'shop_items AS s', Database::$items, 'WHERE s.itemid = {int:id} AND s.status = 1', true, '', ['id' => $itemid]);
+		$item = Database::Get('', '', '', 'stshop_items AS s', Database::$items, 'WHERE s.itemid = {int:id} AND s.status = 1', true, '', ['id' => $itemid]);
 
 		if (empty($item))
 			fatal_error(Shop::getText('item_notfound'), false);
@@ -560,11 +560,11 @@ class Inventory
 			'default_sort_dir' => 'DESC',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_inventory AS si', ['si.itemid', 'si.userid', 'si.itemid', 'COUNT(*) AS count', 'm.real_name AS user'], 'WHERE s.status = 1 AND si.itemid = {int:itemid} GROUP BY si.userid, si.itemid, user', false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid) LEFT JOIN {db_prefix}members AS m ON (m.id_member = si.userid)', ['itemid' => $itemid]],
+				'params' => ['stshop_inventory AS si', ['si.itemid', 'si.userid', 'si.itemid', 'COUNT(*) AS count', 'm.real_name AS user'], 'WHERE s.status = 1 AND si.itemid = {int:itemid} GROUP BY si.userid, si.itemid, user', false, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid) LEFT JOIN {db_prefix}members AS m ON (m.id_member = si.userid)', ['itemid' => $itemid]],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_inventory AS si', ['si.itemid', 'si.userid', 's.status'], 'WHERE si.itemid = {int:id} AND s.status = 1', 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['id' => $itemid]],
+				'params' => ['stshop_inventory AS si', ['si.itemid', 'si.userid', 's.status'], 'WHERE si.itemid = {int:id} AND s.status = 1', 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid)', ['id' => $itemid]],
 			],
 			'no_items_label' => Shop::getText('inventory_no_owners'),
 			'no_items_align' => 'center',
@@ -621,7 +621,7 @@ class Inventory
 			return false;
 
 		// Load the inventory
-		$this->_inventory_items = Database::Get(0, empty($modSettings['Shop_inventory_items_num']) ? 5 : $modSettings['Shop_inventory_items_num'], 'favo DESC,' . (!empty($modSettings['Shop_inventory_show_same_once']) ? 'MAX(si.date)' : 'si.date'). ' DESC', 'shop_inventory AS si', array_merge([(!empty($modSettings['Shop_inventory_show_same_once']) ? 'SUM(si.fav)' : 'si.fav'). ' AS favo'], Database::$profile_inventory), 'WHERE si.trading = 0 AND si.userid = {int:mem} AND s.status = 1' . (!empty($modSettings['Shop_inventory_show_same_once']) ? ' GROUP BY si.itemid, si.userid, si.trading, si.date, s.name, s.status, s.image, s.description' : ''), false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['mem' => $memID]);
+		$this->_inventory_items = Database::Get(0, empty($modSettings['Shop_inventory_items_num']) ? 5 : $modSettings['Shop_inventory_items_num'], 'favo DESC,' . (!empty($modSettings['Shop_inventory_show_same_once']) ? 'MAX(si.date)' : 'si.date'). ' DESC', 'stshop_inventory AS si', array_merge([(!empty($modSettings['Shop_inventory_show_same_once']) ? 'SUM(si.fav)' : 'si.fav'). ' AS favo'], Database::$profile_inventory), 'WHERE si.trading = 0 AND si.userid = {int:mem} AND s.status = 1' . (!empty($modSettings['Shop_inventory_show_same_once']) ? ' GROUP BY si.itemid, si.userid, si.trading, si.date, s.name, s.status, s.image, s.description' : ''), false, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid)', ['mem' => $memID]);
 
 		return $this->_inventory_items;
 	}
@@ -657,6 +657,6 @@ class Inventory
 		];
 
 		// Load the inventory
-		$context['inventory_list'] = Database::Get(0, 100000, 'favo DESC,' . (!empty($modSettings['Shop_inventory_show_same_once']) ? 'MAX(si.date)' : 'si.date'). ' DESC', 'shop_inventory AS si', array_merge([(!empty($modSettings['Shop_inventory_show_same_once']) ? 'SUM(si.fav)' : 'si.fav'). ' AS favo'], Database::$profile_inventory), 'WHERE si.trading = 0 AND si.userid = {int:mem} AND s.status = 1' . (!empty($modSettings['Shop_inventory_show_same_once']) ? ' GROUP BY si.itemid, si.userid, si.trading, si.date, s.name, s.status, s.image, s.description' : ''), false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['mem' => $memData['id_member']]);
+		$context['inventory_list'] = Database::Get(0, 100000, 'favo DESC,' . (!empty($modSettings['Shop_inventory_show_same_once']) ? 'MAX(si.date)' : 'si.date'). ' DESC', 'stshop_inventory AS si', array_merge([(!empty($modSettings['Shop_inventory_show_same_once']) ? 'SUM(si.fav)' : 'si.fav'). ' AS favo'], Database::$profile_inventory), 'WHERE si.trading = 0 AND si.userid = {int:mem} AND s.status = 1' . (!empty($modSettings['Shop_inventory_show_same_once']) ? ' GROUP BY si.itemid, si.userid, si.trading, si.date, s.name, s.status, s.image, s.description' : ''), false, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid)', ['mem' => $memData['id_member']]);
 	}
 }

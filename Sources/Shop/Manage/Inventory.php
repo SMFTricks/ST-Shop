@@ -410,7 +410,7 @@ class Inventory extends Dashboard
 			$_REQUEST['delete'][$key] = (int) $value;
 
 		// Delete selected items
-		Database::Delete('shop_inventory', 'id', $_REQUEST['delete'], ' AND userid = ' .$_REQUEST['u']);
+		Database::Delete('stshop_inventory', 'id', $_REQUEST['delete'], ' AND userid = ' .$_REQUEST['u']);
 
 		// Send the user to the items list with a message
 		redirectexit('action=admin;area=shopinventory;sa=userinv' . ($user_info['id'] == $_REQUEST['u'] ? '' : ';u='.$_REQUEST['u']) . ';deleted');
@@ -431,7 +431,7 @@ class Inventory extends Dashboard
 		$context['template_layers'][] = 'send';
 
 		// List of items
-		$context['shop_items_list'] = Database::Get(0, 100000, 's.name', 'shop_items AS s', Database::$items, 'WHERE s.status = 1 AND s.stock > 0');
+		$context['shop_items_list'] = Database::Get(0, 100000, 's.name', 'stshop_items AS s', Database::$items, 'WHERE s.status = 1 AND s.stock > 0');
 
 		// Load suggest.js
 		loadJavaScriptFile('suggest.js', ['default_theme' => true, 'defer' => false, 'minimize' => true], 'smf_suggest');
@@ -460,7 +460,7 @@ class Inventory extends Dashboard
 		$member_parameters = [];
 
 		// Get item info
-		$item_info = Database::Get('', '', '', 'shop_items AS s', Database::$items, 'WHERE s.itemid = {int:id} AND s.stock > 0', true, '', ['id' => $item]);
+		$item_info = Database::Get('', '', '', 'stshop_items AS s', Database::$items, 'WHERE s.itemid = {int:id} AND s.stock > 0', true, '', ['id' => $item]);
 
 		// That item available and didn't empty it's stock?
 		if (empty($item_info))
@@ -549,7 +549,7 @@ class Inventory extends Dashboard
 		$context['template_layers'][] = 'send';
 
 		// List of items
-		$context['shop_items_list'] = Database::Get(0, 100000, 's.name', 'shop_items AS s', Database::$items, 'WHERE s.status = 1');
+		$context['shop_items_list'] = Database::Get(0, 100000, 's.name', 'stshop_items AS s', Database::$items, 'WHERE s.status = 1');
 	}
 
 	public function restock2()
@@ -572,7 +572,7 @@ class Inventory extends Dashboard
 				$_REQUEST['restockitem'][$key] = (int) $value;
 		
 		// Update the stock
-		Database::Update('shop_items', ['restock' => $restock, 'limit' => $stock, 'ids' => $_REQUEST['restockitem']], 'stock = stock + {int:restock},', 'WHERE'. ($_REQUEST['whatitems'] == 'all' ? ' stock <= {int:limit}' : ' itemid IN ({array_int:ids})'));
+		Database::Update('stshop_items', ['restock' => $restock, 'limit' => $stock, 'ids' => $_REQUEST['restockitem']], 'stock = stock + {int:restock},', 'WHERE'. ($_REQUEST['whatitems'] == 'all' ? ' stock <= {int:limit}' : ' itemid IN ({array_int:ids})'));
 
 		// Success!
 		redirectexit('action=admin;area=shopinventory;sa=restock;success');

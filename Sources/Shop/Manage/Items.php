@@ -97,11 +97,11 @@ class Items extends Dashboard
 			'default_sort_col' => 'modify',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_items AS s', array_merge(Database::$items, ['sc.name AS category, sm.file']), '', false, 'LEFT JOIN {db_prefix}shop_categories AS sc ON (sc.catid = s.catid) LEFT JOIN {db_prefix}shop_modules AS sm ON (sm.id = s.module)'],
+				'params' => ['stshop_items AS s', array_merge(Database::$items, ['sc.name AS category, sm.file']), '', false, 'LEFT JOIN {db_prefix}stshop_categories AS sc ON (sc.catid = s.catid) LEFT JOIN {db_prefix}stshop_modules AS sm ON (sm.id = s.module)'],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_items AS s', Database::$items],
+				'params' => ['stshop_items AS s', Database::$items],
 			],
 			'no_items_label' => Shop::getText('no_items'),
 			'no_items_align' => 'center',
@@ -290,7 +290,7 @@ class Items extends Dashboard
 		$context[$context['admin_menu_name']]['tab_data']['title'] = $context['page_title'];
 		loadTemplate('Shop/ShopAdmin');
 		$context['sub_template'] = 'items_add';
-		$context['shop_modules'] = Database::Get(0, 1000, 'sm.name', 'shop_modules AS sm', Database::$modules);
+		$context['shop_modules'] = Database::Get(0, 1000, 'sm.name', 'stshop_modules AS sm', Database::$modules);
 	}
 
 	public function set_item()
@@ -313,13 +313,13 @@ class Items extends Dashboard
 		$context['items_url'] = $boardurl . Shop::$itemsdir;
 		$context['shop_images_list'] = Images::list();
 		// ... and categories
-		$context['shop_categories_list'] = Database::Get(0, 1000, 'sc.name', 'shop_categories AS sc', Database::$categories);
+		$context['shop_categories_list'] = Database::Get(0, 1000, 'sc.name', 'stshop_categories AS sc', Database::$categories);
 
 		// Edit, or Add?
 		if ($_REQUEST['sa'] == 'edit')
 		{
 			// Get item
-			$context['shop_item'] = Database::Get('', '', '', 'shop_items AS s', array_merge(Database::$items, ['sm.file']), 'WHERE s.itemid = {int:itemid}', true, 'LEFT JOIN {db_prefix}shop_modules AS sm ON (sm.id = s.module)', ['itemid' => (int) (isset($_REQUEST['id']) ? $_REQUEST['id'] : 0)]);
+			$context['shop_item'] = Database::Get('', '', '', 'stshop_items AS s', array_merge(Database::$items, ['sm.file']), 'WHERE s.itemid = {int:itemid}', true, 'LEFT JOIN {db_prefix}stshop_modules AS sm ON (sm.id = s.module)', ['itemid' => (int) (isset($_REQUEST['id']) ? $_REQUEST['id'] : 0)]);
 
 			// No item
 			if (empty($context['shop_item']))
@@ -349,7 +349,7 @@ class Items extends Dashboard
 			$module = isset($_REQUEST['module']) ? (isset($_REQUEST['item']) ? $_REQUEST['item'] : 0) : 0;
 
 			// Get some info on the item
-			$context['shop_item'] = Database::Get('', '', '', 'shop_modules AS sm', Database::$modules, 'WHERE sm.id = {int:module}', true, '', ['module' => (int) $module]);
+			$context['shop_item'] = Database::Get('', '', '', 'stshop_modules AS sm', Database::$modules, 'WHERE sm.id = {int:module}', true, '', ['module' => (int) $module]);
 			$context['shop_item']['module'] = $module;
 
 			// Change description
@@ -435,7 +435,7 @@ class Items extends Dashboard
 				$this->_fields_type[$column] = str_replace('integer', 'int', gettype($type));
 
 			// Insert
-			Database::Insert('shop_items', $this->_fields_data, $this->_fields_type);
+			Database::Insert('stshop_items', $this->_fields_data, $this->_fields_type);
 			$status = 'added';
 		}
 
@@ -453,7 +453,7 @@ class Items extends Dashboard
 				$this->_fields_type .= $column . ' = {'.str_replace('integer', 'int', gettype($type)).':'.$column.'}, ';
 
 			// Update
-			Database::Update('shop_items', $this->_fields_data, $this->_fields_type, 'WHERE itemid = ' . $this->_fields_data['itemid']);
+			Database::Update('stshop_items', $this->_fields_data, $this->_fields_type, 'WHERE itemid = ' . $this->_fields_data['itemid']);
 		}
 
 		redirectexit('action=admin;area=shopitems;sa=index;'.$status);
@@ -486,7 +486,7 @@ class Items extends Dashboard
 			$_REQUEST['delete'][$key] = (int) $value;
 
 		// We want to delete these items?
-		$context['shop_delete'] = Database::Get(0, 1000, 's.name', 'shop_items AS s', Database::$items, 'WHERE s.itemid IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['delete']]);
+		$context['shop_delete'] = Database::Get(0, 1000, 's.name', 'stshop_items AS s', Database::$items, 'WHERE s.itemid IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['delete']]);
 	}
 
 	public function delete2()

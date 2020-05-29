@@ -110,7 +110,7 @@ class Gift
 
 		// Items list
 		if (isset($_REQUEST['sa']) && ($_REQUEST['sa'] != 'sendmoney'))
-			$context['shop_user_items_list'] = Database::Get(0,  100000,'s.name', 'shop_inventory AS si', array_merge(Database::$inventory, Database::$items), 'WHERE si.userid = {int:user} AND si.trading = 0 AND s.status = 1', false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['user' => $user_info['id']]);
+			$context['shop_user_items_list'] = Database::Get(0,  100000,'s.name', 'stshop_inventory AS si', array_merge(Database::$inventory, Database::$items), 'WHERE si.userid = {int:user} AND si.trading = 0 AND s.status = 1', false, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid)', ['user' => $user_info['id']]);
 
 		// Send money string
 		$context['shop']['send_money'] = sprintf(Shop::getText('gift_send_money'), Shop::getText('posting_credits_pocket'));
@@ -217,7 +217,7 @@ class Gift
 					$this->_gift = (int) $_REQUEST['item'];
 
 					// Get item info
-					$this->_gift_info = Database::Get('', '', '', 'shop_inventory AS si', array_merge(Database::$inventory, Database::$items), 'WHERE si.id = {int:id} AND si.trading = 0 AND si.userid = {int:user}', true, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['id' => $this->_gift , 'user' => $user_info['id']]);
+					$this->_gift_info = Database::Get('', '', '', 'stshop_inventory AS si', array_merge(Database::$inventory, Database::$items), 'WHERE si.id = {int:id} AND si.trading = 0 AND si.userid = {int:user}', true, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid)', ['id' => $this->_gift , 'user' => $user_info['id']]);
 
 					// We got valid information?
 					if (empty($this->_gift_info) || empty($this->_gift_info['status']) || !empty($this->_gift_info['trading']))

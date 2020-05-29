@@ -237,7 +237,7 @@ class Trade
 		$this->validate_set($this->_trade);
 
 		// Set the item for trade
-		Database::Update('shop_inventory', ['id' => $this->_trade, 'tradecost' => $this->_amount, 'date' => time()], 'trading = 1, tradecost = {int:tradecost}, tradedate = {int:date}', 'WHERE id = {int:id}');
+		Database::Update('stshop_inventory', ['id' => $this->_trade, 'tradecost' => $this->_amount, 'date' => time()], 'trading = 1, tradecost = {int:tradecost}, tradedate = {int:date}', 'WHERE id = {int:id}');
 
 		// Tell the user that the item was added successfully
 		redirectexit('action=shop;sa=inventory;traded');
@@ -248,7 +248,7 @@ class Trade
 		global $user_info;
 
 		// Load the info
-		$this->_item = Database::Get('', '', '', 'shop_inventory AS si', Database::$profile_inventory, 'WHERE si.id = {int:tradeid} AND s.status = 1 AND si.userid = {int:mem}', true, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['tradeid' => $trade, 'mem' => $user_info['id']]);
+		$this->_item = Database::Get('', '', '', 'stshop_inventory AS si', Database::$profile_inventory, 'WHERE si.id = {int:tradeid} AND s.status = 1 AND si.userid = {int:mem}', true, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid)', ['tradeid' => $trade, 'mem' => $user_info['id']]);
 
 		// No item found
 		if (empty($this->_item))
@@ -307,7 +307,7 @@ class Trade
 		$context['items_url'] = $boardurl . Shop::$itemsdir;
 		$context['shop_images_list'] = Images::list();
 		// ... and categories
-		$context['shop_categories_list'] = Database::Get(0, 1000, 'sc.name', 'shop_categories AS sc', Database::$categories);
+		$context['shop_categories_list'] = Database::Get(0, 1000, 'sc.name', 'stshop_categories AS sc', Database::$categories);
 		$context['form_url'] = '?action=shop;sa=' . $_REQUEST['sa'] . (!isset($_REQUEST['u']) ? '' : ';u='. $memberContext[$memID]['id']) . (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ';cat='.$_REQUEST['cat'] : '');
 
 		// Load suggest.js
@@ -477,7 +477,7 @@ class Trade
 			fatal_error(Shop::getText('item_delete_error'), false);
 
 		// Load this item info
-		$this->_item = Database::Get('', '', '', 'shop_inventory AS si', ['si.id', 'si.itemid', 'si.userid'], 'WHERE si.id = {int:id}', true, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['id' => $this->_trade]);
+		$this->_item = Database::Get('', '', '', 'stshop_inventory AS si', ['si.id', 'si.itemid', 'si.userid'], 'WHERE si.id = {int:id}', true, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid)', ['id' => $this->_trade]);
 
 		// We didn't get results?
 		if (empty($this->_item))
@@ -487,7 +487,7 @@ class Trade
 			fatal_error(Shop::getText('item_notown'), false);
 
 		// Remove item from trading
-		Database::Update('shop_inventory', ['id' => $this->_item['id'], 'user' => $user_info['id']], 'trading = 0, tradecost = 0,', 'WHERE id = {int:id} AND userid = {int:user}');
+		Database::Update('stshop_inventory', ['id' => $this->_item['id'], 'user' => $user_info['id']], 'trading = 0, tradecost = 0,', 'WHERE id = {int:id} AND userid = {int:user}');
 
 		// Send the user to the items list with a message
 		redirectexit('action=shop;sa=mytrades;removed');
@@ -518,10 +518,10 @@ class Trade
 		$this->_trade = (int) $_REQUEST['id'];
 
 		// Item info
-		$this->_item = Database::Get('','','', 'shop_inventory AS si', array_merge(Database::$inventory, Database::$items), 'WHERE si.id = {int:id} AND si.trading = 1 AND s.status = 1', true, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = si.itemid)', ['id' => $this->_trade]);
+		$this->_item = Database::Get('','','', 'stshop_inventory AS si', array_merge(Database::$inventory, Database::$items), 'WHERE si.id = {int:id} AND si.trading = 1 AND s.status = 1', true, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid)', ['id' => $this->_trade]);
 
 		// How many of this item does the user own?
-		$this->_limit = Database::Count('shop_inventory AS si', Database::$inventory, 'WHERE itemid = {int:id} AND userid = {int:userid}', '', ['id' => $this->_item['itemid'], 'userid' => $user_info['id']]);
+		$this->_limit = Database::Count('stshop_inventory AS si', Database::$inventory, 'WHERE itemid = {int:id} AND userid = {int:userid}', '', ['id' => $this->_item['itemid'], 'userid' => $user_info['id']]);
 
 		// Is that id actually valid?
 		if (empty($this->_item))
@@ -584,11 +584,11 @@ class Trade
 			'default_sort_col' => 'date',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_log_buy AS lb', array_merge(Database::$log_buy, ['seller.real_name AS name_seller', 'buyer.real_name AS name_buyer']), 'WHERE lb.sellerid <> 0 AND (lb.sellerid = {int:user} OR lb.userid = {int:user}) AND s.status = 1', false, 'LEFT JOIN {db_prefix}members AS seller ON (seller.id_member = lb.sellerid) LEFT JOIN {db_prefix}members AS buyer ON (buyer.id_member = lb.userid) LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = lb.itemid)', ['user' => $user_info['id']]],
+				'params' => ['stshop_log_buy AS lb', array_merge(Database::$log_buy, ['seller.real_name AS name_seller', 'buyer.real_name AS name_buyer']), 'WHERE lb.sellerid <> 0 AND (lb.sellerid = {int:user} OR lb.userid = {int:user}) AND s.status = 1', false, 'LEFT JOIN {db_prefix}members AS seller ON (seller.id_member = lb.sellerid) LEFT JOIN {db_prefix}members AS buyer ON (buyer.id_member = lb.userid) LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = lb.itemid)', ['user' => $user_info['id']]],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_log_buy AS lb', Database::$log_buy, 'WHERE lb.sellerid <> 0 AND (lb.sellerid = {int:user} OR lb.userid = {int:user}) AND s.status = 1', 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = lb.itemid)', ['user' => $user_info['id']]],
+				'params' => ['stshop_log_buy AS lb', Database::$log_buy, 'WHERE lb.sellerid <> 0 AND (lb.sellerid = {int:user} OR lb.userid = {int:user}) AND s.status = 1', 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = lb.itemid)', ['user' => $user_info['id']]],
 			],
 			'no_items_label' => Shop::getText('logs_empty'),
 			'no_items_align' => 'center',

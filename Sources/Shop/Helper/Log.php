@@ -111,7 +111,7 @@ class Log
 				time()
 			];
 		}
-		Database::Insert('shop_log_gift', $this->_insert_rows, $this->_gift);
+		Database::Insert('stshop_log_gift', $this->_insert_rows, $this->_gift);
 
 		// Regular user? Deduct these credits
 		if (empty($admin))
@@ -135,12 +135,12 @@ class Log
 				time()
 			];
 		}
-		Database::Insert('shop_log_gift', $this->_insert_rows, $this->_gift);
+		Database::Insert('stshop_log_gift', $this->_insert_rows, $this->_gift);
 		unset($this->_insert_rows);
 
 		// Regular user? Just switch the item from one inventory to another
 		if (empty($admin))
-			Database::Update('shop_inventory', ['user' => $users[0], 'invid' => $invid], 'userid = {int:user}', 'WHERE id = {int:invid}');
+			Database::Update('stshop_inventory', ['user' => $users[0], 'invid' => $invid], 'userid = {int:user}', 'WHERE id = {int:invid}');
 		// Admin? Insert a new item on each inventory, and reduce stock?
 		else
 		{
@@ -156,8 +156,8 @@ class Log
 					0
 				];
 			}
-			Database::Insert('shop_inventory', $this->_insert_rows, $this->_inventory);
-			Database::Update('shop_items', ['stock' => count($users), 'itemid' => $item], 'stock = stock - {int:stock}', 'WHERE itemid = {int:itemid}');
+			Database::Insert('stshop_inventory', $this->_insert_rows, $this->_inventory);
+			Database::Update('stshop_items', ['stock' => count($users), 'itemid' => $item], 'stock = stock - {int:stock}', 'WHERE itemid = {int:itemid}');
 		}
 	}
 
@@ -170,7 +170,7 @@ class Log
 		if (empty($seller))
 		{
 			// Insert in inventory
-			Database::Insert('shop_inventory', [
+			Database::Insert('stshop_inventory', [
 				$userid,
 				$itemid,
 				0,
@@ -181,20 +181,20 @@ class Log
 			], $this->_inventory);
 
 			// Discount stock
-			Database::Update('shop_items', ['count' => 1, 'itemid' => $itemid], 'stock = stock - {int:count},', 'WHERE itemid = {int:itemid}');
+			Database::Update('stshop_items', ['count' => 1, 'itemid' => $itemid], 'stock = stock - {int:count},', 'WHERE itemid = {int:itemid}');
 		}
 		// Purchasing at the trade center
 		else
 		{
 			// Move item to buyer inventory
-			Database::Update('shop_inventory', ['user' => $userid, 'invid' => $invid, 'date' => time()], 'userid = {int:user}, trading = 0, tradecost = 0, tradedate = 0, date = {int:date},', 'WHERE id = {int:invid}');
+			Database::Update('stshop_inventory', ['user' => $userid, 'invid' => $invid, 'date' => time()], 'userid = {int:user}, trading = 0, tradecost = 0, tradedate = 0, date = {int:date},', 'WHERE id = {int:invid}');
 
 			// Add the credits to the seller
 			Database::Update('members', ['user' => $seller, 'paid' => $amount, 'fee' => $fee], 'shopMoney = shopMoney + ({int:paid} - {int:fee}),', 'WHERE id_member = {int:user}');
 		}
 
 		// Insert info in the log
-		Database::Insert('shop_log_buy', [
+		Database::Insert('stshop_log_buy', [
 			$itemid,
 			$invid,
 			$userid,
@@ -211,7 +211,7 @@ class Log
 		Database::Update('members', ['user' => $userid, 'amount' => $amount, 'fee' => $fee], 'shopMoney = shopMoney '. ($trans == 'deposit' ? '-' : '+') .' {int:amount}' .(!empty($fee) && empty($type) ? ' - {int:fee}' : '') . ', shopBank = shopBank '. ($trans == 'withdrawal' ? '-' : '+') .' {int:amount}' .(!empty($fee) && !empty($type) ? ' - {int:fee}' : '') . ',', 'WHERE id_member = {int:user}');
 
 		// Insert information in the log
-		Database::Insert('shop_log_bank', [
+		Database::Insert('stshop_log_bank', [
 			$userid,
 			$amount,
 			$fee,
@@ -227,7 +227,7 @@ class Log
 		Database::Update('members', ['user' => $userid, 'amount' => $amount], 'shopMoney = shopMoney + {int:amount},', 'WHERE id_member = {int:user}');
 
 		// Log the changes
-		Database::Insert('shop_log_games', [
+		Database::Insert('stshop_log_games', [
 			$userid,
 			$amount,
 			$game,

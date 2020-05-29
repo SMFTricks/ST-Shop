@@ -111,11 +111,11 @@ class Logs extends Dashboard
 			'default_sort_col' => 'date',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_log_gift AS lg', array_merge(Database::$log_gift, ['m1.real_name AS name_sender', 'm2.real_name AS name_receiver']), 'WHERE lg.itemid = 0 AND lg.amount > 0 AND lg.is_admin = {int:admin}', false, 'LEFT JOIN {db_prefix}members AS m1 ON (m1.id_member = lg.userid) LEFT JOIN {db_prefix}members AS m2 ON (m2.id_member = lg.receiver)', ['admin' => (!isset($_REQUEST['sa']) || $_REQUEST['sa'] == 'admin_money' ? 1 : 0)]],
+				'params' => ['stshop_log_gift AS lg', array_merge(Database::$log_gift, ['m1.real_name AS name_sender', 'm2.real_name AS name_receiver']), 'WHERE lg.itemid = 0 AND lg.amount > 0 AND lg.is_admin = {int:admin}', false, 'LEFT JOIN {db_prefix}members AS m1 ON (m1.id_member = lg.userid) LEFT JOIN {db_prefix}members AS m2 ON (m2.id_member = lg.receiver)', ['admin' => (!isset($_REQUEST['sa']) || $_REQUEST['sa'] == 'admin_money' ? 1 : 0)]],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_log_gift AS lg', Database::$log_gift, 'WHERE lg.itemid = 0 AND lg.amount > 0 AND lg.is_admin = {int:admin}', '', ['admin' => (!isset($_REQUEST['sa']) || $_REQUEST['sa'] == 'admin_money' ? 1 : 0)]],
+				'params' => ['stshop_log_gift AS lg', Database::$log_gift, 'WHERE lg.itemid = 0 AND lg.amount > 0 AND lg.is_admin = {int:admin}', '', ['admin' => (!isset($_REQUEST['sa']) || $_REQUEST['sa'] == 'admin_money' ? 1 : 0)]],
 			],
 			'no_items_label' => Shop::getText('logs_empty'),
 			'no_items_align' => 'center',
@@ -212,11 +212,11 @@ class Logs extends Dashboard
 			'default_sort_col' => 'date',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_log_gift AS lg', array_merge(Database::$log_gift, ['m1.real_name AS name_sender', 'm2.real_name AS name_receiver', 's.itemid', 's.status', 's.name', 's.image', 's.description']), 'WHERE lg.itemid <> 0 AND lg.amount = 0 AND s.status = 1 AND lg.is_admin = {int:admin}', false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = lg.itemid) LEFT JOIN {db_prefix}members AS m1 ON (m1.id_member = lg.userid) LEFT JOIN {db_prefix}members AS m2 ON (m2.id_member = lg.receiver)', ['admin' => ($_REQUEST['sa'] == 'admin_items' ? 1 : 0)]],
+				'params' => ['stshop_log_gift AS lg', array_merge(Database::$log_gift, ['m1.real_name AS name_sender', 'm2.real_name AS name_receiver', 's.itemid', 's.status', 's.name', 's.image', 's.description']), 'WHERE lg.itemid <> 0 AND lg.amount = 0 AND s.status = 1 AND lg.is_admin = {int:admin}', false, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = lg.itemid) LEFT JOIN {db_prefix}members AS m1 ON (m1.id_member = lg.userid) LEFT JOIN {db_prefix}members AS m2 ON (m2.id_member = lg.receiver)', ['admin' => ($_REQUEST['sa'] == 'admin_items' ? 1 : 0)]],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_log_gift AS lg', array_merge(Database::$log_gift, ['s.itemid', 's.status', 's.name']), 'WHERE lg.itemid <> 0 AND lg.amount = 0 AND s.status = 1 AND lg.is_admin = {int:admin}', 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = lg.itemid)', ['admin' => ($_REQUEST['sa'] == 'admin_items' ? 1 : 0)]],
+				'params' => ['stshop_log_gift AS lg', array_merge(Database::$log_gift, ['s.itemid', 's.status', 's.name']), 'WHERE lg.itemid <> 0 AND lg.amount = 0 AND s.status = 1 AND lg.is_admin = {int:admin}', 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = lg.itemid)', ['admin' => ($_REQUEST['sa'] == 'admin_items' ? 1 : 0)]],
 			],
 			'no_items_label' => Shop::getText('logs_empty'),
 			'no_items_align' => 'center',
@@ -324,11 +324,11 @@ class Logs extends Dashboard
 			'default_sort_col' => 'date',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_log_buy AS lb', array_merge(Database::$log_buy, ['m1.real_name AS name_buyer', 'm2.real_name AS name_seller']), 'WHERE lb.sellerid ' . ($_REQUEST['sa'] == 'buy' ? '= 0' : '<>') . '0 AND s.status = 1', false, 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = lb.itemid) LEFT JOIN {db_prefix}members AS m1 ON (m1.id_member = lb.userid) LEFT JOIN {db_prefix}members AS m2 ON (m2.id_member = lb.sellerid)'],
+				'params' => ['stshop_log_buy AS lb', array_merge(Database::$log_buy, ['m1.real_name AS name_buyer', 'm2.real_name AS name_seller']), 'WHERE lb.sellerid ' . ($_REQUEST['sa'] == 'buy' ? '= 0' : '<>') . '0 AND s.status = 1', false, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = lb.itemid) LEFT JOIN {db_prefix}members AS m1 ON (m1.id_member = lb.userid) LEFT JOIN {db_prefix}members AS m2 ON (m2.id_member = lb.sellerid)'],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_log_buy AS lb', Database::$log_buy, 'WHERE lb.sellerid ' . ($_REQUEST['sa'] == 'buy' ? '= 0' : '<>') . '0 AND s.status = 1', 'LEFT JOIN {db_prefix}shop_items AS s ON (s.itemid = lb.itemid)'],
+				'params' => ['stshop_log_buy AS lb', Database::$log_buy, 'WHERE lb.sellerid ' . ($_REQUEST['sa'] == 'buy' ? '= 0' : '<>') . '0 AND s.status = 1', 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = lb.itemid)'],
 			],
 			'no_items_label' => Shop::getText('logs_empty'),
 			'no_items_align' => 'center',
@@ -478,11 +478,11 @@ class Logs extends Dashboard
 			'default_sort_col' => 'date',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_log_bank AS lb', array_merge(Database::$log_bank, ['m.real_name']), '', false, 'LEFT JOIN {db_prefix}members AS m ON (m.id_member = lb.userid)'],
+				'params' => ['stshop_log_bank AS lb', array_merge(Database::$log_bank, ['m.real_name']), '', false, 'LEFT JOIN {db_prefix}members AS m ON (m.id_member = lb.userid)'],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_log_bank AS lb', Database::$log_bank],
+				'params' => ['stshop_log_bank AS lb', Database::$log_bank],
 			],
 			'no_items_label' => Shop::getText('logs_empty'),
 			'no_items_align' => 'center',
@@ -600,11 +600,11 @@ class Logs extends Dashboard
 			'default_sort_col' => 'date',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_log_games AS lg', array_merge(Database::$log_games, ['m.real_name']), '', false, 'LEFT JOIN {db_prefix}members AS m ON (m.id_member = lg.userid)'],
+				'params' => ['stshop_log_games AS lg', array_merge(Database::$log_games, ['m.real_name']), '', false, 'LEFT JOIN {db_prefix}members AS m ON (m.id_member = lg.userid)'],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_log_games AS lg', Database::$log_games],
+				'params' => ['stshop_log_games AS lg', Database::$log_games],
 			],
 			'no_items_label' => Shop::getText('logs_empty'),
 			'no_items_align' => 'center',

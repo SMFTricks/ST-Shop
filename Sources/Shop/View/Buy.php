@@ -69,7 +69,7 @@ class Buy
 		$context['items_url'] = $boardurl . Shop::$itemsdir;
 		$context['shop_images_list'] = Images::list();
 		// ... and categories
-		$context['shop_categories_list'] = Database::Get(0, 1000, 'sc.name', 'shop_categories AS sc', Database::$categories);
+		$context['shop_categories_list'] = Database::Get(0, 1000, 'sc.name', 'stshop_categories AS sc', Database::$categories);
 		$context['form_url'] = '?action=shop;sa=buy'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ';cat='.$_REQUEST['cat'] : '');
 
 		// The entire list
@@ -82,11 +82,11 @@ class Buy
 			'default_sort_dir' => 'ASC',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_items AS s', array_merge(Database::$items, ['sc.name AS category']), 'WHERE s.status = 1'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ' AND s.catid = {int:cat}' : ''), false, 'LEFT JOIN {db_prefix}shop_categories AS sc ON (s.catid = sc.catid)', ['cat' => isset($_REQUEST['cat']) ? $_REQUEST['cat'] : 0]],
+				'params' => ['stshop_items AS s', array_merge(Database::$items, ['sc.name AS category']), 'WHERE s.status = 1'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ' AND s.catid = {int:cat}' : ''), false, 'LEFT JOIN {db_prefix}stshop_categories AS sc ON (s.catid = sc.catid)', ['cat' => isset($_REQUEST['cat']) ? $_REQUEST['cat'] : 0]],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_items AS s', Database::$items, 'WHERE s.status = 1'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ' AND s.catid = {int:cat}' : ''), '', ['cat' => isset($_REQUEST['cat']) ? $_REQUEST['cat'] : 0]],
+				'params' => ['stshop_items AS s', Database::$items, 'WHERE s.status = 1'. (isset($_REQUEST['cat']) && $_REQUEST['cat'] >= 0 ? ' AND s.catid = {int:cat}' : ''), '', ['cat' => isset($_REQUEST['cat']) ? $_REQUEST['cat'] : 0]],
 			],
 			'no_items_label' => Shop::getText('no_items'),
 			'no_items_align' => 'center',
@@ -221,14 +221,14 @@ class Buy
 		$this->_purchase = (int) $_REQUEST['id'];
 
 		// Get the item's information
-		$this->_item = Database::Get('', '', '', 'shop_items AS s', Database::$items, 'WHERE s.status = 1 AND s.itemid = {int:itemid}', true, '', ['itemid' => $this->_purchase]);
+		$this->_item = Database::Get('', '', '', 'stshop_items AS s', Database::$items, 'WHERE s.status = 1 AND s.itemid = {int:itemid}', true, '', ['itemid' => $this->_purchase]);
 
 		// We found and item?
 		if (empty($this->_item))
 			fatal_error(Shop::getText('item_notfound'), false);
 
 		// How many of this item does the user own?
-		$this->_limit = Database::Count('shop_inventory AS si', Database::$inventory, 'WHERE itemid = {int:id} AND userid = {int:userid}', '', ['id' => $this->_purchase, 'userid' => $user_info['id']]);
+		$this->_limit = Database::Count('stshop_inventory AS si', Database::$inventory, 'WHERE itemid = {int:id} AND userid = {int:userid}', '', ['id' => $this->_purchase, 'userid' => $user_info['id']]);
 
 		// Already reached the limit?
 		if ((!empty($this->_item['itemlimit'])) && ($this->_limit >= $this->_item['itemlimit']))

@@ -77,11 +77,11 @@ class Categories extends Dashboard
 			'default_sort_col' => 'modify',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_categories AS sc', Database::$categories],
+				'params' => ['stshop_categories AS sc', Database::$categories],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_categories AS sc', Database::$categories],
+				'params' => ['stshop_categories AS sc', Database::$categories],
 			],
 			'no_items_label' => Shop::getText('no_cats'),
 			'no_items_align' => 'center',
@@ -134,7 +134,7 @@ class Categories extends Dashboard
 						'data' => [
 							'function' => function($row)
 							{
-								return Database::Count('shop_items AS s', Database::$items, 'WHERE s.catid = ' . $row['catid']);
+								return Database::Count('stshop_items AS s', Database::$items, 'WHERE s.catid = ' . $row['catid']);
 							},
 							'style' => 'width: 3%',
 							'class' => 'centertext',
@@ -229,11 +229,11 @@ class Categories extends Dashboard
 		if ($_REQUEST['sa'] == 'edit')
 		{
 			// Try to find this item
-			if (empty(Database::Find('shop_categories AS sc', 'sc.catid', (int) $_REQUEST['id'])))
+			if (empty(Database::Find('stshop_categories AS sc', 'sc.catid', (int) $_REQUEST['id'])))
 				fatal_error(Shop::getText('cat_notfound'), false);
 
 			// Get category
-			$context['shop_category'] = Database::Get('', '', '', 'shop_categories AS sc', Database::$categories, 'WHERE sc.catid = {int:catid}', true, '', ['catid' => (int) (isset($_REQUEST['id']) ? $_REQUEST['id'] : 0)]);
+			$context['shop_category'] = Database::Get('', '', '', 'stshop_categories AS sc', Database::$categories, 'WHERE sc.catid = {int:catid}', true, '', ['catid' => (int) (isset($_REQUEST['id']) ? $_REQUEST['id'] : 0)]);
 
 			// Index?
 			$context[$context['admin_menu_name']]['current_subsection'] = 'index';
@@ -276,7 +276,7 @@ class Categories extends Dashboard
 				$this->_fields_type[$column] = str_replace('integer', 'int', gettype($type));
 
 			// Insert
-			Database::Insert('shop_categories', $this->_fields_data, $this->_fields_type);
+			Database::Insert('stshop_categories', $this->_fields_data, $this->_fields_type);
 			$status = 'added';
 		}
 
@@ -288,7 +288,7 @@ class Categories extends Dashboard
 				$this->_fields_type .= $column . ' = {'.str_replace('integer', 'int', gettype($type)).':'.$column.'}, ';
 
 			// Update
-			Database::Update('shop_categories', $this->_fields_data, $this->_fields_type, 'WHERE catid = ' . $this->_fields_data['catid']);
+			Database::Update('stshop_categories', $this->_fields_data, $this->_fields_type, 'WHERE catid = ' . $this->_fields_data['catid']);
 		}
 		redirectexit('action=admin;area=shopcategories;sa=index;'.$status);
 	}
@@ -320,7 +320,7 @@ class Categories extends Dashboard
 			$_REQUEST['delete'][$key] = (int) $value;
 
 		// We want to delete these items?
-		$context['shop_delete'] = Database::Get(0, 1000, 'sc.name', 'shop_categories AS sc', Database::$categories, 'WHERE sc.catid IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['delete']]);
+		$context['shop_delete'] = Database::Get(0, 1000, 'sc.name', 'stshop_categories AS sc', Database::$categories, 'WHERE sc.catid IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['delete']]);
 
 		// Set the format
 		foreach ($context['shop_delete'] as $id => $var)
@@ -344,7 +344,7 @@ class Categories extends Dashboard
 
 		// Collect the item ids
 		if (isset($_REQUEST['deleteitems']) && !empty($_REQUEST['deleteitems']))
-			$_REQUEST['deleteitems'] = Database::Get(0, 100000, 's.itemid', 'shop_items AS s', ['s.itemid', 's.catid'], 'WHERE s.catid IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['deleteitems']]);
+			$_REQUEST['deleteitems'] = Database::Get(0, 100000, 's.itemid', 'stshop_items AS s', ['s.itemid', 's.catid'], 'WHERE s.catid IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['deleteitems']]);
 
 		// Items using this module are... no longer using it
 		Delete::cats($_REQUEST['delete'], 'action=admin;area=shopcategories;sa=index;deleted', $_REQUEST['deleteitems']);

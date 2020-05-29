@@ -80,11 +80,11 @@ class Modules extends Dashboard
 			'default_sort_col' => 'item_name',
 			'get_items' => [
 				'function' => 'Shop\Helper\Database::Get',
-				'params' => ['shop_modules AS sm', Database::$modules],
+				'params' => ['stshop_modules AS sm', Database::$modules],
 			],
 			'get_count' => [
 				'function' => 'Shop\Helper\Database::Count',
-				'params' => ['shop_modules AS sm', Database::$modules],
+				'params' => ['stshop_modules AS sm', Database::$modules],
 			],
 			'no_items_label' => Shop::getText('no_modules'),
 			'no_items_align' => 'center',
@@ -275,7 +275,7 @@ class Modules extends Dashboard
 							$this->_fields_type[$column] = str_replace('integer', 'int', gettype($type));
 
 						// Insert the module in the database
-						Database::Insert('shop_modules', $this->_fields_data, $this->_fields_type);
+						Database::Insert('stshop_modules', $this->_fields_data, $this->_fields_type);
 					
 						// Get me out of here
 						redirectexit('action=admin;area=shopmodules;sa=upload;success');
@@ -314,7 +314,7 @@ class Modules extends Dashboard
 			$_REQUEST['delete'][$key] = (int) $value;
 
 		// We want to delete these items?
-		$context['shop_delete'] = Database::Get(0, 1000, 'sm.name', 'shop_modules AS sm', Database::$modules, 'WHERE sm.id IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['delete']]);
+		$context['shop_delete'] = Database::Get(0, 1000, 'sm.name', 'stshop_modules AS sm', Database::$modules, 'WHERE sm.id IN ({array_int:delete})', false, '', ['delete' => $_REQUEST['delete']]);
 
 		// Set the format
 		foreach ($context['shop_delete'] as $id => $var)

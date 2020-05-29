@@ -33,16 +33,16 @@ class Delete
 			$items[$key] = (int) $value;
 
 		// Delete all the items
-		Database::Delete('shop_items', 'itemid', $items);
+		Database::Delete('stshop_items', 'itemid', $items);
 
 		// If anyone owned this item, they don't anymore :P
-		Database::Delete('shop_inventory', 'itemid', $items);
+		Database::Delete('stshop_inventory', 'itemid', $items);
 
 		// Clean gift log
-		Database::Delete('shop_log_gift', 'itemid', $items);
+		Database::Delete('stshop_log_gift', 'itemid', $items);
 
 		// Clean buy log
-		Database::Delete('shop_log_buy', 'itemid', $items);
+		Database::Delete('stshop_log_buy', 'itemid', $items);
 
 		// Redirect the user
 		if ($redirect != NULL)
@@ -68,7 +68,7 @@ class Delete
 
 		// Update the items
 		Database::Update(
-			'shop_items',
+			'stshop_items',
 			['delete' => $modules], '
 			module = 0,
 			input_needed = 0,
@@ -78,7 +78,7 @@ class Delete
 		);
 
 		// Delete the modules from the database
-		Database::Delete('shop_modules', 'id', $modules);
+		Database::Delete('stshop_modules', 'id', $modules);
 
 		// Delete files from directory
 		foreach ($_REQUEST['files'] as $key => $file) 
@@ -118,14 +118,14 @@ class Delete
 
 		// Update the items
 		Database::Update(
-			'shop_items',
+			'stshop_items',
 			['delete' => $cats], '
 			catid = 0,',
 			'WHERE catid IN ({array_int:delete})'
 		);
 
 		// Delete the modules from the database
-		Database::Delete('shop_categories', 'catid', $cats);
+		Database::Delete('stshop_categories', 'catid', $cats);
 
 		// Redirect the user
 		if ($redirect != NULL)

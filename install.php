@@ -81,7 +81,7 @@ elseif (!defined('SMF'))
 
 		// Shop items
 		$tables[] = [
-			'table_name' => '{db_prefix}shop_items',
+			'table_name' => '{db_prefix}stshop_items',
 			'columns' => [
 				[
 					'name' => 'itemid',
@@ -198,7 +198,7 @@ elseif (!defined('SMF'))
 		];
 		// Shop modules
 		$tables[] = [
-			'table_name' => '{db_prefix}shop_modules',
+			'table_name' => '{db_prefix}stshop_modules',
 			'columns' => [
 				[
 					'name' => 'id',
@@ -279,7 +279,7 @@ elseif (!defined('SMF'))
 		];
 		// User inventory
 		$tables[] = [
-			'table_name' => '{db_prefix}shop_inventory',
+			'table_name' => '{db_prefix}stshop_inventory',
 			'columns' => [
 				[
 					'name' => 'id',
@@ -342,7 +342,7 @@ elseif (!defined('SMF'))
 		];
 		// Shop Categories
 		$tables[] = [
-			'table_name' => '{db_prefix}shop_categories',
+			'table_name' => '{db_prefix}stshop_categories',
 			'columns' => [
 				[
 					'name' => 'catid',
@@ -382,7 +382,7 @@ elseif (!defined('SMF'))
 		];
 		// Shop logs
 		$tables[] = [
-			'table_name' => '{db_prefix}shop_log_buy',
+			'table_name' => '{db_prefix}stshop_log_buy',
 			'columns' => [
 				[
 					'name' => 'id',
@@ -446,7 +446,7 @@ elseif (!defined('SMF'))
 			'parameters' => [],
 		];
 		$tables[] = [
-			'table_name' => '{db_prefix}shop_log_gift',
+			'table_name' => '{db_prefix}stshop_log_gift',
 			'columns' => [
 				[
 					'name' => 'id',
@@ -515,7 +515,7 @@ elseif (!defined('SMF'))
 			'parameters' => [],
 		];
 		$tables[] = [
-			'table_name' => '{db_prefix}shop_log_bank',
+			'table_name' => '{db_prefix}stshop_log_bank',
 			'columns' => [
 				[
 					'name' => 'id',
@@ -571,7 +571,7 @@ elseif (!defined('SMF'))
 			'parameters' => [],
 		];
 		$tables[] = [
-			'table_name' => '{db_prefix}shop_log_games',
+			'table_name' => '{db_prefix}stshop_log_games',
 			'columns' => [
 				[
 					'name' => 'id',
@@ -693,7 +693,7 @@ elseif (!defined('SMF'))
 		// Check for any categories, or create a 'default' category
 		$categories = $smcFunc['db_query']('', '
 			SELECT catid
-			FROM {db_prefix}shop_categories',
+			FROM {db_prefix}stshop_categories',
 			[]
 		);
 		$has_categories = $smcFunc['db_num_rows']($categories);
@@ -703,7 +703,7 @@ elseif (!defined('SMF'))
 		{
 			$smcFunc['db_insert'](
 				'ignore',
-				'{db_prefix}shop_categories',
+				'{db_prefix}stshop_categories',
 				[
 					'name' => 'string',
 					'image' => 'string',
@@ -724,7 +724,7 @@ elseif (!defined('SMF'))
 		// Check if there are items, if not, proceed
 		$items = $smcFunc['db_query']('', '
 			SELECT itemid
-			FROM {db_prefix}shop_items',
+			FROM {db_prefix}stshop_items',
 			[]
 		);
 		$has_items = $smcFunc['db_num_rows']($items);
@@ -734,7 +734,7 @@ elseif (!defined('SMF'))
 		{
 			$smcFunc['db_insert'](
 				'ignore',
-				'{db_prefix}shop_items',
+				'{db_prefix}stshop_items',
 				[
 					'name' => 'string',
 					'image' => 'string',
@@ -763,7 +763,7 @@ elseif (!defined('SMF'))
 		// Let's add some modules shall we
 		$modules = $smcFunc['db_query']('', '
 			SELECT id
-			FROM {db_prefix}shop_modules',
+			FROM {db_prefix}stshop_modules',
 			[]
 		);
 		$has_modules = $smcFunc['db_num_rows']($modules);
@@ -773,7 +773,7 @@ elseif (!defined('SMF'))
 		{
 			$smcFunc['db_insert'](
 				'ignore',
-				'{db_prefix}shop_modules',
+				'{db_prefix}stshop_modules',
 				[
 					'name' => 'string',
 					'description' => 'string',
