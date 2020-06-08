@@ -33,7 +33,7 @@ class Format
 		if (empty($formal))
 			$disp = (!empty($modSettings['Shop_credits_prefix']) ? $modSettings['Shop_credits_prefix'] : '') . (!is_numeric($money) ? $money : comma_format($money)) . ' ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : '');
 		else
-			$disp = (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : '') . ':' . (!empty($modSettings['Shop_credits_prefix']) ? $modSettings['Shop_credits_prefix'] : '') . (!is_numeric($money) ? $money : comma_format($money));
+			$disp = (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : '') . ': ' . (!empty($modSettings['Shop_credits_prefix']) ? $modSettings['Shop_credits_prefix'] : '') . (!is_numeric($money) ? $money : comma_format($money));
 
 		return $disp;
 	}
@@ -54,7 +54,7 @@ class Format
 		// Item images...
 		self::$items_url = $boardurl . Shop::$itemsdir;
 
-		$formatname = '<img' . (!empty($class) ? ' class="' . $class . '" id="' . $class . '"' : ''). ' src="' . self::$items_url . $image . '" alt="' . $description . '" title="' . $description . '" width="' . $modSettings['Shop_images_width'] . '" height="' . $modSettings['Shop_images_height'] . '" style="vertical-align: middle;" />';
+		$formatname = '<img' . (!empty($class) ? ' class="' . $class . '" id="' . $class . '"' : ''). ' src="' . self::$items_url . $image . '" alt="' . $description . '" title="' . $description . '" style="vertical-align: middle;width:' . $modSettings['Shop_images_width'] . ';height:' . $modSettings['Shop_images_height'] . ';" />';
 
 		return $formatname;
 	}
