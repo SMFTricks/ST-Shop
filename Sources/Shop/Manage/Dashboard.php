@@ -146,7 +146,7 @@ class Dashboard
 				],
 				'shopinventory' => [
 					'label' => Shop::getText('tab_inventory'),
-					'icon' => 'maintain',
+					'icon' => 'members',
 					'function' =>  __NAMESPACE__ . '\Inventory::main#',
 					'permission' => ['shop_canManage'],
 					'subsections' => [
@@ -203,6 +203,15 @@ class Dashboard
 							Shop::getText('logs_games'),
 							'enabled' => !empty($modSettings['Shop_enable_games']) && !empty($modSettings['Shop_enable_shop']),
 						],
+					],
+				],
+				'shopmaintenance' => [
+					'label' => Shop::getText('tab_maint'),
+					'icon' => 'maintain',
+					'function' =>  __NAMESPACE__ . '\Maintenance::main#',
+					'permission' => ['shop_canManage'],
+					'subsections' => [
+						'import' => [Shop::getText('maint_import')],
 					],
 				],
 			],
