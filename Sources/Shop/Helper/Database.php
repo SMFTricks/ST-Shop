@@ -277,4 +277,12 @@ class Database
 			$columns
 		);
 	}
+
+	public function list_columns($table,  $details = true)
+	{
+		global $smcFunc;
+
+		db_extend('packages');
+		return $smcFunc['db_list_columns']('{db_prefix}' . $table, $details);
+	}
 }
