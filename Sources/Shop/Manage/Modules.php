@@ -188,15 +188,15 @@ class Modules extends Dashboard
 
 	public function upload2()
 	{
-		global $context, $sourcedir;
+		global $context, $sourcedir, $user_info;
 
 		// Page stuff
 		$context['page_title'] = Shop::getText('tab_modules') . ' - '. Shop::getText('modules_upload');
 		$context[$context['admin_menu_name']]['current_subsection'] = 'upload';
 
 		// Only admins can upload modules
-		if (empty($context['user']['is_admin']))
-			fatal_error($txt['Shop_modules_only_admin'], false);
+		if (empty($user_info['is_admin']))
+			fatal_error(Shop::getText('modules_only_admin'), false);
 
 		// No file? That can't be
 		if (!isset($_FILES['newitem']) || empty($_FILES['newitem']))
