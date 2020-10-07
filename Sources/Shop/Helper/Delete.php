@@ -22,7 +22,7 @@ class Delete
 	 *
 	 * It wipes multiple items from existence
 	 */
-	public function items($items, $redirect = NULL)
+	public static function items($items, $redirect = NULL)
 	{
 		// If nothing was chosen to delete (shouldn't happen, but meh)
 		if (empty($items))
@@ -54,7 +54,7 @@ class Delete
 	 *
 	 * Removes modules completely
 	 */
-	public function modules($modules, $redirect = NULL)
+	public static function modules($modules, $redirect = NULL)
 	{
 		global $sourcedir;
 
@@ -94,7 +94,7 @@ class Delete
 	 *
 	 * It kills kittens (allegedly)
 	 */
-	public function cats($cats, $redirect = NULL, $items)
+	public static function cats($cats, $redirect = NULL, $items)
 	{
 		global $sourcedir;
 

@@ -152,6 +152,7 @@ class Shop
 			'Shop_noty_trade' => 0,
 			'Shop_noty_credits' => 0,
 			'Shop_noty_items' => 0,
+			'Shop_importer_success' => 0,
 		];
 		$modSettings = array_merge($defaults, $modSettings);
 	}
@@ -325,7 +326,7 @@ class Shop
 	 *
 	 * Gets a string key, and returns the associated text string.
 	 */
-	public function getText($text, $pattern = true)
+	public static function getText($text, $pattern = true)
 	{
 		global $txt;
 

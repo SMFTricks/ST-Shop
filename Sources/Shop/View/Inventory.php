@@ -138,7 +138,7 @@ class Inventory
 		];
 	}
 
-	public function inventory_list($memberResult, $form_url, $notin = false, $trading = false)
+	public static function inventory_list($memberResult, $form_url, $notin = false, $trading = false)
 	{
 		global $modSettings, $user_info, $context, $settings, $scripturl;
 
@@ -318,7 +318,7 @@ class Inventory
 		loadJavaScriptFile('suggest.js', ['default_theme' => true, 'defer' => false, 'minimize' => true], 'smf_suggest');
 	}
 
-	public function search_inventory()
+	public static function search_inventory()
 	{
 		global $user_info, $context, $scripturl;
 

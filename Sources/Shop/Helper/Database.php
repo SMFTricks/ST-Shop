@@ -28,7 +28,7 @@ class Database
 	public static $log_bank = ['lb.id', 'lb.userid', 'lb.amount', 'lb.fee', 'lb.action', 'lb.type', 'lb.date'];
 	public static $log_games = ['lg.id', 'lg.userid', 'lg.amount', 'lg.game', 'lg.date'];
 
-	public function Save($config_vars, $return_config, $sa, $area = 'shopsettings')
+	public static function Save($config_vars, $return_config, $sa, $area = 'shopsettings')
 	{
 		global $context, $scripturl;
 
@@ -46,42 +46,42 @@ class Database
 		prepareDBSettingContext($config_vars);
 	}
 
-	public function sanitize($string)
+	public static function sanitize($string)
 	{
 		global $smcFunc;
 
 		return $smcFunc['htmlspecialchars']($string, ENT_QUOTES);
 	}
 
-	public function strtolower($value)
+	public static function strtolower($value)
 	{
 		global $smcFunc;
 
 		return $smcFunc['strtolower']($value);
 	}
 
-	public function strlen($string)
+	public static function strlen($string)
 	{
 		global $smcFunc;
 
 		return $smcFunc['strlen']($string);
 	}
 
-	public function json_encode($add = [])
+	public static function json_encode($add = [])
 	{
 		global $smcFunc;
 
 		return $smcFunc['json_encode']($add);
 	}
 
-	public function json_decode($add = [], $param = false)
+	public static function json_decode($add = [], $param = false)
 	{
 		global $smcFunc;
 
 		return $smcFunc['json_decode']($add, $param);
 	}
 
-	public function Count($table, $columns, $additional_query = '', $additional_columns = '', $more_values = [])
+	public static function Count($table, $columns, $additional_query = '', $additional_columns = '', $more_values = [])
 	{
 		global $smcFunc;
 
@@ -105,7 +105,7 @@ class Database
 		return $rows;
 	}
 
-	public function Get($start, $items_per_page, $sort, $table, $columns, $additional_query = '', $single = false, $additional_columns = '', $more_values = [], $attachments = [])
+	public static function Get($start, $items_per_page, $sort, $table, $columns, $additional_query = '', $single = false, $additional_columns = '', $more_values = [], $attachments = [])
 	{
 		global $smcFunc;
 
@@ -144,7 +144,7 @@ class Database
 		return $items;
 	}
 
-	public function Nested($table, $sort, $column_main, $column_sec, $query_member, $additional_query = '', $additional_columns = '', $more_values = [], $attachments = [], $attach_main = false)
+	public static function Nested($table, $sort, $column_main, $column_sec, $query_member, $additional_query = '', $additional_columns = '', $more_values = [], $attachments = [], $attach_main = false)
 	{
 		global $smcFunc;
 
@@ -204,14 +204,14 @@ class Database
 		return $items;
 	}
 
-	public function Attachments($row)
+	public static function Attachments($row)
 	{
 		global $modSettings, $scripturl;
 
 		// Build the array for avatar
 		$set_attachments = [
 			'name' => $row['avatar'],
-			'image' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? '<img class="avatar" src="' . (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) . '" alt="" />' : '') : ((stristr($row['avatar'], 'http://') || stristr($row['avatar'], 'https://')) ? '<img class="avatar" src="' . $row['avatar'] . '"' . $avatar_width . $avatar_height . ' alt="" />' : '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row['avatar']) . '" alt="" />'),
+			'image' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? '<img class="avatar" src="' . (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) . '" alt="" />' : '') : ((stristr($row['avatar'], 'http://') || stristr($row['avatar'], 'https://')) ? '<img class="avatar" src="' . $row['avatar'] . '" alt="" />' : '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . htmlspecialchars($row['avatar']) . '" alt="" />'),
 			'href' => $row['avatar'] == '' ? ($row['id_attach'] > 0 ? (empty($row['attachment_type']) ? $scripturl . '?action=dlattach;attach=' . $row['id_attach'] . ';type=avatar' : $modSettings['custom_avatar_url'] . '/' . $row['filename']) : '') : ((stristr($row['avatar'], 'http://') || stristr($row['avatar'], 'https://')) ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar']),
 			'url' => $row['avatar'] == '' ? '' : ((stristr($row['avatar'], 'http://') || stristr($row['avatar'], 'https://')) ? $row['avatar'] : $modSettings['avatar_url'] . '/' . $row['avatar'])
 		];
@@ -219,7 +219,7 @@ class Database
 		return $set_attachments;
 	}
 
-	public function Find($table, $column, $search = '', $additional_query = '')
+	public static function Find($table, $column, $search = '', $additional_query = '')
 	{
 		global $smcFunc;
 
@@ -239,7 +239,7 @@ class Database
 		return $result;
 	}
 
-	public function Delete($table, $column, $search, $additional_query = '')
+	public static function Delete($table, $column, $search, $additional_query = '')
 	{
 		global $smcFunc;
 
@@ -253,7 +253,7 @@ class Database
 		);
 	}
 
-	public function Insert($table, $columns, $types, $indexes = [])
+	public static function Insert($table, $columns, $types, $indexes = [])
 	{
 		global $smcFunc;
 
@@ -265,7 +265,7 @@ class Database
 		);
 	}
 
-	public function Update($table, $columns, $types, $query)
+	public static function Update($table, $columns, $types, $query)
 	{
 		global $smcFunc;
 
@@ -278,7 +278,7 @@ class Database
 		);
 	}
 
-	public function list_columns($table,  $details = true)
+	public static function list_columns($table,  $details = true)
 	{
 		global $smcFunc;
 
