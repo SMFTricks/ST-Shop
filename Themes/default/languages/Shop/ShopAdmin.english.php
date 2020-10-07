@@ -326,5 +326,14 @@ $txt['install_shop_games'] = 'Install Shop Game';
 
 // Maintenance
 $txt['Shop_tab_maint'] = 'Maintenance';
-$txt['Shop_tab_maint_desc'] = 'Here you can use some maintenance utilities for the shop, like converting from other shops.';
+$txt['Shop_tab_maint_desc'] = 'Here you can use some maintenance utilities for the shop, like converting from other sho mods.';
 $txt['Shop_maint_import'] = 'Import data';
+$txt['Shop_maint_import_desc'] = 'On this section you can import data from other shop mods you previously had installed in your forum.';
+$txt['Shop_maint_convert'] = 'Importing data';
+$txt['Shop_maint_convert_warn'] = 'Once you go forward importing data from a different mod, your current shop items, shop categories and logs will be deleted. this shouldn\'t be a problem assuming you just installed ST Shop and want to convert from a different mod or 3.x version of ST Shop.<br/>
+Shop items that work on a Module (are usable) won\'t carry over as usable and will become regular items. If you are upgrading from ST Shop 3.2 they will keep working as usual if are on default modules.';
+$txt['Shop_import_from'] = 'We have detected a previous installation of ';
+$txt['Shop_import_from_SMFShop'] = $txt['Shop_import_from'] .= '<a href="https://custom.simplemachines.org/mods/index.php?mod=65">SMF Shop</a>';
+$txt['Shop_import_from_STShop'] = $txt['Shop_import_from'] .= '<a href="https://custom.simplemachines.org/mods/index.php?mod=1794">SMF Shop</a>';
+$txt['Shop_import_from_SAShop'] = $txt['Shop_import_from'] .= 'SA Shop';
+$txt['Shop_maint_import_go'] = 'Start';

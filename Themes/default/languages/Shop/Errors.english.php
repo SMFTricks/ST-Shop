@@ -89,3 +89,6 @@ $txt['Shop_gift_not_negative_or_zero'] = 'The amount to send cannot be negative 
 $txt['Shop_restock_error_noitems'] = 'You didn\'t select any items.';
 
 $txt['Shop_games_invalid'] = 'Your pass for the games room has expired, please buy a new pass at the shop!';
+
+$txt['Shop_error_import_data'] = 'We couldn\'t find any data to import or you already imported the data';
+$txt['Shop_import_only_admin'] = 'Only Admins can perform the import/convert of data.';
