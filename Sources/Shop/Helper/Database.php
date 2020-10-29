@@ -253,11 +253,23 @@ class Database
 		);
 	}
 
-	public static function Insert($table, $columns, $types, $indexes = [])
+	public static function Truncate($table)
 	{
 		global $smcFunc;
 
-		$smcFunc['db_insert']('ignore',
+		$smcFunc['db_query']('', '
+			TRUNCATE TABLE {db_prefix}{raw:table}',
+			[
+				'table' => $table,
+			]
+		);
+	}
+
+	public static function Insert($table, $columns, $types, $indexes = [], $method = 'ignore')
+	{
+		global $smcFunc;
+
+		$smcFunc['db_insert']($method,
 			'{db_prefix}'.$table,
 			$types,
 			$columns,
