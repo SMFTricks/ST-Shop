@@ -668,3 +668,35 @@ function template_send_below()
 			});
 		</script>';
 }
+
+function template_import()
+{
+	global $context, $txt, $modSettings, $scripturl;
+
+	echo '
+	<div class="windowbg">
+		<div class="title_bar">
+			<h4 class="titlebg">
+				', $txt['Shop_maint_convert'], '
+			</h4>
+		</div>
+		<div class="information">
+			', $txt['Shop_maint_convert_warn'], '
+		</div>
+	
+		<div class="', (!empty($modSettings['Shop_importer_success']) || empty($context['shop_convert_data']) ? 'errorbox' : 'infobox') , '">
+			', (!empty($modSettings['Shop_importer_success']) || empty($context['shop_convert_data']) ? $txt['Shop_error_import_data'] : $txt['Shop_import_from_' . $context['shop_convert_from']]) , '
+		</div>';
+
+	// Move forward
+	if (empty($modSettings['Shop_importer_success']) && !empty($context['shop_convert_data']))
+		echo '
+		<form method="post" action="', $scripturl,'?action=admin;area=shopmaintenance;sa=importdo">
+			<input type="hidden" name="convert_from" value="', $context['shop_convert_from'], '">
+			<input class="button floatright" type="submit" value="', $txt['Shop_maint_import_go'], '" />
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
+		</form>';
+
+	echo '
+	</div>';
+}
