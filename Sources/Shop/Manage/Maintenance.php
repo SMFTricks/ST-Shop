@@ -80,8 +80,6 @@ class Maintenance extends Dashboard
 		// From what mod?
 		$context['shop_convert_from'] = $this->_convert_from;
 		$context['shop_convert_data'] = $this->_select_shop;
-
-		// print_r($this->_select_shop);
 	}
 
 	public function discover()
@@ -122,6 +120,7 @@ class Maintenance extends Dashboard
 			fatal_error(Shop::getText('error_import_data'), false);
 
 		checkSession();
+		validateSession();
 
 		// We got import select?
 		$this->_convert_from = isset($_REQUEST['convert_from']) && !empty($_REQUEST['convert_from']) ? $_REQUEST['convert_from'] : 'SMFShop';
@@ -148,15 +147,38 @@ class Maintenance extends Dashboard
 			if (!empty($this->_importModel->importItems()))
 			{
 				// Categories
-				$context['shop_found']['cats_total'] = $this->_importModel->countCategories();
-				$context['shop_imported']['cats_total'] = $this->_importModel->importCategories();
+				if (!empty($this->_importModel->countCategories()))
+				{
+					$context['shop_found']['cats_total'] = $this->_importModel->countCategories();
+					$context['shop_imported']['cats_total'] = $this->_importModel->importCategories();
+				}
 
+				// Inventory
+				if (!empty($this->_importModel->countInventory()))
+				{
+					$context['shop_found']['inventory_total'] = $this->_importModel->countInventory();
+					$context['shop_imported']['inventory_total'] = $this->_importModel->importInventory();
+				}
 			}
-
 		}
-		// No point in moving forward if there are no items
-		else
-			fatal_error('', false);
 
+		// Do the money next
+		$context['shop_imported']['cash_total'] = $this->_importModel->importMoney();
+
+		// Convert board settings
+		$context['shop_imported']['boards_total'] = $this->_importModel->importBoardSettings();
+
+		// Convert shop settings
+		$context['shop_imported']['settings_total'] = $this->_importModel->importSettings();
+
+		// Update the settings for the converter
+		// updateSettings(['Shop_importer_success' => 1]);
+
+		// Template
+		loadTemplate('Shop/ShopAdmin');
+
+		// Info
+		$context['page_title'] = Shop::getText('tab_maint') . ' - ' . Shop::getText('maint_import');
+		$context['sub_template'] = 'import_results';
 	}
 }
