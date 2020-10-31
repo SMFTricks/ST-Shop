@@ -15,6 +15,14 @@ if (!defined('SMF'))
 
 class Signup
 {
+	/**
+	 * Signup::register()
+	 *
+	 * Gives money toe the users upon registration
+	 * 
+	 * @param array $regOptions An array of registration options
+	 * @return void
+	 */
 	public function register(&$regOptions, &$theme_vars, &$knownInts, &$knownFloats)
 	{
 		global $modSettings;
