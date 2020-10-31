@@ -330,10 +330,22 @@ $txt['Shop_tab_maint_desc'] = 'Here you can use some maintenance utilities for t
 $txt['Shop_maint_import'] = 'Import data';
 $txt['Shop_maint_import_desc'] = 'On this section you can import data from other shop mods you previously had installed in your forum.';
 $txt['Shop_maint_convert'] = 'Importing data';
-$txt['Shop_maint_convert_warn'] = 'Once you go forward importing data from a different mod, your current shop items, shop categories and logs will be deleted. this shouldn\'t be a problem assuming you just installed ST Shop and want to convert from a different mod or 3.x version of ST Shop.<br/>
+$txt['Shop_maint_convert_warn'] = 'Once you go forward importing data from a different mod, your current shop items, shop categories, inventories and logs will be deleted. This shouldn\'t be a problem assuming you just installed ST Shop and want to convert from a different mod or 3.x version of ST Shop.<br/>
 Shop items that work on a Module (are usable) won\'t carry over as usable and will become regular items. If you are upgrading from ST Shop 3.2 they will keep working as usual if are on default modules.';
 $txt['Shop_import_from'] = 'We have detected a previous installation of ';
 $txt['Shop_import_from_SMFShop'] = $txt['Shop_import_from'] .= '<a href="https://custom.simplemachines.org/mods/index.php?mod=65">SMF Shop</a>';
-$txt['Shop_import_from_STShop'] = $txt['Shop_import_from'] .= '<a href="https://custom.simplemachines.org/mods/index.php?mod=1794">SMF Shop</a>';
-$txt['Shop_import_from_SAShop'] = $txt['Shop_import_from'] .= 'SA Shop';
+$txt['Shop_import_from_STShop'] = $txt['Shop_import_from'] .= '<a href="https://custom.simplemachines.org/mods/index.php?mod=1794">ST Shop</a>';
+$txt['Shop_import_from_SAShop'] = $txt['Shop_import_from'] .= '<a href="https://custom.simplemachines.org/mods/index.php?mod=1794">SA Shop</a>';
 $txt['Shop_maint_import_go'] = 'Start';
+$txt['Shop_maint_import_results'] = 'Results of the import';
+$txt['Shop_maint_import_found'] = 'Data found';
+$txt['Shop_maint_import_converted'] = 'Data converted';
+$txt['Shop_import_found_items'] = 'Items found:';
+$txt['Shop_import_found_cats'] = 'Categories found:';
+$txt['Shop_import_found_inventories'] = 'Items found in inventories:';
+$txt['Shop_import_converted_items'] = 'Items imported:';
+$txt['Shop_import_converted_cats'] = 'Categories imported:';
+$txt['Shop_import_converted_inventories'] = 'Inventory items imported:';
+$txt['Shop_import_converted_cash'] = 'User\'s with money imported:';
+$txt['Shop_import_converted_board'] = 'Board settings imported:';
+$txt['Shop_import_converted_settings'] = 'Shop settings imported:';
