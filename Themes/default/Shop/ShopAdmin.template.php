@@ -700,3 +700,89 @@ function template_import()
 	echo '
 	</div>';
 }
+
+function template_import_results()
+{
+	global $context, $txt;
+
+	echo '
+	<div class="windowbg">
+		<div class="cat_bar">
+			<h3 class="catbg">
+				', $txt['Shop_maint_import_results'], '
+			</h3>
+		</div>
+		<div class="half_content">
+			<div class="title_bar">
+				<h4 class="titlebg">
+					', $txt['Shop_maint_import_found'], '
+				</h4>
+			</div>
+			<dl class="settings">
+				<dt>
+					', $txt['Shop_import_found_items'], '
+				</dt>
+				<dd>
+					', $context['shop_found']['items_total'], '
+				</dd>
+				<dt>
+					', $txt['Shop_import_found_cats'], '
+				</dt>
+				<dd>
+					', $context['shop_found']['cats_total'], '
+				</dd>
+				<dt>
+					', $txt['Shop_import_found_inventories'], '
+				</dt>
+				<dd>
+					', $context['shop_found']['inventory_total'], '
+				</dd>
+			</dl>
+		</div>
+		<div class="half_content">
+			<div class="title_bar">
+				<h4 class="titlebg">
+					', $txt['Shop_maint_import_converted'], '
+				</h4>
+			</div>
+			<dl class="settings">
+				<dt>
+					', $txt['Shop_import_converted_items'], '
+				</dt>
+				<dd>
+					', $context['shop_imported']['items_total'], '
+				</dd>
+				<dt>
+					', $txt['Shop_import_converted_cats'], '
+				</dt>
+				<dd>
+					', $context['shop_imported']['cats_total'], '
+				</dd>
+				<dt>
+					', $txt['Shop_import_converted_inventories'], '
+				</dt>
+				<dd>
+					', $context['shop_imported']['inventory_total'], '
+				</dd>
+				<dt>
+					', $txt['Shop_import_converted_cash'], '
+				</dt>
+				<dd>
+					', $context['shop_imported']['cash_total'], '
+				</dd>
+				<dt>
+					', $txt['Shop_import_converted_board'], '
+				</dt>
+				<dd>
+					', $context['shop_imported']['boards_total'], '
+				</dd>
+				<dt>
+					', $txt['Shop_import_converted_settings'], '
+				</dt>
+				<dd>
+					', $context['shop_imported']['settings_total'], '
+				</dd>
+			</dl>
+		</div>
+	</div>';
+}
