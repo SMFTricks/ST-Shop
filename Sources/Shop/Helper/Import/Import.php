@@ -357,6 +357,28 @@ abstract class Import
 	}
 
 	/**
+	 * Import::convertGamesPass()
+	 * 
+	 * Will complete the importing of the cash
+	 *
+	 * @param array The column that includes gamepass
+	 * @return int The total of users that got their gamepass days converted
+	 */
+	public function convertGamespass($gamespass)
+	{
+		global $smcFunc;
+
+		// Convert the shop money
+		$this->_types = 'gamesPass = ' .  $gamespass . ',';
+
+		// Update the money for users that used to have money
+		Database::Update('members', [], $this->_types, 'WHERE '.$gamespass . ' > 0');
+
+		// Users that got back their ca$h
+		return $smcFunc['db_affected_rows']();
+	}
+
+	/**
 	 * Import::convertBoardSettings()
 	 * 
 	 * Will complete the importing of the board settings

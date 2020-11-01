@@ -95,6 +95,8 @@ class SAShop extends Import
 		'cashBank',
 	];
 
+	public $_gamespass = 'games_pass';
+
 	/**
 	 * @var array The columns for board settings
 	 */
@@ -252,6 +254,25 @@ class SAShop extends Import
 				$this->_result = false;
 
 		return (!empty($this->_result) ? $this->convertMoney($this->_money) : 0);
+	}
+
+	/**
+	 * SAShop::importGamesPass()
+	 * 
+	 * Checks for any gamespass from the old data
+	 * 
+	 * @return bool The amount of users found with gamespass days
+	 */
+	public function importGamesPass()
+	{
+		$this->_result = true;
+		$this->_insert = [];
+		$this->_insert = Database::list_columns('members');
+
+		if (!isset($this->_insert[$this->_gamespass]))
+			$this->_result = false;
+
+		return (!empty($this->_result) ? $this->convertGamesPass($this->_gamespass) : 0);
 	}
 
 	/**
