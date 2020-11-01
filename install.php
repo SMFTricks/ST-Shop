@@ -925,13 +925,3 @@ elseif (!defined('SMF'))
 
 		}
 	}
-	else
-	{
-		$smcFunc['db_query']('', '
-			DELETE FROM {db_prefix}scheduled_tasks
-			WHERE task = {string:name}',
-			[
-				'name' => 'shop_bank_interest',
-			]
-		);
-	}

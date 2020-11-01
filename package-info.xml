@@ -35,18 +35,19 @@
 		<!-- Source Files -->
 		<remove-dir name="$sourcedir/Shop">Source files</remove-dir>
 		<!-- Languages -->
-		<remove-file name="$languagedir/Shop.english.php">Language file</remove-file>
+		<remove-dir name="$languagedir/Shop">Language files</remove-dir>
 		<!-- Images -->
 		<remove-file name="$imagesdir/icons/shop.png">Shop icon</remove-file>
 		<remove-dir name="$imagesdir/icons/shop">Shop Stats icons</remove-dir>
 		<!-- Templates -->
-		<remove-file name="$themedir/Shop.template.php">Main template</remove-file>
-		<remove-file name="$themedir/ShopAdmin.template.php">Admin template</remove-file>
+		<remove-dir name="$themedir/Shop">Template files</remove-dir>
 		<!-- Item Modules and Images -->
-		<remove-dir name="$boarddir/shop_items">Shop items and modules</remove-dir>
+		<remove-dir name="$boarddir/shop_items">Shop items</remove-dir>
 		<!-- Hooks Remove -->
 		<hook hook="integrate_pre_load" function="Shop::initialize" file="$sourcedir/Shop/Shop.php" reverse="true" />
 		<!-- Database -->
 		<database>install.php</database>
+		<!-- Tasks-->
+		<code>uninstall.php</code>
 	</uninstall>
 </package-info>
