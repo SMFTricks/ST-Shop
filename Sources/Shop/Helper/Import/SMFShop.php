@@ -141,7 +141,7 @@ class SMFShop extends Import
 	 */
 	public function countItems()
 	{
-		return Database::Count('shop_items', ['id']);
+		return (!empty(Database::list_columns('shop_items'))) ? Database::Count('shop_items', ['id']) : 0;
 	}
 
 	/**
@@ -179,7 +179,7 @@ class SMFShop extends Import
 	 */
 	public function countInventory()
 	{
-		return Database::Count('shop_inventory', ['id']);
+		return (!empty(Database::list_columns('shop_inventory'))) ? Database::Count('shop_inventory', ['id']) : 0;
 	}
 
 	/**
@@ -216,7 +216,7 @@ class SMFShop extends Import
 	 */
 	public function countCategories()
 	{
-		return Database::Count('shop_categories', ['id']);
+		return (!empty(Database::list_columns('shop_categories'))) ? Database::Count('shop_categories', ['id']) : 0;
 	}
 
 	/**
@@ -228,8 +228,13 @@ class SMFShop extends Import
 	 */
 	public function importMoney()
 	{
-		$this->_result = [];
-		$this->_result = Database::Count('members', $this->_money);
+		$this->_result = true;
+		$this->_insert = [];
+		$this->_insert = Database::list_columns('members');
+
+		foreach ($this->_money as $key => $value)
+			if (!isset($this->_insert[$value]))
+				$this->_result = false;
 
 		return (!empty($this->_result) ? $this->convertMoney($this->_money) : 0);
 	}
@@ -243,8 +248,13 @@ class SMFShop extends Import
 	 */
 	public function importBoardSettings()
 	{
-		$this->_result = [];
-		$this->_result = Database::Count('boards', $this->_boards);
+		$this->_result = true;
+		$this->_insert = [];
+		$this->_insert = Database::list_columns('boards');
+
+		foreach ($this->_boards as $key => $value)
+			if (!isset($this->_insert[$value]))
+				$this->_result = false;
 
 		return (!empty($this->_result) ? $this->convertBoardSettings($this->_boards) : 0);
 	}
