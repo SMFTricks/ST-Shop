@@ -121,7 +121,7 @@ elseif (!defined('SMF'))
 				],
 				[
 					'name' => 'module',
-					'type' => 'tinyint',
+					'type' => 'int',
 					'null' => false,
 					'size' => 10,
 					'default' => 0,
