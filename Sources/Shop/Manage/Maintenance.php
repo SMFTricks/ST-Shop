@@ -176,6 +176,9 @@ class Maintenance extends Dashboard
 		// Do the money next
 		$context['shop_imported']['cash_total'] = ($this->_convert_from != 'STShop') ? $this->_importModel->importMoney() : 0;
 
+		// Do the gamespass next
+		$context['shop_imported']['gamespass_total'] = ($this->_convert_from == 'SAShop') ? $this->_importModel->importGamesPass() : 0;
+
 		// Convert board settings
 		$context['shop_imported']['boards_total'] = ($this->_convert_from != 'STShop') ? $this->_importModel->importBoardSettings() : 0;
 
@@ -183,7 +186,7 @@ class Maintenance extends Dashboard
 		$context['shop_imported']['settings_total'] = ($this->_convert_from != 'STShop') ? $this->_importModel->importSettings() : 0;
 
 		// Update the settings for the converter
-		// updateSettings(['Shop_importer_success' => 1]);
+		updateSettings(['Shop_importer_success' => 1]);
 
 		// Template
 		loadTemplate('Shop/ShopAdmin');
