@@ -456,7 +456,7 @@ class STShop extends Import
 	}
 
 	/**
-	 * STShop::importGames()
+	 * STShop::importGifts()
 	 * 
 	 * Search for the items and inserts them into a very nice array of data
 	 * 
@@ -486,7 +486,7 @@ class STShop extends Import
 	}
 
 	/**
-	 * STShop::countGames()
+	 * STShop::countGifts()
 	 * 
 	 * Counts the amount of items found in the table
 	 * 
