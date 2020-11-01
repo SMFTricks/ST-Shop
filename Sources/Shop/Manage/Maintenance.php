@@ -19,12 +19,24 @@ if (!defined('SMF'))
 
 class Maintenance extends Dashboard
 {
+	/**
+	 * @var array Select and check for the columns we need
+	 */
 	private $_select_shop = [];
 
+	/**
+	 * @var string Store the compatible mod to make the import of data
+	 */
 	private $_convert_from;
 
+	/**
+	 * @var string The model we have available to import data
+	 */
 	private $_import;
 
+	/**
+	 * @var object Create a new instance with the desired model
+	 */
 	private $_importModel;
 
 	/**
