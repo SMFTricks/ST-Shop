@@ -737,50 +737,108 @@ function template_import_results()
 				<dd>
 					', $context['shop_found']['inventory_total'], '
 				</dd>
+				<dt>
+					', $txt['Shop_import_found_modules'], '
+				</dt>
+				<dd>
+					', $context['shop_found']['modules_total'], '
+				</dd>
+			</dl>
+			<dl class="settings">
+				<dt>
+					', $txt['Shop_import_found_log_buy'], '
+				</dt>
+				<dd>
+					', $context['shop_found']['logbuy_total'], '
+				</dd>
+				<dt>
+					', $txt['Shop_import_found_log_bank'], '
+				</dt>
+				<dd>
+					', $context['shop_found']['logbank_total'], '
+				</dd>
+				<dt>
+					', $txt['Shop_import_found_log_gift'], '
+				</dt>
+				<dd>
+					', $context['shop_found']['loggift_total'], '
+				</dd>
+				<dt>
+					', $txt['Shop_import_found_log_games'], '
+				</dt>
+				<dd>
+					', $context['shop_found']['loggames_total'], '
+				</dd>
 			</dl>
 		</div>
 		<div class="half_content">
 			<div class="title_bar">
 				<h4 class="titlebg">
-					', $txt['Shop_maint_import_converted'], '
+					', $txt['Shop_maint_import_imported'], '
 				</h4>
 			</div>
 			<dl class="settings">
 				<dt>
-					', $txt['Shop_import_converted_items'], '
+					', $txt['Shop_import_imported_items'], '
 				</dt>
 				<dd>
 					', $context['shop_imported']['items_total'], '
 				</dd>
 				<dt>
-					', $txt['Shop_import_converted_cats'], '
+					', $txt['Shop_import_imported_cats'], '
 				</dt>
 				<dd>
 					', $context['shop_imported']['cats_total'], '
 				</dd>
 				<dt>
-					', $txt['Shop_import_converted_inventories'], '
+					', $txt['Shop_import_imported_inventories'], '
 				</dt>
 				<dd>
 					', $context['shop_imported']['inventory_total'], '
 				</dd>
 				<dt>
-					', $txt['Shop_import_converted_cash'], '
+					', $txt['Shop_import_imported_cash'], '
 				</dt>
 				<dd>
 					', $context['shop_imported']['cash_total'], '
 				</dd>
 				<dt>
-					', $txt['Shop_import_converted_board'], '
+					', $txt['Shop_import_imported_board'], '
 				</dt>
 				<dd>
 					', $context['shop_imported']['boards_total'], '
 				</dd>
 				<dt>
-					', $txt['Shop_import_converted_settings'], '
+					', $txt['Shop_import_imported_settings'], '
 				</dt>
 				<dd>
 					', $context['shop_imported']['settings_total'], '
+				</dd>
+			</dl>
+			<dl class="settings">
+				<dt>
+					', $txt['Shop_import_imported_log_buy'], '
+				</dt>
+				<dd>
+					', $context['shop_imported']['logbuy_total'], '
+				</dd>
+				<dt>
+					', $txt['Shop_import_imported_log_bank'], '
+				</dt>
+				<dd>
+					', $context['shop_imported']['logbank_total'], '
+				</dd>
+				<dt>
+					', $txt['Shop_import_imported_log_gift'], '
+				</dt>
+				<dd>
+					', $context['shop_imported']['loggift_total'], '
+				</dd>
+				<dt>
+					', $txt['Shop_import_imported_log_games'], '
+				</dt>
+				<dd>
+					', $context['shop_imported']['loggames_total'], '
 				</dd>
 			</dl>
 		</div>
