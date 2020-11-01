@@ -353,6 +353,7 @@ $txt['Shop_import_imported_cats'] = 'Categories imported:';
 $txt['Shop_import_imported_inventories'] = 'Inventory items imported:';
 $txt['Shop_import_imported_modules'] = 'Modules imported:';
 $txt['Shop_import_imported_cash'] = 'User\'s with money imported:';
+$txt['Shop_import_imported_gamespass'] = 'User\'s with game days imported:';
 $txt['Shop_import_imported_board'] = 'Board settings imported:';
 $txt['Shop_import_imported_settings'] = 'Shop settings imported:';
 $txt['Shop_import_imported_log_buy'] = 'Purchase log entries imported:';

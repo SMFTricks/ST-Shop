@@ -803,6 +803,12 @@ function template_import_results()
 					', $context['shop_imported']['cash_total'], '
 				</dd>
 				<dt>
+					', $txt['Shop_import_imported_gamespass'], '
+				</dt>
+				<dd>
+					', $context['shop_imported']['gamespass_total'], '
+				</dd>
+				<dt>
 					', $txt['Shop_import_imported_board'], '
 				</dt>
 				<dd>
