@@ -327,7 +327,7 @@ $txt['shop_games_package'] = 'ST Shop Games';
 $txt['install_shop_games'] = 'Install Shop Game';
 
 // Maintenance
-$txt['Shop_tab_maint'] = 'Maintenance';
+$txt['Shop_tab_maint'] = 'Shop Maintenance';
 $txt['Shop_tab_maint_desc'] = 'Here you can use some maintenance utilities for the shop, like converting from other sho mods.';
 $txt['Shop_maint_import'] = 'Import data';
 $txt['Shop_maint_import_desc'] = 'On this section you can import data from other shop mods you previously had installed in your forum.';
