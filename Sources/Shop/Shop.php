@@ -161,6 +161,9 @@ class Shop
 			'Shop_importer_success' => 0,
 		];
 		$modSettings = array_merge($defaults, $modSettings);
+
+		// Always have the importer setting on zero when installing
+		updateSettings(['Shop_importer_success' => 0]);
 	}
 
 	/**
