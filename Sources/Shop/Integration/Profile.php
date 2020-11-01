@@ -267,7 +267,7 @@ class Profile
 			];
 
 		// Inventory
-		if ($area == 'summary' && !empty($modSettings['Shop_inventory_enable']) && !empty($modSettings['Shop_enable_shop']) && empty($context['member']['shopInventory_hide']))
+		if ($area == 'summary' && !empty($modSettings['Shop_inventory_enable']) && !empty($modSettings['Shop_enable_shop']) && empty($context['member']['shopInventory_hide']) && allowedTo('shop_viewInventory'))
 			$context['custom_fields']['shop_inventory'] = [
 				'name' => Shop::getText('posting_inventory'),
 				'colname' => 'Shop_inventory',

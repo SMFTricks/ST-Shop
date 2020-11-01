@@ -167,7 +167,7 @@ class User
 			];
 
 		// Inventory
-		if (empty($this->_profile['shopInventory_hide']) && !empty($modSettings['Shop_inventory_enable']) && !empty($modSettings['Shop_enable_shop']) && !empty($topic))
+		if (empty($this->_profile['shopInventory_hide']) && !empty($modSettings['Shop_inventory_enable']) && !empty($modSettings['Shop_enable_shop']) && !empty($topic) && allowedTo('shop_viewInventory'))
 			$data['custom_fields']['shop_inventory'] = [
 				'title' => Shop::getText('posting_inventory'),
 				'col_name' => 'Shop_inventory',
