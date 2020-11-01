@@ -137,39 +137,50 @@ class Maintenance extends Dashboard
 			$this->_importModel->DropTables();
 
 		// We only import if we have items, otherwise it's pointless
-		if (!empty($this->_importModel->CountItems()))
+		$context['shop_found']['items_total'] = $this->_importModel->countItems();
+		$context['shop_imported']['items_total'] = (!empty($context['shop_found']['items_total'])) ? $this->_importModel->importItems() : 0;
+
+		// If we imported items, then we could try to do the rest
+		if (!empty($context['shop_found']['items_total']))
 		{
-			// Items
-			$context['shop_found']['items_total'] = $this->_importModel->countItems();
-			$context['shop_imported']['items_total'] = $this->_importModel->importItems();
+			// I'm just gonna use ternaries so I don't have to put a plethora of ifs in the template
+			// Categories
+			$context['shop_found']['cats_total'] = $this->_importModel->countCategories();
+			$context['shop_imported']['cats_total'] = (!empty($context['shop_found']['cats_total'])) ? $this->_importModel->importCategories() : 0;
 
-			// If we imported items, then we could try to do the rest
-			if (!empty($this->_importModel->importItems()))
-			{
-				// Categories
-				if (!empty($this->_importModel->countCategories()))
-				{
-					$context['shop_found']['cats_total'] = $this->_importModel->countCategories();
-					$context['shop_imported']['cats_total'] = $this->_importModel->importCategories();
-				}
+			// Inventory
+			$context['shop_found']['inventory_total'] = $this->_importModel->countInventory();
+			$context['shop_imported']['inventory_total'] = (!empty($context['shop_found']['inventory_total'])) ? $this->_importModel->importInventory() : 0;
 
-				// Inventory
-				if (!empty($this->_importModel->countInventory()))
-				{
-					$context['shop_found']['inventory_total'] = $this->_importModel->countInventory();
-					$context['shop_imported']['inventory_total'] = $this->_importModel->importInventory();
-				}
-			}
+			// Modules
+			$context['shop_found']['modules_total'] = ($this->_convert_from == 'STShop') ? $this->_importModel->countModules() : 0;
+			$context['shop_imported']['modules_total'] = (!empty($context['shop_found']['modules_total'])) ? $this->_importModel->importInventory() : 0;
+
+			// Purchase Logs
+			$context['shop_found']['logbuy_total'] = ($this->_convert_from != 'SMFShop') ? $this->_importModel->countPurchase() : 0;
+			$context['shop_imported']['logbuy_total'] = (!empty($context['shop_found']['logbuy_total'])) ? $this->_importModel->importPurchases() : 0;
+
+			// Bank Logs
+			$context['shop_found']['logbank_total'] = ($this->_convert_from == 'STShop') ? $this->_importModel->countBank() : 0;
+			$context['shop_imported']['logbank_total'] = (!empty($context['shop_found']['logbank_total'])) ? $this->_importModel->importBank() : 0;
+
+			// Games Logs
+			$context['shop_found']['loggames_total'] = ($this->_convert_from == 'STShop') ? $this->_importModel->countGames() : 0;
+			$context['shop_imported']['loggames_total'] = (!empty($context['shop_found']['loggames_total'])) ? $this->_importModel->importGames() : 0;
+
+			// Gifts Logs
+			$context['shop_found']['loggift_total'] = ($this->_convert_from == 'STShop') ? $this->_importModel->countGifts() : 0;
+			$context['shop_imported']['loggift_total'] = (!empty($context['shop_found']['loggifts_total'])) ? $this->_importModel->importGifts() : 0;
 		}
 
 		// Do the money next
-		$context['shop_imported']['cash_total'] = $this->_importModel->importMoney();
+		$context['shop_imported']['cash_total'] = ($this->_convert_from != 'STShop') ? $this->_importModel->importMoney() : 0;
 
 		// Convert board settings
-		$context['shop_imported']['boards_total'] = $this->_importModel->importBoardSettings();
+		$context['shop_imported']['boards_total'] = ($this->_convert_from != 'STShop') ? $this->_importModel->importBoardSettings() : 0;
 
 		// Convert shop settings
-		$context['shop_imported']['settings_total'] = $this->_importModel->importSettings();
+		$context['shop_imported']['settings_total'] = ($this->_convert_from != 'STShop') ? $this->_importModel->importSettings() : 0;
 
 		// Update the settings for the converter
 		// updateSettings(['Shop_importer_success' => 1]);
