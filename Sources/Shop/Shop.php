@@ -45,6 +45,7 @@ class Shop
 			'Shop_enable_bank' => 1,
 			'Shop_enable_gift' => 1,
 			'Shop_enable_trade' => 1,
+			'Shop_enable_stats' => 0,
 			'Shop_enable_maintenance' => 0,
 			'Shop_credits_register' => 5,
 			'Shop_credits_topic' => 10,
