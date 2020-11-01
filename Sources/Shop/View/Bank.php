@@ -93,7 +93,7 @@ class Bank
 
 	public function trans()
 	{
-		global $context, $user_info, $modSettings;
+		global $user_info, $modSettings;
 
 		// Check session
 		checkSession();
