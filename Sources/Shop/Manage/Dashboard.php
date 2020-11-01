@@ -238,6 +238,9 @@ class Dashboard
 		$context['Shop']['support'] = Shop::$supportSite;
 		$context['Shop']['credits'] = $this->credits();
 
+		// Load the currrent version for this mod
+		loadJavaScriptFile('https://smftricks.com/assets/version/Shop/version.js', ['external' => true]);
+
 		// Feed news
 		addInlineJavascript('
 			$(function(){
@@ -268,6 +271,18 @@ class Dashboard
 					},
 					error: function (html){}
 				});
+
+				if (window.st_mod_version)
+				{
+					var shopversion = document.getElementById("lastestVersion");
+
+					if (window.st_mod_version != "' . Shop::$version . '")
+					{
+						setInnerHTML(yourVersion, "<i style=\"color:red\">" + \'' . Shop::$version . '\' + "</i> " + \'' . Shop::getText('version_outdated') . '\');
+					}
+
+					setInnerHTML(lastestVersion, window.st_mod_version);
+				}
 			});
 		', true);
 	}

@@ -45,9 +45,10 @@ function template_dashboard()
 				<div class="windowbg nopadding">
 					<div class="content padding">
 						<div id="version_details">
-							<strong>', $txt['support_versions'], ':</strong><br />
-							', $txt['Shop_version'] , ':
-							<em id="yourVersion" style="white-space: nowrap;">', $context['Shop']['version'] , '</em><br />
+							<strong>', $txt['Shop_version'], ':</strong> 
+							<span id="yourVersion" style="white-space: nowrap;">', $context['Shop']['version'] , '</span><br />
+							<strong>', $txt['Shop_current_version'], ':</strong> 
+							<span id="lastestVersion" style="white-space: nowrap;"></span><br />
 						</div>
 					</div>
 					<div class="title_bar">
