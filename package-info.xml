@@ -5,7 +5,7 @@
 	<name>ST Shop</name>
 	<version>4.0</version>
 	<type>modification</type>
-	<install for="2.1 - 2.1.99, 2.1 Beta 1 - 3">
+	<install for="2.1 - 2.1.99, 2.1 RC3, 2.1 RC4">
 
 		<!-- Mod Readme -->
 		<readme lang="english" parsebbc="true" type="file">readme/readme.english.txt</readme>
@@ -31,7 +31,7 @@
 		<redirect url="?action=admin;area=shopinfo">redirect.txt</redirect>
 	</install>
 	
-	<uninstall for="2.1 - 2.1.99, 2.1 Beta 1 - 3">
+	<uninstall for="2.1 - 2.1.99, 2.1 RC3, 2.1 RC4">
 		<!-- Source Files -->
 		<remove-dir name="$sourcedir/Shop">Source files</remove-dir>
 		<!-- Languages -->
