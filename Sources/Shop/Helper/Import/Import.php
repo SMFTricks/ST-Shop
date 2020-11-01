@@ -53,7 +53,7 @@ abstract class Import
 	/**
 	 * @var array Stores the categories data in an organized array for later inserting it onto the table
 	 */
-	public $shop_categories = [];
+	public $_shop_categories = [];
 
 	/**
 	 * @var array Stores the inventory data in an organized array for later inserting it onto the table
@@ -61,9 +61,14 @@ abstract class Import
 	public $_shop_inventory = [];
 
 	/**
-	 * @var array Stores the items purchase log data in an organized array for later inserting it onto the table
+	 * @var array Stores the modules data in an organized array for later inserting it onto the table
 	 */
-	public $_shop_buy_log = [];
+	public $_shop_modules = [];
+
+	/**
+	 * @var array Stores the items log data in an organized array for later inserting it onto the table
+	 */
+	public $_shop_log = [];
 
 	/**
 	 * Import::Verify()
@@ -127,33 +132,6 @@ abstract class Import
 	 * @return int The total amount of inventory items found
 	 */
 	abstract public function countInventory();
-
-	/**
-	 * Import::importMoney()
-	 * 
-	 * Checks for any cash/money from the old data
-	 * 
-	 * @return bool The amount of users found with cash or money in either the bank or the pocket
-	 */
-	abstract public function importMoney();
-
-	/**
-	 * Import::importBoardSettings()
-	 * 
-	 * Checks for any board settings using the old data
-	 * 
-	 * @return bool The amount of board settings found that have data
-	 */
-	abstract public function importBoardSettings();
-
-	/**
-	 * Import::importSettings()
-	 * 
-	 * Builds an array with the old settings and attempts to find data
-	 * 
-	 * @return array The array with the settings and their respective data
-	 */
-	abstract public function importSettings();
 
 	/**
 	 * Import::DropTables()
@@ -239,7 +217,7 @@ abstract class Import
 		$this->_total_imported = 0;
 
 		foreach($categories as $id_cat => $cat)
-			$this->shop_categories[] = [
+			$this->_shop_categories[] = [
 				'catid' => (int) $id_cat,
 				'name' => (string) $cat['name'],
 				'image' => (string) isset($cat['image']) ? $cat['image'] : 'blank.gif',
@@ -247,14 +225,14 @@ abstract class Import
 			];
 
 		// Import these categories and count them again
-		if (!empty($this->shop_categories))
+		if (!empty($this->_shop_categories))
 		{
 			// Type
-			foreach($this->shop_categories[0] as $column => $type)
+			foreach($this->_shop_categories[0] as $column => $type)
 				$this->_types[$column] = str_replace('integer', 'int', gettype($type));
 
 			// Insert the categories into the database
-			Database::Insert('stshop_categories', $this->shop_categories, $this->_types, ['catid'], 'replace');
+			Database::Insert('stshop_categories', $this->_shop_categories, $this->_types, ['catid'], 'replace');
 
 			// Get our total of categories imported
 			$this->_total_imported = $smcFunc['db_affected_rows']();
@@ -280,7 +258,7 @@ abstract class Import
 		$this->_total_imported = 0;
 
 		foreach($inventory as $id_inv => $inv)
-			$this->shop_inventory[] = [
+			$this->_shop_inventory[] = [
 				'id' => (int) $id_inv,
 				'userid' => (int) $inv['userid'],
 				'itemid' => (int) $inv['itemid'],
@@ -292,16 +270,64 @@ abstract class Import
 			];
 
 		// Import these items and count them again
-		if (!empty($this->shop_inventory))
+		if (!empty($this->_shop_inventory))
 		{
 			// Type
-			foreach($this->shop_inventory[0] as $column => $type)
+			foreach($this->_shop_inventory[0] as $column => $type)
 				$this->_types[$column] = str_replace('integer', 'int', gettype($type));
 
 			// Insert the items into the database
-			Database::Insert('stshop_inventory', $this->shop_inventory, $this->_types, ['id'], 'replace');
+			Database::Insert('stshop_inventory', $this->_shop_inventory, $this->_types, ['id'], 'replace');
 
 			// Get our total of items imported
+			$this->_total_imported = $smcFunc['db_affected_rows']();
+		}
+
+		return $this->_total_imported;
+	}
+
+	/**
+	 * Import::insertModules()
+	 * 
+	 * Will complete the importing of the shop categories
+	 *
+	 * @param array The array of information obatained from the modules stored in the old table
+	 * @return int The total of categories imported
+	 */
+	public function insertModules($modules)
+	{
+		global $smcFunc;
+
+		$this->_insert = [];
+		$this->_types = [];
+		$this->_total_imported = 0;
+
+		foreach($modules as $id_module => $module)
+			$this->_shop_modules[] = [
+				'id' => (int) $id_module,
+				'name' => (string) $module['name'],
+				'description' => (string) isset($module['desc']) ? $module['desc'] : '',
+				'price' => (int) isset($module['price']) ? $module['price'] : 0,
+				'author' => (string) isset($module['author']) ? $module['author'] : '',
+				'email' => (string) isset($module['email']) ? $module['email'] : '',
+				'require_input' => (int) isset($module['require']) ? $module['require'] : '',
+				'can_use_item' => (int) isset($module['can']) ? $module['can'] : '',
+				'editable_input' => (int) isset($module['editable']) ? $module['editable'] : '',
+				'web' => (string) isset($module['web']) ? $module['web'] : '',
+				'file' => (string) isset($module['file']) ? $module['file'] : '',
+			];
+
+		// Import these categories and count them again
+		if (!empty($this->_shop_modules))
+		{
+			// Type
+			foreach($this->_shop_modules[0] as $column => $type)
+				$this->_types[$column] = str_replace('integer', 'int', gettype($type));
+
+			// Insert the categories into the database
+			Database::Insert('stshop_modules', $this->_shop_modules, $this->_types, ['id'], 'replace');
+
+			// Get our total of categories imported
 			$this->_total_imported = $smcFunc['db_affected_rows']();
 		}
 
@@ -366,5 +392,186 @@ abstract class Import
 		updateSettings($shop_settings);
 
 		return count($shop_settings);
+	}
+
+	/**
+	 * Import::insertPurchases()
+	 * 
+	 * Will complete the importing of the shop inventory items
+	 *
+	 * @param array The array of information obatained from the inventory items stored in the old table
+	 * @return int The total of inventory items imported
+	 */
+	public function insertPurchases($purchases)
+	{
+		global $smcFunc;
+
+		$this->_insert = [];
+		$this->_types = [];
+		$this->_shop_log = [];
+		$this->_total_imported = 0;
+
+		foreach($purchases as $id_log => $log)
+			$this->_shop_log[] = [
+				'id' => (int) $id_log,
+				'itemid' => (int) $log['itemid'],
+				'invid' => (int) isset($log['invid']) ? $log['invid'] : 0,
+				'userid' => (int) $log['userid'],
+				'sellerid' => (int) isset($log['sellerid']) ? $log['sellerid'] : 0,
+				'amount' => (int) isset($log['amount']) ? $log['amount'] : 0,
+				'fee' => (int) isset($log['fee']) ? $log['fee'] : 0,
+				'date' => (int) isset($log['date']) ? $log['date'] : time(),
+			];
+
+		// Import these items and count them again
+		if (!empty($this->_shop_log))
+		{
+			// Type
+			foreach($this->_shop_log[0] as $column => $type)
+				$this->_types[$column] = str_replace('integer', 'int', gettype($type));
+
+			// Insert the items into the database
+			Database::Insert('stshop_log_buy', $this->_shop_log, $this->_types, ['id'], 'replace');
+
+			// Get our total of items imported
+			$this->_total_imported = $smcFunc['db_affected_rows']();
+		}
+
+		return $this->_total_imported;
+	}
+
+	/**
+	 * Import::insertTransactions()
+	 * 
+	 * Will complete the importing of the shop inventory items
+	 *
+	 * @param array The array of information obatained from the inventory items stored in the old table
+	 * @return int The total of inventory items imported
+	 */
+	public function insertTransactions($transactions)
+	{
+		global $smcFunc;
+
+		$this->_insert = [];
+		$this->_types = [];
+		$this->_shop_log = [];
+		$this->_total_imported = 0;
+
+		foreach($transactions as $id_log => $log)
+			$this->_shop_log[] = [
+				'id' => (int) $id_log,
+				'userid' => (int) $log['userid'],
+				'amount' => (int) isset($log['amount']) ? $log['amount'] : 0,
+				'fee' => (int) isset($log['fee']) ? $log['fee'] : 0,
+				'action' => (string) isset($log['action']) ? $log['action'] : 'deposit',
+				'type' => (int) isset($log['type']) ? $log['type'] : 0,
+				'date' => (int) isset($log['date']) ? $log['date'] : time(),
+			];
+
+		// Import these items and count them again
+		if (!empty($this->_shop_log))
+		{
+			// Type
+			foreach($this->_shop_log[0] as $column => $type)
+				$this->_types[$column] = str_replace('integer', 'int', gettype($type));
+
+			// Insert the items into the database
+			Database::Insert('stshop_log_bank', $this->_shop_log, $this->_types, ['id'], 'replace');
+
+			// Get our total of items imported
+			$this->_total_imported = $smcFunc['db_affected_rows']();
+		}
+
+		return $this->_total_imported;
+	}
+
+	/**
+	 * Import::insertGames()
+	 * 
+	 * Will complete the importing of the shop inventory items
+	 *
+	 * @param array The array of information obatained from the inventory items stored in the old table
+	 * @return int The total of inventory items imported
+	 */
+	public function insertGames($games)
+	{
+		global $smcFunc;
+
+		$this->_insert = [];
+		$this->_types = [];
+		$this->_shop_log = [];
+		$this->_total_imported = 0;
+
+		foreach($games as $id_log => $log)
+			$this->_shop_log[] = [
+				'id' => (int) $id_log,
+				'userid' => (int) $log['userid'],
+				'amount' => (int) isset($log['amount']) ? $log['amount'] : 0,
+				'game' => (string) isset($log['game']) ? $log['game'] : 0,
+				'date' => (int) isset($log['date']) ? $log['date'] : time(),
+			];
+
+		// Import these items and count them again
+		if (!empty($this->_shop_log))
+		{
+			// Type
+			foreach($this->_shop_log[0] as $column => $type)
+				$this->_types[$column] = str_replace('integer', 'int', gettype($type));
+
+			// Insert the items into the database
+			Database::Insert('stshop_log_games', $this->_shop_log, $this->_types, ['id'], 'replace');
+
+			// Get our total of items imported
+			$this->_total_imported = $smcFunc['db_affected_rows']();
+		}
+
+		return $this->_total_imported;
+	}
+
+	/**
+	 * Import::insertGames()
+	 * 
+	 * Will complete the importing of the shop inventory items
+	 *
+	 * @param array The array of information obatained from the inventory items stored in the old table
+	 * @return int The total of inventory items imported
+	 */
+	public function insertGifts($gifts)
+	{
+		global $smcFunc;
+
+		$this->_insert = [];
+		$this->_types = [];
+		$this->_shop_log = [];
+		$this->_total_imported = 0;
+
+		foreach($gifts as $id_log => $log)
+			$this->_shop_log[] = [
+				'id' => (int) $id_log,
+				'userid' => (int) $log['userid'],
+				'receiver' => (int) $log['receiver'],
+				'amount' => (int) isset($log['amount']) ? $log['amount'] : 0,
+				'itemid' => (int) isset($log['itemid']) ? $log['itemid'] : 0,
+				'invid' => (int) isset($log['invid']) ? $log['invid'] : 0,
+				'message' => (string) isset($log['message']) ? $log['message'] : '',
+				'is_admin' => (int) isset($log['is_admin']) ? $log['is_admin'] : 0,
+				'date' => (int) isset($log['date']) ? $log['date'] : time(),
+			];
+
+		// Import these items and count them again
+		if (!empty($this->_shop_log))
+		{
+			// Type
+			foreach($this->_shop_log[0] as $column => $type)
+				$this->_types[$column] = str_replace('integer', 'int', gettype($type));
+
+			// Insert the items into the database
+			Database::Insert('stshop_log_gift', $this->_shop_log, $this->_types, ['id'], 'replace');
+
+			// Get our total of items imported
+			$this->_total_imported = $smcFunc['db_affected_rows']();
+		}
+
+		return $this->_total_imported;
 	}
 }
