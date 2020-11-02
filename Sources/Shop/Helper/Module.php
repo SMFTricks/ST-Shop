@@ -122,6 +122,8 @@ abstract class Module
 	 * Module::getItemDetails()
 	 * 
 	 * This is the main function that loads the details from the module and any other initial config
+	 * 
+	 * @return void
 	 */
 	abstract function getItemDetails();
 	
@@ -137,6 +139,7 @@ abstract class Module
 	 * 
 	 * return 'Some input that the admin fills in: <input type="text" name="info1" value="' . $item_info[1] . '" />';
 	 * 
+	 * @return string The properly formatted inputs for the admin settings
 	 */
 	abstract function getAddInput();
 
@@ -156,6 +159,7 @@ abstract class Module
 	 * If no input needed:
 	 * return false;
 	 * 
+	 * @return string The properly formatted inputs for using the item
 	 */
 	abstract function getUseInput();
 
@@ -166,6 +170,7 @@ abstract class Module
 	 * The input fields in the getUseInput() function are passed here in the $_POST array
 	 * The admin fields in the getAddInput() function are passed in the $item_info array
 	 *
+	 * @return void
 	 */
 	abstract function onUse();
 }
