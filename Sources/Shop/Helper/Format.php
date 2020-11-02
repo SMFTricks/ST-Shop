@@ -17,21 +17,27 @@ if (!defined('SMF'))
 
 class Format
 {
+	/**
+	 * @var string Sets the url for the item images
+	 */
 	private static $items_url;
+
 	/**
 	 * Format::cash()
 	 *
 	 * It gives the money a format, adding the suffix and prefix set in the admin (if)
-	 * @param $money A string that usually includes the amount of cash/credits
-	 * @param $formal It will put the suffix at the beginning if enabled
+	 * @param int $money A string that usually includes the amount of cash/credits
+	 * @param bool $formal It will put the suffix at the beginning if enabled
+	 * @param bool|int $placement Will fix the format for the title placement in the posts only
 	 * @return string A text containing the specified money/string with format
 	 */
-	public static function cash($money, $formal = false)
+	public static function cash($money, $formal = false, $placement = true)
 	{
 		global $modSettings;
 
+
 		if (empty($formal))
-			$disp = (!empty($modSettings['Shop_credits_prefix']) ? $modSettings['Shop_credits_prefix'] : '') . (!is_numeric($money) ? $money : comma_format($money)) . ' ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : '');
+			$disp = (!empty($modSettings['Shop_credits_prefix']) ? $modSettings['Shop_credits_prefix'] : '') . (!is_numeric($money) ? $money : comma_format($money)) . ' ' . (!empty($modSettings['Shop_credits_suffix'] && !empty($placement)) ? $modSettings['Shop_credits_suffix'] : '');
 		else
 			$disp = (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : '') . ': ' . (!empty($modSettings['Shop_credits_prefix']) ? $modSettings['Shop_credits_prefix'] : '') . (!is_numeric($money) ? $money : comma_format($money));
 
@@ -42,9 +48,9 @@ class Format
 	 * Format::item()
 	 *
 	 * Gives the provided item format with its image
-	 * @param $image The image of an item
-	 * @param $description Optional parameter for including the description in the title/alt
-	 * @param $class Optional parameter for including class and id
+	 * @param string $image The image of an item
+	 * @param string $description Optional parameter for including the description in the title/alt
+	 * @param string $class Optional parameter for including class and id
 	 * @return string A formatted image
 	 */
 	public static function image($image, $description = '', $class = '')
@@ -63,7 +69,7 @@ class Format
 	 * Format::gamespass()
 	 *
 	 * Provides a format to the dyas left of gamespass access
-	 * @param $days The days the user has on his subscription to the gamespass
+	 * @param int $days The days the user has on his subscription to the gamespass
 	 * @return string Days left of gamespass
 	 */
 	public static function gamespass($days)
