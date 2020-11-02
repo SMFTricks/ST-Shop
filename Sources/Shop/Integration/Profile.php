@@ -289,11 +289,14 @@ class Profile
 	{
 		global $modSettings;
 
-		if (!empty($modSettings['Shop_noty_credits']))
+		// Credits
+		if (!empty($modSettings['Shop_noty_credits']) && !empty($modSettings['Shop_enable_shop']))
 			$alert_types['shop']['shop_usercredits'] = ['alert' => 'yes', 'email' => 'never'];
-		if (!empty($modSettings['Shop_noty_items']))
+		// Gifts
+		if (!empty($modSettings['Shop_noty_items']) && !empty($modSettings['Shop_enable_gift']) && !empty($modSettings['Shop_enable_shop']))
 			$alert_types['shop']['shop_useritems'] = ['alert' => 'yes', 'email' => 'never'];
-		if (!empty($modSettings['Shop_noty_trade']))
+		// Trades
+		if (!empty($modSettings['Shop_noty_trade']) && !empty($modSettings['Shop_enable_trade']) && !empty($modSettings['Shop_enable_shop']))
 			$alert_types['shop']{'shop_usertraded'} = ['alert' => 'yes', 'email' => 'never'];
 	}
 }
