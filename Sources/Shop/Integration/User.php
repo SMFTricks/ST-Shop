@@ -153,7 +153,7 @@ class User
 			$data['custom_fields']['shopMoney'] = [
 				'title' => Shop::getText('posting_credits_pocket'),
 				'col_name' => 'Shop_pocket',
-				'value' => Format::cash($this->_profile['shopMoney']),
+				'value' => Format::cash($this->_profile['shopMoney'], false, $modSettings['Shop_display_bank_placement']),
 				'placement' => $modSettings['Shop_display_pocket_placement'],
 			];
 
@@ -162,7 +162,7 @@ class User
 			$data['custom_fields']['shopBank'] = [
 				'title' => Shop::getText('posting_credits_bank'),
 				'col_name' => 'Shop_bank',
-				'value' => Format::cash($this->_profile['shopBank']),
+				'value' => Format::cash($this->_profile['shopBank'], false, $modSettings['Shop_display_bank_placement']),
 				'placement' => $modSettings['Shop_display_bank_placement'],
 			];
 
