@@ -106,7 +106,7 @@ class GamesPass extends Module
 		updateMemberData($user_info['id'], ['gamesPass' => $this->_time]);
 
 		// Give them the exact amount of days user now has
-		$this->_expires = Format::gamespass($user_info['gamesPass']) + $this->item_info[1];
+		$this->_expires = Format::gamespass($this->_time);
 		
 		return '
 			<div class="infobox">
