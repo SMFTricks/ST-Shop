@@ -42,15 +42,12 @@ class Steal extends Module
 	private $_membername;
 
 	/**
-	 * Steal::__construct()
+	 * Steal::getItemDetails()
 	 *
 	 * Set the details and basics of the module, along with default values if needed.
 	 */
-	function __construct()
+	function getItemDetails()
 	{
-		// We will of course override stuff...
-		parent::__construct();
-
 		// Item details
 		$this->authorName = 'Diego Andrés';
 		$this->authorWeb = 'https://smftricks.com/';

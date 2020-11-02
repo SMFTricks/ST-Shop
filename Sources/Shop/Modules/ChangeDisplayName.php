@@ -22,18 +22,15 @@ class ChangeDisplayName extends Module
 	/**
 	 * @var string Saves the display name.
 	 */
-	private $display_name;
+	private $_display_name;
 
 	/**
-	 * ChangeDisplayName::__construct()
+	 * ChangeDisplayName::getItemDetails()
 	 *
 	 * Set the details and basics of the module, along with default values if needed.
 	 */
-	function __construct()
+	function getItemDetails()
 	{
-		// We will of course override stuff...
-		parent::__construct();
-
 		// Item details
 		$this->authorName = 'Daniel15';
 		$this->authorWeb = 'https://github.com/Daniel15';
@@ -85,38 +82,37 @@ class ChangeDisplayName extends Module
 			fatal_error(Shop::getText('cdn_error_empty'), false);
 
 		// The new display name
-		$this->display_name = Database::sanitize($_REQUEST['newDisplayName']);
+		$this->_display_name = Database::sanitize($_REQUEST['newDisplayName']);
 
 		checkSession();
 
 		// It's not a matter of size, but that's not good enough
-		if (trim($this->display_name) == '')
+		if (trim($this->_display_name) == '')
 			fatal_error(Shop::getText('cdn_error_empty'), false);
 		// Is it long enough then? ;)
-		elseif (Database::strlen($this->display_name) < $this->item_info[1])
+		elseif (Database::strlen($this->_display_name) < $this->item_info[1])
 			fatal_error(sprintf(Shop::getText('cdn_error_short'), $this->item_info[1]), false);
 		// It's too long! :o
-		elseif (Database::strlen($this->display_name) > 60)
+		elseif (Database::strlen($this->_display_name) > 60)
 			fatal_error(Shop::getText('cdn_error_long'), false);
 		// Well, we wanted a change for once
-		elseif ($user_info['name'] == $this->display_name)
+		elseif ($user_info['name'] == $this->_display_name)
 			fatal_error(Shop::getText('cdn_error_same'), false);
 		// One last detail
-		elseif ($user_info['name'] != $this->display_name)
+		elseif ($user_info['name'] != $this->_display_name)
 		{
 			// Check for reserved name
 			require_once($sourcedir . '/Subs-Members.php');
-
-			if (isReservedName($this->display_name, $user_info['id'], true))
+			if (isReservedName($this->_display_name, $user_info['id'], true))
 				fatal_error(Shop::getText('cdn_error_taken'), false);
 		}
 
 		// Update the display name
-		updateMemberData($user_info['id'], ['real_name' => $this->display_name]);
+		updateMemberData($user_info['id'], ['real_name' => $this->_display_name]);
 
 		return '
 			<div class="infobox">
-				' . sprintf(Shop::getText('cdn_success'), $this->display_name) . '
+				' . sprintf(Shop::getText('cdn_success'), $this->_display_name) . '
 			</div>';
 	}
 }

@@ -25,15 +25,12 @@ class ChangeUsername extends Module
 	private $_username;
 
 	/**
-	 * ChangeUsername::__construct()
+	 * ChangeUsername::getItemDetails()
 	 *
 	 * Set the details and basics of the module, along with default values if needed.
 	 */
-	function __construct()
+	function getItemDetails()
 	{
-		// We will of course override stuff...
-		parent::__construct();
-
 		// Item details
 		$this->authorName = 'Daniel15';
 		$this->authorWeb = 'https://github.com/Daniel15';
@@ -41,6 +38,11 @@ class ChangeUsername extends Module
 		$this->name = Shop::getText('cu_name');
 		$this->desc = Shop::getText('cu_desc');
 		$this->price = 50;
+	}
+
+	function getAddInput()
+	{
+		return;
 	}
 
 	function getUseInput()

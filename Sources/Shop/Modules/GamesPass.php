@@ -40,15 +40,12 @@ class GamesPass extends Module
 	private $_expires;
 
 	/**
-	 * GamesPass::__construct()
+	 * GamesPass::getItemDetails()
 	 *
 	 * Set the details and basics of the module, along with default values if needed.
 	 */
-	function __construct()
+	function getItemDetails()
 	{
-		// We will of course override stuff...
-		parent::__construct();
-
 		// Item details
 		$this->authorName = 'Sleepy Arcade';
 		$this->authorWeb = 'https://www.simplemachines.org/community/index.php?action=profile;u=84438';
@@ -78,6 +75,11 @@ class GamesPass extends Module
 					<input type="number" min="1" id="info1" name="info1" value="' . $this->item_info[1] . '" />
 				</dd>
 			</dl>';
+	}
+
+	function getUseInput()
+	{
+		return;
 	}
 
 	function onUse()

@@ -25,15 +25,12 @@ class DecreasePostCount extends Module
 	private $_membername;
 
 	/**
-	 * DecreasePostCount::__construct()
+	 * DecreasePostCount::getItemDetails()
 	 *
 	 * Set the details and basics of the module, along with default values if needed.
 	 */
-	function __construct()
+	function getItemDetails()
 	{
-		// We will of course override stuff...
-		parent::__construct();
-
 		// Item details
 		$this->authorName = 'Daniel15';
 		$this->authorWeb = 'https://github.com/Daniel15';
