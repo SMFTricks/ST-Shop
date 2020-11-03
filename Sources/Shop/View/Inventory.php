@@ -43,12 +43,16 @@ class Inventory
 	 */
 	function __construct()
 	{
-		// Build the tabs for this section
-		$this->tabs();
+		// We only need these things if we are in the shop
+		if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'shop')
+		{
+			// Build the tabs for this section
+			$this->tabs();
 
-		// Check if user is allowed to access this section
-		if (!allowedTo('shop_canManage') && (isset($_REQUEST['action']) && $_REQUEST['action'] == 'shop'))
-			isAllowedTo('shop_viewInventory');
+			// Check if user is allowed to access this section
+			if (!allowedTo('shop_canManage'))
+				isAllowedTo('shop_viewInventory');
+		}
 	}
 
 	public function main()
