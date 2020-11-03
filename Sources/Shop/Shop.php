@@ -161,6 +161,7 @@ class Shop
 			'Shop_noty_credits' => 0,
 			'Shop_noty_items' => 0,
 			'Shop_importer_success' => 0,
+			'Shop_integration_arcade_score' => 0,
 		];
 		$modSettings = array_merge($defaults, $modSettings);
 	}
