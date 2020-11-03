@@ -14,6 +14,7 @@ namespace Shop\Integration\Addons\Arcade;
 
 use Shop\Shop;
 use Shop\Integration\Addons\Addons;
+use Shop\Helper\Database;
 use Shop\Helper\Log;
 
 if (!defined('SMF'))
@@ -21,8 +22,14 @@ if (!defined('SMF'))
 
 class Arcade implements Addons
 {
+	/**
+	 * @var bool Check if we want to load the language file in a specific page.
+	 */
 	private static $_language = false;
 
+	/**
+	 * @var array Store the settings for the arcade
+	 */
 	private static $_settings = [];
 
 	/**
@@ -43,8 +50,8 @@ class Arcade implements Addons
 		// Hooks
 		self::defineHooks();
 
-		// Log the creditss the user gets
-		self::$_log = new Log;
+		// Log the credits the user gets
+		// self::$_log = new Log;
 	}
 
 	/**
@@ -121,6 +128,6 @@ class Arcade implements Addons
 
 		// Just submitting a score? lame...
 		if (!empty($modSettings['Shop_integration_arcade_score']))
-			self::$_log->game($member['id'], $modSettings['Shop_integration_arcade_score'], $game['name'], $game['id']);
+			Database::Update('members', ['user' => $member['id'], 'credits' => $modSettings['Shop_integration_arcade_score']], 'shopMoney = shopMoney + {int:credits}', 'WHERE id_member = {int:user}');
 	}
 }
