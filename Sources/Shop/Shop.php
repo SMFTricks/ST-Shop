@@ -16,7 +16,8 @@ if (!defined('SMF'))
 class Shop
 {
 	public static $name = 'Shop';
-	public static $version = '4.0';
+	public static $version = '4.1';
+	public static $addonsdir = '/Shop/Integration/Addons/';
 	public static $itemsdir = '/shop_items/items/';
 	public static $modulesdir = '/Shop/Modules/';
 	public static $gamesdir = '/shop_items/games/';
@@ -27,6 +28,7 @@ class Shop
 		self::setDefaults();
 		self::defineHooks();
 		self::userHooks();
+		self::addonHooks();
 	}
 
 	/**
@@ -161,9 +163,6 @@ class Shop
 			'Shop_importer_success' => 0,
 		];
 		$modSettings = array_merge($defaults, $modSettings);
-
-		// Always have the importer setting on zero when installing
-		updateSettings(['Shop_importer_success' => 0]);
 	}
 
 	/**
@@ -182,6 +181,28 @@ class Shop
 		];
 		foreach ($hooks as $point => $callable)
 			add_integration_function('integrate_' . $point, __CLASS__ . '::' . $callable, false);
+	}
+	/**
+	 * Shop::addonHooks()
+	 * 
+	 * Load hooks from addons/mods
+	 * 
+	 * @return void
+	 */
+	public static function addonHooks()
+	{
+		global $sourcedir;
+
+		// List of addons/mods that we are integrating
+		$addons = array_diff(scandir($sourcedir . self::$addonsdir), ['..', '.', 'index.php', 'Addons.php']);
+
+		// Class
+		$class = __NAMESPACE__ . '\Integration\Addons\\';
+
+		// load the hooks for these addons
+		foreach ($addons as $addon)
+			if (is_callable($class . $addon . '\\'. $addon, 'integration'))
+				add_integration_function('integrate_pre_load_theme', $class . $addon . '\\'. $addon .'::integration', false);
 	}
 
 	/**
@@ -211,37 +232,38 @@ class Shop
 		$actions['shopfeed'] = [false, __CLASS__ . '::getFeed'];
 		
 		// Add some hooks by action
-		switch ($_REQUEST['action'])
-		{
-			// I can simple load the language file, but...
-			// I'll load this hook just to flex on using yet another hook
-			case 'helpadmin':
-				add_integration_function('integrate_helpadmin', __NAMESPACE__ . '\Integration\Permissions::language', false);
-				break;
-			// Shop Admin
-			case 'admin':
-				add_integration_function('integrate_admin_areas', __NAMESPACE__ . '\Manage\Dashboard::hookAreas#', false);
-				break;
-			// Give points/credits on posting
-			case 'post':
-			case 'post2':
-				add_integration_function('integrate_after_create_post', __NAMESPACE__ . '\Integration\Posting::after_create_post#', false);
-				break;
-			// Who actions
-			case 'who':
-				add_integration_function('who_allowed', __NAMESPACE__ . '\Integration\Who::who_allowed#', false);
-				add_integration_function('whos_online_after', __NAMESPACE__ . '\Integration\Who::whos_online_after#', false);
-				break;
-			// Profile
-			case 'profile':
-				add_integration_function('integrate_pre_profile_areas', __NAMESPACE__ . '\Integration\Profile::hookAreas#', false);
-				break;
-			// Register
-			case 'signup':
-			case 'signup2':
-				add_integration_function('integrate_register', __NAMESPACE__ . '\Integration\Signup::register', false);
-				break;
-		}
+		if (isset($_REQUEST['action']))
+			switch ($_REQUEST['action'])
+			{
+				// I can simple load the language file, but...
+				// I'll load this hook just to flex on using yet another hook
+				case 'helpadmin':
+					add_integration_function('integrate_helpadmin', __NAMESPACE__ . '\Integration\Permissions::language', false);
+					break;
+				// Shop Admin
+				case 'admin':
+					add_integration_function('integrate_admin_areas', __NAMESPACE__ . '\Manage\Dashboard::hookAreas#', false);
+					break;
+				// Give points/credits on posting
+				case 'post':
+				case 'post2':
+					add_integration_function('integrate_after_create_post', __NAMESPACE__ . '\Integration\Posting::after_create_post#', false);
+					break;
+				// Who actions
+				case 'who':
+					add_integration_function('who_allowed', __NAMESPACE__ . '\Integration\Who::who_allowed#', false);
+					add_integration_function('whos_online_after', __NAMESPACE__ . '\Integration\Who::whos_online_after#', false);
+					break;
+				// Profile
+				case 'profile':
+					add_integration_function('integrate_pre_profile_areas', __NAMESPACE__ . '\Integration\Profile::hookAreas#', false);
+					break;
+				// Register
+				case 'signup':
+				case 'signup2':
+					add_integration_function('integrate_register', __NAMESPACE__ . '\Integration\Signup::register', false);
+					break;
+			}
 	}
 
 	/**

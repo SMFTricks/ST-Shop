@@ -34,6 +34,7 @@ class Settings extends Dashboard
 		$this->_subactions = [
 			'general' => 'general',
 			'credits' => 'credits',
+			'integrations' => 'integrations',
 			'permissions' => 'permissions',
 			'profile' => 'profile',
 			'notifications' => 'notifications',
@@ -52,6 +53,7 @@ class Settings extends Dashboard
 			'tabs' => [
 				'general' => ['description' => Shop::getText('settings_general_desc')],
 				'credits' => ['description' => Shop::getText('settings_credits_desc')],
+				'integrations' => ['description' => Shop::getText('settings_integrations_desc')],
 				'permissions' => ['description' => Shop::getText('settings_permissions_desc')],
 				'profile' => ['description' => Shop::getText('settings_profile_desc')],
 				'notifications' => ['description' => Shop::getText('settings_notifications_desc')],
@@ -132,6 +134,22 @@ class Settings extends Dashboard
 		$config_vars = array_merge($config_vars, $this->_shop_vars);
 
 		Database::Save($config_vars, $return_config, 'credits');
+	}
+
+	public function integrations($return_config = false)
+	{
+		global $context, $sourcedir;
+
+		require_once($sourcedir . '/ManageServer.php');
+		$context['sub_template'] = 'show_settings';
+		$context['page_title'] = Shop::getText('tab_settings'). ' - ' . Shop::getText('settings_integrations');
+		$context[$context['admin_menu_name']]['tab_data']['title'] = $context['page_title'];
+		$config_vars = [];
+
+		// Integrate settings from/for Addons
+		call_integration_hook('integrate_shop_addons_settings', [&$config_vars]);
+
+		Database::Save($config_vars, $return_config, 'integrations');
 	}
 
 	public function permissions($return_config = false)

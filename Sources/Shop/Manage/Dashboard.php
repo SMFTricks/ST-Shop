@@ -88,6 +88,10 @@ class Dashboard
 					'subsections' => [
 						'general' => [Shop::getText('settings_general')],
 						'credits' => [Shop::getText('settings_credits')],
+						'integrations' => [
+							Shop::getText('settings_integrations'),
+							'enabled' => !empty($modSettings['Shop_enable_shop']),
+						],
 						'permissions' => [
 							Shop::getText('settings_permissions'),
 							'enabled' => !empty($modSettings['Shop_enable_shop']),
@@ -395,7 +399,7 @@ class Dashboard
 					'ospina' => [
 						'name' => 'Cristian Ospina',
 						'site' => 'https://www.simplemachines.org/community/index.php?action=profile;u=215234',
-						'desc' => 'Feedback and ideas for Shop Modules.',
+						'desc' => 'Feedback and code ideas for Shop Modules and Plugins.',
 					],
 					'gerard' => [
 						'name' => 'Zerk',
