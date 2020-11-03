@@ -141,7 +141,9 @@ abstract class Module
 	 * 
 	 * @return string The properly formatted inputs for the admin settings
 	 */
-	abstract function getAddInput();
+	function getAddInput()
+	{
+	}
 
 	/**
 	 * Module::getUseInput()
@@ -161,7 +163,9 @@ abstract class Module
 	 * 
 	 * @return string The properly formatted inputs for using the item
 	 */
-	abstract function getUseInput();
+	function getUseInput()
+	{
+	}
 
 	/**
 	 * Module::onUse()
