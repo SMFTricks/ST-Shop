@@ -45,6 +45,10 @@ $txt['Shop_stats_refresh_desc'] = 'The time in seconds that the forum will take 
 $txt['Shop_enable_maintenance'] = 'Enable Maintenance?';
 $txt['Shop_enable_maintenance_desc'] = 'This will put the Shop in maintenance, only users who are allowed to manage the Shop have access.';
 
+// Integrations
+$txt['Shop_settings_integrations'] = 'Integrations';
+$txt['Shop_settings_integrations_desc'] = 'In this section you can change settings for different integrations with other mods or addons';
+
 // Permissions
 $txt['Shop_settings_permissions'] = 'Permissions';
 $txt['Shop_settings_permissions_desc'] = 'In this section you can handle the permissions in a very easy way.';
@@ -321,8 +325,8 @@ $txt['scheduled_task_shop_bank_interest'] = 'Shop Bank interest';
 $txt['scheduled_task_desc_shop_bank_interest'] = 'The magic task that will create bank ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' out of nowhere for the users.';
 
 // Packages types
-$txt['shop_modules_package'] = 'ST Shop Modules';
-$txt['install_shop_modules'] = 'Install Shop Module';
+$txt['shop_modules_package'] = 'ST Shop Plugins';
+$txt['install_shop_modules'] = 'Install Shop Plugin';
 $txt['shop_games_package'] = 'ST Shop Games';
 $txt['install_shop_games'] = 'Install Shop Game';
 
