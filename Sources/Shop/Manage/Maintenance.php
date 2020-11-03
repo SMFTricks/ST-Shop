@@ -198,7 +198,7 @@ class Maintenance extends Dashboard
 		$context['shop_imported']['settings_total'] = ($this->_convert_from != 'STShop') ? $this->_importModel->importSettings() : 0;
 
 		// Update the settings for the converter
-		updateSettings(['Shop_importer_success' => 1]);
+		updateSettings(['Shop_importer_success' => 1], true);
 
 		// Template
 		loadTemplate('Shop/ShopAdmin');
