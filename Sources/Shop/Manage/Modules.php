@@ -13,7 +13,6 @@ namespace Shop\Manage;
 use Shop\Shop;
 use Shop\Helper\Database;
 use Shop\Helper\Delete;
-use Shop\Modules as Module_Template;
 
 if (!defined('SMF'))
 	die('No direct access...');
