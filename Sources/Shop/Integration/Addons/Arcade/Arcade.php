@@ -121,6 +121,6 @@ class Arcade implements Addons
 
 		// Just submitting a score? lame...
 		if (!empty($modSettings['Shop_integration_arcade_score']))
-			self::$_log->arcade($member['id'], $modSettings['Shop_integration_arcade_score'], $game['name'], $game['id']);
+			self::$_log->game($member['id'], $modSettings['Shop_integration_arcade_score'], $game['name'], $game['id']);
 	}
 }
