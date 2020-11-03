@@ -53,11 +53,6 @@ class IncreasePostCount extends Module
 			</dl>';
 	}
 
-	function getUseInput()
-	{
-		return;
-	}
-
 	function onUse()
 	{
 		global $user_info;

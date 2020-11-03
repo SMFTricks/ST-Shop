@@ -52,11 +52,6 @@ class StickyTopic extends Module
 		$this->can_use_item = true;
 	}
 
-	function getAddInput()
-	{
-		return;
-	}
-
 	function getUseInput()
 	{
 		global $user_info;

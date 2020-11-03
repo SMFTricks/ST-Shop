@@ -40,11 +40,6 @@ class ChangeUsername extends Module
 		$this->price = 50;
 	}
 
-	function getAddInput()
-	{
-		return;
-	}
-
 	function getUseInput()
 	{
 		return '
