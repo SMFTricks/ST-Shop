@@ -45,15 +45,12 @@ class Number extends GamesRoom
 	private $_winner = true;
 
 	/**
-	 * Number::__construct()
+	 * Number::init()
 	 *
 	 * Load the data for this game
 	 */
-	function __construct()
+	function init()
 	{
-		// Load previous info
-		parent::__construct();
-
 		// Set the images url for this game
 		$this->_images_dir .= $this->_game . '/';
 

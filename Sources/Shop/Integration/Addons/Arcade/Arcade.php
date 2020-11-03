@@ -12,7 +12,9 @@
 
 namespace Shop\Integration\Addons\Arcade;
 
+use Shop\Shop;
 use Shop\Integration\Addons\Addons;
+use Shop\Helper\Log;
 
 if (!defined('SMF'))
 	die('No direct access...');
@@ -22,6 +24,11 @@ class Arcade implements Addons
 	private static $_language = false;
 
 	private static $_settings = [];
+
+	/**
+	 * @var object Log the user history playing at the arcade.
+	 */
+	private static $_log;
 
 	/**
 	 * Addons::integration()
@@ -35,6 +42,9 @@ class Arcade implements Addons
 
 		// Hooks
 		self::defineHooks();
+
+		// Log the creditss the user gets
+		self::$_log = new Log;
 	}
 
 	/**
@@ -51,6 +61,9 @@ class Arcade implements Addons
 				case 'admin': 
 					if (isset($_REQUEST['area']) && $_REQUEST['area'] == 'shopsettings')
 						add_integration_function('integrate_shop_addons_settings', __CLASS__ . '::settings', false);
+				break;
+				case 'arcade':
+					add_integration_function('integrate_arcade_score', __CLASS__ . '::score', false);
 				break;
 			}
 	}
@@ -91,8 +104,23 @@ class Arcade implements Addons
 	{
 		self::$_settings = [
 			['title', 'Shop_integration_arcade'],
-
+			['int', 'Shop_integration_arcade_score', 'subtext' => Shop::getText('integration_arcade_score_desc')],
 		];
 		$settings = array_merge(self::$_settings, $settings);
+	}
+
+	/**
+	 * Arcade::score()
+	 *
+	 * Gives credits for saving a score or for breaking a record
+	 * 
+	 */
+	public static function score($game, $member, $score)
+	{
+		global $modSettings;
+
+		// Just submitting a score? lame...
+		if (!empty($modSettings['Shop_integration_arcade_score']))
+			self::$_log->arcade($member['id'], $modSettings['Shop_integration_arcade_score'], $game['name'], $game['id']);
 	}
 }

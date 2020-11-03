@@ -76,6 +76,18 @@ class GamesRoom
 		// Let's see if the games pass it's valid
 		if (time() >= $user_info['gamesPass'])
 			fatal_error(Shop::getText('games_invalid'), false);
+
+		// Load the main details
+		$this->init();
+	}
+
+	/**
+	 * GamesRoom::init()
+	 *
+	 * Sets the basic details for the games
+	 */
+	public function init()
+	{
 	}
 
 	public function main()

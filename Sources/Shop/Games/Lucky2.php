@@ -55,15 +55,13 @@ class Lucky2 extends GamesRoom
 	private $_winner = false;
 
 	/**
-	 * Lucky2::__construct()
+	 * Lucky2::init()
 	 *
 	 * Load the data for this game
 	 */
-	function __construct()
+	
+	public function init()
 	{
-		// Load previous info
-		parent::__construct();
-
 		// Set the images url for this game
 		$this->_images_dir .= $this->_game . '/';
 

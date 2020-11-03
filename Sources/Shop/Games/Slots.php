@@ -55,15 +55,12 @@ class Slots extends GamesRoom
 	private $_winner = false;
 
 	/**
-	 * Slots::__construct()
+	 * Slots::init()
 	 *
 	 * Load the data for this game
 	 */
-	function __construct()
+	function init()
 	{
-		// Load previous info
-		parent::__construct();
-
 		// Set the images url for this game
 		$this->_images_dir .= $this->_game . '/';
 
