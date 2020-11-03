@@ -21,12 +21,19 @@ elseif (!defined('SMF'))
 	if (empty($context['uninstalling']))
 	{
 		// Set the importer not completed by default
-		$smcFunc['db_query']('', '
-			UPDATE IGNORE {db_prefix}settings
-			SET Shop_importer_success = {int:importer_success}',
+		$smcFunc['db_insert']('replace', '
+			{db_prefix}settings',
 			[
-				'importer_success' => 0,
-			]
+				'variable' => 'string',
+				'value' => 'int',
+			],
+			[
+				[
+					'Shop_importer_success',
+					0,
+				],
+			],
+			['variable'],
 		);
 
 		// Enable the alert by default
