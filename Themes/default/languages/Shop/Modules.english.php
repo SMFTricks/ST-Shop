@@ -108,7 +108,14 @@ $txt['Shop_steal_error_yourself'] = 'What are you doing? You cannot steal from y
 $txt['Shop_steal_notification_robbed'] = 'You just got robbed!';
 $txt['Shop_steal_notification_pm'] = 'We are sorry to inform you that you just have been robbed!' . "\n" . '[url=%1$s]%2$s[/url] has stripped you of [i]%3$s[/i] from your pocket. You now have [i]%4$s[/i] remaining in your pocket.' . "\n\n" . ' Next time put your money safe in the Shop Bank.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
 $txt['alert_shop_module_steal'] = '{member_link} just robbed you {amount} from your pocket!';
-// Battle Pass
+// SA Battle
 $txt['Shop_blc_name'] = 'Battle Life Card';
 $txt['Shop_blc_desc'] = 'Revive your character in Battle';
 $txt['Shop_blc_success'] = 'You have successfully revived in Battle';
+// Primary MemberGroup
+$txt['Shop_pmg_name'] = 'Change Primary Membergroup';
+$txt['Shop_pmg_desc'] = 'Change your Membergroup!';
+$txt['Shop_pmg_nogroups'] = 'You don\'t have any special groups to select';
+$txt['Shop_pmg_setting1'] = 'Membergroup';
+$txt['Shop_pmg_setting1_desc'] = 'Select the membergroup the user will get when usin the item.';
+$txt['Shop_pmg_success'] = 'You have successfully joined the group!';
