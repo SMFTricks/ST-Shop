@@ -422,7 +422,8 @@ class Inventory
 		$itemModel->item_info[4] = $item['info4'];
 
 		// Execute
-		$context['shop']['use']['input'] = $itemModel->getUseInput();
+		if (!empty($itemModel->require_input))
+			$context['shop']['use']['input'] = $itemModel->getUseInput();
 
 		// Load suggest.js for special cases
 		loadJavaScriptFile('suggest.js', ['default_theme' => true, 'defer' => false, 'minimize' => true], 'smf_suggest');

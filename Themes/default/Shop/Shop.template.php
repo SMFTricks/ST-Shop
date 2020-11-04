@@ -145,8 +145,16 @@ function template_use()
 		<div class="roundframe">
 			<form method="post" action="', $scripturl,'?action=shop;sa=invused">
 				<input type="hidden" name="id" value="', $context['item']['id'], '">
-				', $txt['Shop_inventory_use_confirm'], '<br /><br />
-				', $context['shop']['use']['input'], '<br />
+				', $txt['Shop_inventory_use_confirm'];
+				
+		// Only if the user is required to set any additional information
+		if (isset($context['shop']['use']['input']) && !empty($context['shop']['use']['input']))
+			echo '
+				<br /><br />
+				', $context['shop']['use']['input'];
+			
+			echo '
+				<br />
 				<input class="button floatright" type="submit" value="', $txt['Shop_item_useit'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '">
 			</form>
