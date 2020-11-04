@@ -52,7 +52,7 @@ class Shop
 			'Shop_credits_register' => 5,
 			'Shop_credits_topic' => 10,
 			'Shop_credits_post' => 2,
-			//'Shop_credits_likes_post' => 0,
+			// 'Shop_credits_likes_post' => 0,
 			'Shop_credits_word' => 0,
 			'Shop_credits_character' => 0,
 			'Shop_credits_limit' => 0,
@@ -178,7 +178,6 @@ class Shop
 			'autoload' => 'autoload',
 			'menu_buttons' => 'hookButtons',
 			'actions' => 'hookActions',
-			//'issue_like' => 'Shop::likePost',
 		];
 		foreach ($hooks as $point => $callable)
 			add_integration_function('integrate_' . $point, __CLASS__ . '::' . $callable, false);

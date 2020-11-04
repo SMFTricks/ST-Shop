@@ -10,64 +10,70 @@
 
 namespace Shop\Integration;
 
+use Shop\Helper\Database;
+
 if (!defined('SMF'))
 	die('No direct access...');
 
 class Likes
 {
 	/**
+	 * @var array Value for credits
+	 */
+	private $_credits_like;
+
+	/**
+	 * @var array Store the data about the specific message id
+	 */
+	private $_likedAuthor;
+
+	/**
+	 * Posting::__construct()
+	 *
+	 * Add default values for the posting values, and create a new instance of Boards
+	 */
+	function __construct()
+	{
+		// Some defaults for fallback
+		$this->_credits_like = 0;
+	}
+
+	/**
 	 * Likes::likePost()
 	 *
 	 * Gives or removes points to author of the post for each like.
-	 * @param int $message id of the message
 	 * @return void
 	 */
-	public static function likePost($like_type, $like_content, $like_userid, $alreadyLiked, $validlikes)
+	public function likePost($like_info)
 	{
-		global $smcFunc, $modSettings;
+		global $modSettings;
 
 		//Are we giving credits per like?
 		if (!empty($modSettings['Shop_credits_likes_post']))
 		{
+			// Set the amount of credits
+			$this->_credits_like = $modSettings['Shop_credits_likes_post'];
+
 			// We are only interested in messages for now
-			if ($like_type == 'msg')
+			if ($this->_likes_class::get($like_info->_type) == 'msg')
 			{
-				$msglikes = $smcFunc['db_query']('', '
-					SELECT id_member
-					FROM {db_prefix}messages
-					WHERE id_msg = {int:like}',
-					array(
-						'like' => $like_content,
-					)
-				);
-				$likedAuthor = $smcFunc['db_fetch_assoc']($msglikes);
-				$smcFunc['db_free_result']($msglikes);
+				$this->_likedAuthor = Database::Get('', '', '', 'messages', ['id_member'], 'WHERE id_msg = {int:like}', true, ['like' => $like_info->_content]);
 
 				// Like removed, points too!
-				if ($alreadyLiked)
+				if ($this->_likes_class::get($like_info->_alreadyLiked))
 				{
-					$result = $smcFunc['db_query']('','
-						UPDATE {db_prefix}members
-						SET shopMoney = shopMoney - {int:likepost}
-						WHERE id_member = {int:id_member}',
-						array(
-							'likepost' => $modSettings['Shop_credits_likes_post'],
-							'id_member' => $likedAuthor['id_member'],
-						)
-					);
+					Database::Update('members', [
+						'likepost' => $this->_credits_like,
+						'id_member' => $this->_likedAuthor['id_member'],
+					], 'SET shopMoney = shopMoney - {int:likepost}', 'WHERE id_member = {int:id_member}');
 				}
 				// Post liked, points delivered!
 				else
 				{
-					$result = $smcFunc['db_query']('','
-						UPDATE {db_prefix}members
-						SET shopMoney = shopMoney + {int:likepost}
-						WHERE id_member = {int:id_member}',
-						array(
-							'likepost' => $modSettings['Shop_credits_likes_post'],
-							'id_member' => $likedAuthor['id_member'],
-						)
-					);
+					Database::Update('members', [
+						'likepost' => $this->_credits_like,
+						'id_member' => $this->_likedAuthor['id_member'],
+					], 'SET shopMoney = shopMoney + {int:likepost}', 'WHERE id_member = {int:id_member}');
 				}
 			}
 		}
