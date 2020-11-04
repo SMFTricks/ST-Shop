@@ -382,7 +382,7 @@ class Items extends Dashboard
 				$itemModel->item_info = $this->_item_info;
 
 			// Can we edit the getAddInput() info?
-			if ($itemModel->addInput_editable == true)
+			if (!empty($itemModel->addInput_editable))
 			{
 				$context['shop_item']['addInputEditable'] = true;
 				$context['shop_item']['addInput'] = $itemModel->getAddInput();
