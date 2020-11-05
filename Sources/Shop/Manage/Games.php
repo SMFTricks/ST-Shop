@@ -55,6 +55,11 @@ class Games extends Dashboard
 				'dice' => ['description' => Shop::getText('settings_dice_desc')],
 			],
 		];
+
+		// Integrate settings from/for Addons
+		call_integration_hook('integrate_shop_games_settings', [&$context[$context['admin_menu_name']]['tab_data']['tabs'], &$this->_subactions]);
+
+		// Load the settings
 		call_helper(__CLASS__ . '::' . $this->_subactions[$this->_sa].'#');
 	}
 
