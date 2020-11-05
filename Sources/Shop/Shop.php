@@ -52,7 +52,7 @@ class Shop
 			'Shop_credits_register' => 5,
 			'Shop_credits_topic' => 10,
 			'Shop_credits_post' => 2,
-			// 'Shop_credits_likes_post' => 0,
+			'Shop_credits_likes_post' => 0,
 			'Shop_credits_word' => 0,
 			'Shop_credits_character' => 0,
 			'Shop_credits_limit' => 0,
@@ -262,6 +262,10 @@ class Shop
 				case 'signup':
 				case 'signup2':
 					add_integration_function('integrate_register', __NAMESPACE__ . '\Integration\Signup::register', false);
+					break;
+				// Likes
+				case 'likes':
+					add_integration_function('integrate_issue_like_before', __NAMESPACE__ . '\Integration\Likes::likePost#', false);
 					break;
 			}
 	}

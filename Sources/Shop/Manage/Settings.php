@@ -105,7 +105,7 @@ class Settings extends Dashboard
 			['int', 'Shop_credits_register'],
 			['int', 'Shop_credits_topic'],
 			['int', 'Shop_credits_post'],
-			//['int', 'Shop_credits_likes_post'],
+			['int', 'Shop_credits_likes_post'],
 			'',
 			['int', 'Shop_credits_word'],
 			['int', 'Shop_credits_character'],
