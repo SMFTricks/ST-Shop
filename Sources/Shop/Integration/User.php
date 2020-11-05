@@ -43,12 +43,24 @@ class User
 		{
 			// Create new instance of inventory
 			$this->_inventory = new Inventory;
-			// Load template
-			loadTemplate('Shop/Inventory');
+
+			// Load the template just once without disrupting other parts of the logic
+			add_integration_function('integrate_load_theme', __CLASS__ . '::template', false);
 		}
 
 		// Load language just in case
 		loadLanguage('Shop/Shop');
+	}
+
+	/**
+	 * User::template()
+	 *
+	 * Helper to load the inventory template
+	 */
+	public function template()
+	{
+		// Load template
+		loadTemplate('Shop/Inventory');
 	}
 
 	/**
