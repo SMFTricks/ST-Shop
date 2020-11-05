@@ -630,6 +630,40 @@ elseif (!defined('SMF'))
 			'parameters' => [],
 		];
 
+		// Content log
+		$tables[] = [
+			'table_name' => '{db_prefix}stshop_log_content',
+			'columns' => [
+				[
+					'name' => 'id_msg',
+					'type' => 'int',
+					'size' => 10,
+					'null' => false,
+				],
+				[
+					'name' => 'id_member',
+					'type' => 'int',
+					'size' => 10,
+					'null' => false,
+				],
+				[
+					'name' => 'content',
+					'type' => 'VARCHAR',
+					'size' => 25,
+					'null' => false,
+				],
+			],
+			'indexes' => [
+				[
+					'type' => 'primary',
+					'columns' => ['id_msg', 'id_member','content'],
+				],
+			],
+			'if_exists' => 'ignore',
+			'error' => 'fatal',
+			'parameters' => [],
+		];
+
 		// Installing
 		foreach ($tables as $table)
 			$smcFunc['db_create_table']($table['table_name'], $table['columns'], $table['indexes'], $table['parameters'], $table['if_exists'], $table['error']);
