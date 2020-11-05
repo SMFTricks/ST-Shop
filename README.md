@@ -45,7 +45,7 @@
 * You can install ST Shop through the package manager of your forum administration.
 
 ## More Modules
-* You can find some more "official" modules in the [ST Shop Modules](https://github.com/SMFTricks/ST-Shop-Modules)
+* You can find some more "official" modules in the [ST Shop Modules](https://github.com/SMFTricks/ST-Shop-Modules) repository.
 
 ## Changelog
 You can find the changelog for ST Shop on SMF Tricks: [Changelog](https://smftricks.com/index.php?board=51.0)
