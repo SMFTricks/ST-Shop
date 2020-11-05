@@ -58,3 +58,8 @@ Original idea: [url=https://www.simplemachines.org/community/index.php?action=pr
 
 [size=12pt][color=navy][url=https://smftricks.com/index.php?board=51.0]Changelog[/url][/color][/size]
 [size=12pt][color=purple][url=https://github.com/SMFTricks/ST-Shop]GitHub[/url][/color][/size]
+
+[hr]
+
+[size=12pt][color=blue][url=https://github.com/SMFTricks/ST-Shop-Modules]More ST Shop Modules[/url][/color][/size]
+[size=12pt][color=green][url=https://smftricks.com/index.php?board=109.0]Discuss about addons and modules[/url][/color][/size]
