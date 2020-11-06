@@ -194,7 +194,7 @@ class Shop
 		global $sourcedir;
 
 		// List of addons/mods that we are integrating
-		$addons = array_diff(scandir($sourcedir . self::$addonsdir), ['..', '.', 'index.php', 'Addons.php']);
+		$addons = array_diff(scandir($sourcedir . self::$addonsdir, 1), ['..', '.', 'index.php', 'Addons.php']);
 
 		// Class
 		$class = __NAMESPACE__ . '\Integration\Addons\\';
