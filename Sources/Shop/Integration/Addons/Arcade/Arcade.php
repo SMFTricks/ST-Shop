@@ -33,6 +33,11 @@ class Arcade implements Addons
 	private static $_settings = [];
 
 	/**
+	 * @var int Store the total credits the user will get
+	 */
+	private static $_credits = 0;
+
+	/**
 	 * @var object Log the user history playing at the arcade.
 	 */
 	private static $_log;
@@ -112,6 +117,8 @@ class Arcade implements Addons
 		self::$_settings = [
 			['title', 'Shop_integration_arcade'],
 			['int', 'Shop_integration_arcade_score', 'subtext' => Shop::getText('integration_arcade_score_desc')],
+			['int', 'Shop_integration_arcade_personal_best', 'subtext' => Shop::getText('integration_arcade_personal_best_desc')],
+			['int', 'Shop_integration_arcade_new_champion', 'subtext' => Shop::getText('integration_arcade_new_champion_desc')],
 		];
 		$settings = array_merge(self::$_settings, $settings);
 	}
@@ -126,8 +133,24 @@ class Arcade implements Addons
 	{
 		global $modSettings;
 
-		// Just submitting a score? lame...
-		if (!empty($modSettings['Shop_integration_arcade_score']))
-			Database::Update('members', ['user' => $member['id'], 'credits' => $modSettings['Shop_integration_arcade_score']], 'shopMoney = shopMoney + {int:credits}', 'WHERE id_member = {int:user}');
+		// We got a score??
+		if (!empty($score))
+		{
+			// Just submitting a score? lame...
+			if (!empty($modSettings['Shop_integration_arcade_score']))
+				self::$_credits += $modSettings['Shop_integration_arcade_score'];
+
+			// New Personal Best!
+			if (!empty($_SESSION['arcade']['highscore']['personalBest']) && !empty($modSettings['Shop_integration_arcade_personal_best']))
+				self::$_credits += $modSettings['Shop_integration_arcade_personal_best'];
+
+			// New Champion!!
+			if (!empty($_SESSION['arcade']['highscore']['newChampion']) && !empty($modSettings['Shop_integration_arcade_new_champion']))
+				self::$_credits += $modSettings['Shop_integration_arcade_new_champion'];
+
+			// Update in a single query if there's any stuff to update
+			if (!empty(self::$_credits))
+				Database::Update('members', ['user' => $member['id'], 'credits' => self::$_credits], 'shopMoney = shopMoney + {int:credits}', 'WHERE id_member = {int:user}');
+		}
 	}
 }
