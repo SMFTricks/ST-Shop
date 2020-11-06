@@ -16,7 +16,7 @@ if (!defined('SMF'))
 class Shop
 {
 	public static $name = 'Shop';
-	public static $version = '4.1';
+	public static $version = '4.1.1';
 	public static $addonsdir = '/Shop/Integration/Addons/';
 	public static $itemsdir = '/shop_items/items/';
 	public static $modulesdir = '/Shop/Modules/';
