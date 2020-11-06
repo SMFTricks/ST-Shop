@@ -32,6 +32,11 @@ class BestAnswer implements Addons
 	private static $_settings = [];
 
 	/**
+	 * @var array Log data to prevent duplicate content
+	 */
+	private static $_content;
+
+	/**
 	 * Addons::integration()
 	 *
 	 * Loads the essentials of the integration for this addon
@@ -106,7 +111,20 @@ class BestAnswer implements Addons
 		global $modSettings, $user_info;
 
 		// Give credits for getting the best answer, but only if you're not marking it yourself
-		if (!empty($modSettings['Shop_integration_sycho_best_answer_setting']) && $user_info['id'] != $id_user)
-			Database::Update('members', ['user' => $id_user, 'credits' => $modSettings['Shop_integration_sycho_best_answer_setting']], 'shopMoney = shopMoney + {int:credits}', 'WHERE id_member = {int:user}');
+		if (!empty($modSettings['Shop_integration_sycho_best_answer_setting']) && $user_info['id'] != $id_user && !empty($id_user))
+		{
+			// Check if we performed this action already
+			self::$_content = Database::Get('', '', '', 'stshop_log_content', ['id_member', 'id_msg', 'content'], 'WHERE id_msg = {int:id_msg} AND content = {string:content} AND id_member = {int:member}', true, '', ['id_msg' => $id_msg, 'content' => 'bestanswer', 'member' => $id_user]);
+
+			// Do we send credits??
+			if (empty(self::$_content))
+			{
+				// Update the credits for best answer
+				Database::Update('members', ['user' => $id_user, 'credits' => $modSettings['Shop_integration_sycho_best_answer_setting']], 'shopMoney = shopMoney + {int:credits}', 'WHERE id_member = {int:user}');
+
+				// Log the entry
+				Database::Insert('stshop_log_content', ['id_msg'=> $id_msg, 'id_member'=> $id_user, 'content' => 'bestanswer'], ['id_msg' => 'int', 'id_member' => 'int', 'content' => 'string']) ;
+			}
+		}
 	}
 }

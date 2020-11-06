@@ -18,12 +18,12 @@ if (!defined('SMF'))
 class Likes
 {
 	/**
-	 * @var array Value for credits
+	 * @var array Log data to prevent duplicate content
 	 */
-	private $_credits_like;
+	private $_content;
 
 	/**
-	 * @var int ID of the post author
+	 * @var array Info of the post author
 	 */
 	private $_author;
 
@@ -46,8 +46,22 @@ class Likes
 				// For some reason likes don't provide the id of the content author, only the one liking
 				$this->_author = Database::Get('', '', '', 'messages', ['id_member'], 'WHERE id_msg = {int:id_msg}', true, '', ['id_msg' => $content]);
 
-				// Post liked, points delivered!
-				Database::Update('members', ['likepost' => $modSettings['Shop_credits_likes_post'], 'id_member' => $this->_author['id_member']], 'shopMoney = shopMoney + {int:likepost},', 'WHERE id_member = {int:id_member}');
+				// The author is actually an user and not a guest
+				if (!empty($this->_author['id_member']))
+				{
+					// Check if we performed this action already
+					$this->_content = Database::Get('', '', '', 'stshop_log_content', ['id_member', 'id_msg', 'content'], 'WHERE id_msg = {int:id_msg} AND content = {string:content} AND id_member = {int:member}', true, '', ['id_msg' => $content, 'content' => 'likes', 'member' => $this->_author['id_member']]);
+
+					// Post liked, points delivered!
+					if (empty($this->_content))
+					{
+						// Update the credits
+						Database::Update('members', ['likepost' => $modSettings['Shop_credits_likes_post'], 'id_member' => $this->_author['id_member']], 'shopMoney = shopMoney + {int:likepost},', 'WHERE id_member = {int:id_member}');
+
+						// Log the entry
+						Database::Insert('stshop_log_content', ['id_msg'=> $content, 'id_member'=> $this->_author['id_member'], 'content' => 'likes'], ['id_msg' => 'int', 'id_member' => 'int', 'content' => 'string']) ;
+					}
+				}
 			}
 		}
 	}
