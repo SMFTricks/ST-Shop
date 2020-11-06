@@ -15,17 +15,51 @@ if (!defined('SMF'))
 
 class Shop
 {
-	public static $name = 'Shop';
-	public static $version = '4.1.1';
-	public static $addonsdir = '/Shop/Integration/Addons/';
-	public static $itemsdir = '/shop_items/items/';
-	public static $modulesdir = '/Shop/Modules/';
-	public static $gamesdir = '/shop_items/games/';
-	public static $supportSite = 'https://smftricks.com/index.php?action=.xml;sa=news;board=51;limit=10;type=rss2';
+	/**
+	 * @var int Version of the mod
+	 */
+	public static $version;
+
+	/**
+	 * @var string Addons directory
+	 */
+	public static $addonsdir;
+
+	/**
+	 * @var string Items directory
+	 */
+	public static $itemsdir;
+
+	/**
+	 * @var string Modules directory
+	 */
+	public static $modulesdir;
+
+	/**
+	 * @var string Games directory
+	 */
+	public static $gamesdir;
+
+	/**
+	 * @var string Suppoort site link
+	 */
+	public static $supportSite;
+
 
 	public static function initialize()
 	{
+		// Version and paths
+		self::$version = '4.1.1';
+		self::$addonsdir = '/Shop/Integration/Addons/';
+		self::$itemsdir = '/shop_items/items/';
+		self::$modulesdir = '/Shop/Modules/';
+		self::$gamesdir = '/shop_items/games/';
+		self::$supportSite = 'https://smftricks.com/index.php?action=.xml;sa=news;board=51;limit=10;type=rss2';
+
+		// Default Values
 		self::setDefaults();
+
+		// Hooks
 		self::defineHooks();
 		self::userHooks();
 		self::addonHooks();
