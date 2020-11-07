@@ -331,11 +331,13 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'date',
 					'type' => 'int',
+					'size' => 11,
 					'null' => false,
 				],
 				[
 					'name' => 'tradedate',
 					'type' => 'int',
+					'size' => 11,
 					'default' => 0,
 					'null' => false,
 				],
@@ -376,7 +378,6 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'image',
 					'type' => 'tinytext',
-					'null' => true,
 					'null' => false,
 				],
 				[
@@ -449,6 +450,7 @@ elseif (!defined('SMF'))
 					'name' => 'date',
 					'type' => 'int',
 					'null' => false,
+					'size' => 11,
 				],
 			],
 			'indexes' => [
@@ -518,6 +520,7 @@ elseif (!defined('SMF'))
 					'name' => 'date',
 					'type' => 'int',
 					'null' => false,
+					'size' => 11,
 				],
 			],
 			'indexes' => [
@@ -574,6 +577,7 @@ elseif (!defined('SMF'))
 					'name' => 'date',
 					'type' => 'int',
 					'null' => false,
+					'size' => 11,
 				],
 			],
 			'indexes' => [
@@ -617,6 +621,7 @@ elseif (!defined('SMF'))
 					'name' => 'date',
 					'type' => 'int',
 					'null' => false,
+					'size' => 11,
 				],
 			],
 			'indexes' => [
