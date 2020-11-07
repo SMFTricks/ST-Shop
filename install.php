@@ -21,8 +21,9 @@ elseif (!defined('SMF'))
 	if (empty($context['uninstalling']))
 	{
 		// Set the importer not completed by default
-		$smcFunc['db_insert']('replace', '
-			{db_prefix}settings',
+		$smcFunc['db_insert'](
+			'replace',
+			'{db_prefix}settings',
 			[
 				'variable' => 'string',
 				'value' => 'int',
@@ -33,7 +34,7 @@ elseif (!defined('SMF'))
 					0,
 				],
 			],
-			['variable'],
+			['variable']
 		);
 
 		// Enable the alert by default
