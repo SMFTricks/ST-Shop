@@ -28,7 +28,7 @@ $txt['Shop_main_yourinventory'] = 'Your Inventory';
 // Shop Home
 $txt['Shop_user_info'] = 'User information';
 $txt['Shop_welcome_to'] = '%s Shop';
-$txt['Shop_welcome_text'] = '<strong>Welcome to the Shop, %1$s.</strong><br /> Here you can buy items with the %2$s you get from posting on the forum, trade items at the trade center, put your money save in the bank, browse your inventory and other users inventory.';
+$txt['Shop_welcome_text'] = '<strong>Welcome to the Shop, %1$s.</strong><br /> Here you can buy items with the %2$s you get from posting on the forum, trade items at the trade center, put your money safe in the bank, browse your inventory and other users inventory.';
 $txt['Shop_money_pocket'] = 'Pocket';
 $txt['Shop_money_bank'] = 'Bank';
 $txt['Shop_user_avatar'] = 'Avatar';
