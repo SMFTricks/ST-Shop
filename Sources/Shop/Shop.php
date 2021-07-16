@@ -49,7 +49,7 @@ class Shop
 	public static function initialize()
 	{
 		// Version and paths
-		self::$version = '4.1.2';
+		self::$version = '4.1.3';
 		self::$addonsdir = '/Shop/Integration/Addons/';
 		self::$itemsdir = '/shop_items/items/';
 		self::$modulesdir = '/Shop/Modules/';

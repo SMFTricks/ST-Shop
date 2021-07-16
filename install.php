@@ -126,7 +126,7 @@ elseif (!defined('SMF'))
 				],
 				[
 					'name' => 'price',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'null' => false,
 					'default' => 0,
 				],
@@ -300,14 +300,14 @@ elseif (!defined('SMF'))
 			'columns' => [
 				[
 					'name' => 'id',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'auto' => true,
 					'null' => false,
 				],
 				[
 					'name' => 'userid',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'null' => false,
 				],	
@@ -325,7 +325,7 @@ elseif (!defined('SMF'))
 				],
 				[
 					'name' => 'tradecost',
-					'type' => 'int',
+					'type' => 'bigint',
 					'default' => 0,
 					'null' => false,
 				],
@@ -365,7 +365,7 @@ elseif (!defined('SMF'))
 			'columns' => [
 				[
 					'name' => 'catid',
-					'type' => 'smallint',
+					'type' => 'int',
 					'size' => 5,
 					'auto' => true,
 					'null' => false,
@@ -404,7 +404,7 @@ elseif (!defined('SMF'))
 			'columns' => [
 				[
 					'name' => 'id',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'auto' => true,
 					'null' => false,
@@ -417,26 +417,26 @@ elseif (!defined('SMF'))
 				],
 				[
 					'name' => 'invid',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'null' => false,
 				],
 				[
 					'name' => 'userid',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'null' => false,
 				],
 				[
 					'name' => 'sellerid',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'default' => 0,
 					'null' => false,
 				],
 				[
 					'name' => 'amount',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'null' => false,
 				],
@@ -476,19 +476,19 @@ elseif (!defined('SMF'))
 				],
 				[
 					'name' => 'userid',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'null' => false,
 				],
 				[
 					'name' => 'receiver',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'null' => false,
 				],
 				[
 					'name' => 'amount',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'null' => false,
 				],
@@ -500,7 +500,7 @@ elseif (!defined('SMF'))
 				],
 				[
 					'name' => 'invid',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'default' => 0,
 					'null' => false,
@@ -539,26 +539,26 @@ elseif (!defined('SMF'))
 			'columns' => [
 				[
 					'name' => 'id',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'auto' => true,
 					'null' => false,
 				],
 				[
 					'name' => 'userid',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'null' => false,
 				],
 				[
 					'name' => 'amount',
-					'type' => 'int',
+					'type' => 'bigint',
 					'size' => 10,
 					'null' => false,
 				],
 				[
 					'name' => 'fee',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'default' => 0,
 					'null' => false,
@@ -596,20 +596,20 @@ elseif (!defined('SMF'))
 			'columns' => [
 				[
 					'name' => 'id',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'auto' => true,
 					'null' => false,
 				],
 				[
 					'name' => 'userid',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'null' => false,
 				],
 				[
 					'name' => 'amount',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'null' => false,
 				],
@@ -648,7 +648,7 @@ elseif (!defined('SMF'))
 				],
 				[
 					'name' => 'id_member',
-					'type' => 'int',
+					'type' => 'mediumint',
 					'size' => 10,
 					'null' => false,
 				],
@@ -714,7 +714,7 @@ elseif (!defined('SMF'))
 			'{db_prefix}members', 
 			[
 				'name' => 'shopMoney',
-				'type' => 'int',
+				'type' => 'mediumint',
 				'default' => 0,
 			]
 		);
