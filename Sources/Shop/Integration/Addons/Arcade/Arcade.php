@@ -23,6 +23,11 @@ if (!defined('SMF'))
 class Arcade implements Addons
 {
 	/**
+	 * @var string The link to this integration or mod
+	 */
+	private static $_link = 'https://web-develop.ca/index.php?action=downloads;area=stable_smf_arcade';
+
+	/**
 	 * @var bool Check if we want to load the language file in a specific page.
 	 */
 	private static $_language = false;
@@ -116,7 +121,7 @@ class Arcade implements Addons
 	{
 		self::$_settings = [
 			['title', 'Shop_integration_arcade'],
-			['desc', 'Shop_integration_arcade_desc'],
+			['desc', 'Shop_integration_arcade_desc', 'label' => sprintf(Shop::getText('integration_settings_desc'), self::$_link, Shop::getText('integration_arcade'))],
 			['int', 'Shop_integration_arcade_score', 'subtext' => Shop::getText('integration_arcade_score_desc')],
 			['int', 'Shop_integration_arcade_personal_best', 'subtext' => Shop::getText('integration_arcade_personal_best_desc')],
 			['int', 'Shop_integration_arcade_new_champion', 'subtext' => Shop::getText('integration_arcade_new_champion_desc')],

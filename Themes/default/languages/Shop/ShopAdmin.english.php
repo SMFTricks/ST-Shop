@@ -48,6 +48,7 @@ $txt['Shop_enable_maintenance_desc'] = 'This will put the Shop in maintenance, o
 // Integrations
 $txt['Shop_settings_integrations'] = 'Integrations';
 $txt['Shop_settings_integrations_desc'] = 'In this section you can change settings for different integrations with other mods or addons';
+$txt['Shop_integration_settings_desc'] = '<a href="%1$s">%2$s</a> mod is required.';
 
 // Permissions
 $txt['Shop_settings_permissions'] = 'Permissions';

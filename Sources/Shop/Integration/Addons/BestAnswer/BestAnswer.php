@@ -22,6 +22,11 @@ if (!defined('SMF'))
 class BestAnswer implements Addons
 {
 	/**
+	 * @var string The link to this integration or mod
+	 */
+	private static $_link = 'https://custom.simplemachines.org/mods/index.php?mod=4274';
+
+	/**
 	 * @var bool Check if we want to load the language file in a specific page.
 	 */
 	private static $_language = false;
@@ -95,7 +100,7 @@ class BestAnswer implements Addons
 	{
 		self::$_settings = [
 			['title', 'Shop_integration_sycho_best_answer'],
-			['desc', 'Shop_integration_sycho_best_answer_desc'],
+			['desc', 'Shop_integration_sycho_best_answer_desc', 'label' => sprintf(Shop::getText('integration_settings_desc'), self::$_link, Shop::getText('integration_sycho_best_answer'))],
 			['int', 'Shop_integration_sycho_best_answer_setting', 'subtext' => Shop::getText('integration_sycho_best_answer_setting_desc')],
 		];
 		$settings = array_merge(self::$_settings, $settings);
