@@ -59,7 +59,7 @@ function template_shop_inventory_search_below()
 	</script>';
 }
 
-function template_shop_inventory($inventory)
+function template_shop_inventory($inventory, $title = true)
 {
 	global $scripturl, $txt;
 
@@ -67,7 +67,7 @@ function template_shop_inventory($inventory)
 	if (empty($inventory))
 		return;
 
-	$disp = '<strong>'. $txt['Shop_posting_inventory']. '</strong>:<br />';
+	$disp = !empty($title) ? '<strong>' . $txt['Shop_posting_inventory'] . '</strong>:<br />' : '<br />';
 
 	// Format items
 	foreach($inventory as $item)
