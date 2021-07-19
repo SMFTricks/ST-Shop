@@ -11,6 +11,7 @@
 global $modSettings;
 
 $txt['Shop_integration_arcade'] = 'SMF Arcade';
+$txt['Shop_integration_arcade_desc'] = '<a href="https://web-develop.ca/index.php?action=downloads;area=stable_smf_arcade">SMF Arcade</a> mod is required.';
 $txt['Shop_integration_arcade_score'] = (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' for submitting score';
 $txt['Shop_integration_arcade_score_desc'] = 'The user will receive points after they submit a score/play a game.';
 $txt['Shop_integration_arcade_personal_best'] = (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' for beating their personal best';

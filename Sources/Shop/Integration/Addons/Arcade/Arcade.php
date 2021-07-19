@@ -116,6 +116,7 @@ class Arcade implements Addons
 	{
 		self::$_settings = [
 			['title', 'Shop_integration_arcade'],
+			['desc', 'Shop_integration_arcade_desc'],
 			['int', 'Shop_integration_arcade_score', 'subtext' => Shop::getText('integration_arcade_score_desc')],
 			['int', 'Shop_integration_arcade_personal_best', 'subtext' => Shop::getText('integration_arcade_personal_best_desc')],
 			['int', 'Shop_integration_arcade_new_champion', 'subtext' => Shop::getText('integration_arcade_new_champion_desc')],

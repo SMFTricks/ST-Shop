@@ -95,6 +95,7 @@ class BestAnswer implements Addons
 	{
 		self::$_settings = [
 			['title', 'Shop_integration_sycho_best_answer'],
+			['desc', 'Shop_integration_sycho_best_answer_desc'],
 			['int', 'Shop_integration_sycho_best_answer_setting', 'subtext' => Shop::getText('integration_sycho_best_answer_setting_desc')],
 		];
 		$settings = array_merge(self::$_settings, $settings);
