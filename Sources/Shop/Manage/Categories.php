@@ -28,9 +28,6 @@ class Categories extends Dashboard
 	 */
 	function __construct()
 	{
-		// Required languages
-		loadLanguage('Shop/Shop');
-
 		// Array of sections
 		$this->_subactions = [
 			'index' => 'index',

@@ -46,9 +46,6 @@ class Maintenance extends Dashboard
 	 */
 	function __construct()
 	{
-		// Required languages
-		loadLanguage('Shop/Shop');
-
 		// Array of sections
 		$this->_subactions = [
 			'import' => 'import',
