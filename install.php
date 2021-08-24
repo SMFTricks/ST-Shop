@@ -106,6 +106,7 @@ elseif (!defined('SMF'))
 					'size' => 10,
 					'auto' => true,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'name',
@@ -128,12 +129,14 @@ elseif (!defined('SMF'))
 					'type' => 'mediumint',
 					'not_null' => true,
 					'default' => 0,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'stock',
 					'type' => 'smallint',
 					'not_null' => true,
 					'default' => 0,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'module',
@@ -141,6 +144,7 @@ elseif (!defined('SMF'))
 					'not_null' => true,
 					'size' => 10,
 					'default' => 0,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'info1',
@@ -164,6 +168,7 @@ elseif (!defined('SMF'))
 					'size' => 1,
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'can_use_item',
@@ -171,6 +176,7 @@ elseif (!defined('SMF'))
 					'size' => 1,
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'delete_after_use',
@@ -178,24 +184,28 @@ elseif (!defined('SMF'))
 					'size' => 1,
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'catid',
 					'type' => 'int',
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'status',
 					'type' => 'smallint',
 					'default' => 1,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'itemlimit',
 					'type' => 'int',
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 			],
 			'indexes' => [
@@ -218,6 +228,7 @@ elseif (!defined('SMF'))
 					'size' => 10,
 					'auto' => true,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'name',
@@ -236,6 +247,7 @@ elseif (!defined('SMF'))
 					'type' => 'int',
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'author',
@@ -254,18 +266,21 @@ elseif (!defined('SMF'))
 					'type' => 'tinyint',
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'can_use_item',
 					'type' => 'tinyint',
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'editable_input',
 					'type' => 'tinyint',
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'web',
@@ -299,17 +314,20 @@ elseif (!defined('SMF'))
 					'size' => 10,
 					'auto' => true,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'userid',
 					'type' => 'mediumint',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
 				],	
 				[
 					'name' => 'itemid',
 					'type' => 'int',
 					'size' => 10,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'trading',
@@ -317,18 +335,21 @@ elseif (!defined('SMF'))
 					'size' => 1,
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'tradecost',
-					'type' => 'bigint',
+					'type' => 'int',
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'date',
 					'type' => 'int',
 					'size' => 11,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'tradedate',
@@ -336,12 +357,14 @@ elseif (!defined('SMF'))
 					'size' => 11,
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'fav',
-					'type' => 'int',
+					'type' => 'tinyint',
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 			],
 			'indexes' => [
@@ -364,6 +387,7 @@ elseif (!defined('SMF'))
 					'size' => 5,
 					'auto' => true,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'name',
@@ -399,28 +423,32 @@ elseif (!defined('SMF'))
 			'columns' => [
 				[
 					'name' => 'id',
-					'type' => 'mediumint',
+					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'itemid',
 					'type' => 'int',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'invid',
 					'type' => 'mediumint',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'userid',
 					'type' => 'mediumint',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'sellerid',
@@ -428,12 +456,14 @@ elseif (!defined('SMF'))
 					'size' => 10,
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'amount',
-					'type' => 'mediumint',
+					'type' => 'int',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'fee',
@@ -441,12 +471,14 @@ elseif (!defined('SMF'))
 					'size' => 10,
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'date',
 					'type' => 'int',
 					'not_null' => true,
 					'size' => 11,
+					'unsigned' => true,
 				],
 			],
 			'indexes' => [
@@ -468,30 +500,35 @@ elseif (!defined('SMF'))
 					'size' => 10,
 					'auto' => true,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'userid',
 					'type' => 'mediumint',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'receiver',
 					'type' => 'mediumint',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'amount',
-					'type' => 'mediumint',
-					'size' => 10,
-					'not_null' => true,
-				],
-				[
-					'name' => 'itemid',
 					'type' => 'int',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
+				],
+				[
+					'name' => 'itemid',
+					'type' => 'mediumint',
+					'size' => 10,
+					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'invid',
@@ -499,6 +536,7 @@ elseif (!defined('SMF'))
 					'size' => 10,
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'message',
@@ -511,12 +549,14 @@ elseif (!defined('SMF'))
 					'type' => 'tinyint',
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'date',
 					'type' => 'int',
 					'not_null' => true,
 					'size' => 11,
+					'unsigned' => true,
 				],
 			],
 			'indexes' => [
@@ -534,22 +574,25 @@ elseif (!defined('SMF'))
 			'columns' => [
 				[
 					'name' => 'id',
-					'type' => 'mediumint',
+					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'userid',
 					'type' => 'mediumint',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'amount',
-					'type' => 'bigint',
+					'type' => 'int',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'fee',
@@ -557,6 +600,7 @@ elseif (!defined('SMF'))
 					'size' => 10,
 					'default' => 0,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'action',
@@ -568,12 +612,14 @@ elseif (!defined('SMF'))
 					'type' => 'smallint',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'date',
 					'type' => 'int',
 					'not_null' => true,
 					'size' => 11,
+					'unsigned' => true,
 				],
 			],
 			'indexes' => [
@@ -591,22 +637,25 @@ elseif (!defined('SMF'))
 			'columns' => [
 				[
 					'name' => 'id',
-					'type' => 'mediumint',
+					'type' => 'int',
 					'size' => 10,
 					'auto' => true,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'userid',
 					'type' => 'mediumint',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'amount',
-					'type' => 'mediumint',
+					'type' => 'int',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'game',
@@ -618,6 +667,7 @@ elseif (!defined('SMF'))
 					'type' => 'int',
 					'not_null' => true,
 					'size' => 11,
+					'unsigned' => true,
 				],
 			],
 			'indexes' => [
@@ -640,12 +690,14 @@ elseif (!defined('SMF'))
 					'type' => 'int',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'id_member',
 					'type' => 'mediumint',
 					'size' => 10,
 					'not_null' => true,
+					'unsigned' => true,
 				],
 				[
 					'name' => 'content',
