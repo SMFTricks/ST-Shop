@@ -565,7 +565,7 @@ function template_stats()
 		foreach ($block['call'] as $item)
 		{
 			echo '
-						<dt>
+						<dt style="align-self: center;">
 							', (isset($item['num']) ? (!empty($item['image']) ? ($item['image'] . ' &nbsp;') : '') . (empty($item['link']) ? 
 								$item['name'] : 
 								'<a href="' . $scripturl. '?action=profile;u=' . $item['id'] . '" style="font-weight: initial;">' . $item['name'] . '</a>') : $item['image']), '
