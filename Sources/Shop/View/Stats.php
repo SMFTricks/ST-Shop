@@ -13,7 +13,6 @@ namespace Shop\View;
 use Shop\Shop;
 use Shop\Helper\Database;
 use Shop\Helper\Format;
-use Shop\Helper\Images;
 
 if (!defined('SMF'))
 	die('No direct access...');
@@ -138,6 +137,11 @@ class Stats
 		// Add more stats?
 		call_integration_hook('integrate_shop_stats', [&$this->_stats]);
 
+		// Remove empty stats
+		foreach ($this->_stats as $stat => $result)
+			if (empty($result['call']))
+				unset($this->_stats[$stat]);
+
 		return $this->_stats;
 	}
 
@@ -164,6 +168,7 @@ class Stats
 	 */
 	public function format($link = false)
 	{
+		$this->_final = [];
 		// We actually got something?
 		if (!empty($this->_result))
 		{
@@ -201,10 +206,6 @@ class Stats
 	 */
 	public function purchased($limit = 5)
 	{
-		// Clean
-		unset($this->_result);
-		unset($this->_final);
-
 		$this->_result = Database::Get(0, $limit, 'count DESC', 'stshop_log_buy AS lb', ['lb.itemid AS stat_id', 'count(*) AS count', 's.name AS stat_name ', 's.image', 's.status'], 'WHERE s.status = 1 GROUP BY stat_id, stat_name, s.image, s.status', false, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = lb.itemid)');
 		$this->format();
 
@@ -218,10 +219,6 @@ class Stats
 	 */
 	public function categories($limit = 5)
 	{
-		// Clean
-		unset($this->_result);
-		unset($this->_final);
-
 		$this->_result = Database::Get(0, $limit, 'count DESC', 'stshop_items AS s', ['s.catid AS stat_id', 'count(*) AS count', 'c.name AS stat_name', 'c.image', 's.status'], 'WHERE s.catid <> 0 AND s.status = 1 GROUP BY stat_id, s.status, stat_name, c.image', false, 'LEFT JOIN {db_prefix}stshop_categories AS c ON (c.catid = s.catid)');
 		$this->format();
 
@@ -235,10 +232,6 @@ class Stats
 	 */
 	public function inventories($limit = 5)
 	{
-		// Clean
-		unset($this->_result);
-		unset($this->_final);
-
 		$this->_result = Database::Get(0, $limit, 'count DESC', 'stshop_inventory AS si', ['si.userid AS stat_id', 'count(*) AS count', 'si.trading', 'm.real_name AS stat_name', 's.status'], 'WHERE si.trading = 0 AND s.status = 1 GROUP BY stat_id, s.status, si.trading, stat_name', false, 'LEFT JOIN {db_prefix}members AS m ON (m.id_member = si.userid) LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = si.itemid)');
 		$this->format(true);
 
@@ -252,10 +245,6 @@ class Stats
 	 */
 	public function buyers($limit = 5)
 	{
-		// Clean
-		unset($this->_result);
-		unset($this->_final);
-
 		$this->_result = Database::Get(0, $limit, 'count DESC', 'stshop_log_buy AS lb', ['lb.userid AS stat_id', 'count(*) AS count', 'm.real_name AS stat_name', 's.status'], 'WHERE s.status = 1 GROUP BY stat_id, s.status, stat_name', false, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = lb.itemid) LEFT JOIN {db_prefix}members AS m ON (m.id_member = lb.userid)');
 		$this->format(true);
 
@@ -269,10 +258,6 @@ class Stats
 	 */
 	public function gifts($sent = true, $money = false, $limit = 5)
 	{
-		// Clean
-		unset($this->_result);
-		unset($this->_final);
-
 		$this->_result = Database::Get(0, $limit, 'count DESC', 'stshop_log_gift AS lg', ['lg.' . (!empty($sent) ? 'userid' : 'receiver') . ' AS stat_id', (!empty($money) ? 'sum(lg.amount)' : 'count(*)') . ' AS count', 'm.real_name AS stat_name', 's.status'], 'WHERE' . (!empty($money) ? '' : ' s.status = 1 AND') . ' lg.is_admin = 0 AND lg.amount ' . (!empty($money) ? '>' : '=') . ' 0 GROUP BY stat_id, s.status, stat_name', false, 'LEFT JOIN {db_prefix}members AS m ON (m.id_member = lg.' . (!empty($sent) ? 'userid' : 'receiver') . ') LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = lg.itemid)');
 		$this->format(true);
 
@@ -286,10 +271,6 @@ class Stats
 	 */
 	public function richest($bank = false, $limit = 5)
 	{
-		// Clean
-		unset($this->_result);
-		unset($this->_final);
-
 		$this->_result = Database::Get(0, $limit, 'm.shop' . (!empty($bank) ? 'Bank' : 'Money'). ' DESC', 'members AS m', ['m.id_member AS stat_id', 'm.shop' . (!empty($bank) ? 'Bank' : 'Money') . ' AS count', 'm.real_name AS stat_name'], 'WHERE m.shop' . (!empty($bank) ? 'Bank' : 'Money') . ' > 0');
 		$this->format(true);
 
@@ -303,10 +284,6 @@ class Stats
 	 */
 	public function recent($limit = 5)
 	{
-		// Clean
-		unset($this->_result);
-		unset($this->_final);
-
 		$this->_result = Database::Get(0, $limit, 's.itemid DESC', 'stshop_items AS s', ['s.itemid AS stat_id', 's.name AS stat_name', 's.image', 's.status'], 'WHERE s.status = 1');
 		$this->format();
 
@@ -320,10 +297,6 @@ class Stats
 	 */
 	public function last_purchased($limit = 5)
 	{
-		// Clean
-		unset($this->_result);
-		unset($this->_final);
-
 		$this->_result = Database::Get(0, $limit, 'lb.id DESC', 'stshop_log_buy AS lb', ['lb.id AS stat_id', 'lb.itemid', 's.name AS stat_name', 's.image', 's.status'], 'WHERE s.status = 1', false, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = lb.itemid)');
 		$this->format();
 
@@ -337,10 +310,6 @@ class Stats
 	 */
 	public function traded($limit = 5)
 	{
-		// Clean
-		unset($this->_result);
-		unset($this->_final);
-
 		$this->_result = Database::Get(0, $limit, 'count DESC', 'stshop_log_buy AS lb', ['lb.itemid AS stat_id', 'count(*) AS count', 's.name AS stat_name', 's.image', 's.status'], 'WHERE s.status = 1 AND lb.sellerid <> 0 GROUP BY lb.itemid, s.name, s.image, s.status', false, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = lb.itemid)');
 		$this->format();
 
@@ -354,10 +323,6 @@ class Stats
 	 */
 	public function expensive($limit = 5)
 	{
-		// Clean
-		unset($this->_result);
-		unset($this->_final);
-
 		$this->_result = Database::Get(0, $limit, 'count DESC', 'stshop_log_buy AS lb', ['lb.itemid AS stat_id', 'lb.amount AS count', 's.name AS stat_name', 's.image', 's.status'], 'WHERE s.status = 1 AND lb.sellerid <> 0', false, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = lb.itemid)');
 		$this->format();
 
@@ -371,10 +336,6 @@ class Stats
 	 */
 	public function profit($spent = false, $limit = 5)
 	{
-		// Clean
-		unset($this->_result);
-		unset($this->_final);
-
 		$this->_result = Database::Get(0, $limit, 'count DESC', 'stshop_log_buy AS lb', ['lb.' . (empty($spent) ? 'sellerid' : 'userid') . ' AS stat_id', 'sum(lb.amount) AS count', 'm.real_name AS stat_name', 's.status', 'lb.' . (empty($spent) ? 'userid' : 'sellerid')], 'WHERE s.status = 1 AND lb.sellerid <> 0 GROUP BY stat_id, stat_name, s.status, lb.' . (empty($spent) ? 'userid' : 'sellerid'), false, 'LEFT JOIN {db_prefix}stshop_items AS s ON (s.itemid = lb.itemid) LEFT JOIN {db_prefix}members AS m ON (m.id_member = lb.' . (empty($spent) ? 'sellerid' : 'userid'). ')');
 		$this->format();
 
