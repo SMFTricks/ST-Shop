@@ -139,11 +139,6 @@ class Trade
 				'enabled' => true,
 			],
 		];
-
-		// Remove empty stats
-		foreach ($context['stats_blocks'] as $stat => $result)
-			if (empty($result['call']))
-				unset($context['stats_blocks'][$stat]);
 	}
 
 	public function tabs()

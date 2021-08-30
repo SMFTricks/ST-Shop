@@ -137,11 +137,6 @@ class Stats
 		// Add more stats?
 		call_integration_hook('integrate_shop_stats', [&$this->_stats]);
 
-		// Remove empty stats
-		foreach ($this->_stats as $stat => $result)
-			if (empty($result['call']))
-				unset($this->_stats[$stat]);
-
 		return $this->_stats;
 	}
 
