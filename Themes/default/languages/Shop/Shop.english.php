@@ -195,6 +195,7 @@ $txt['Shop_stats_last_purchased'] = 'Last items purchased or traded';
 $txt['Shop_stats_top_profit'] = 'Top profit';
 $txt['Shop_stats_top_spent'] = 'Top spent';
 $txt['Shop_stats_most_expensive'] = 'Most expensive';
+$txt['Shop_stats_nostats'] = 'There are currently no stats to display.';
 
 // Shop who
 $txt['whoallow_shopinfo'] = 'Managing the Shop in the Admin Center';

@@ -139,6 +139,11 @@ class Trade
 				'enabled' => true,
 			],
 		];
+
+		// Remove empty stats
+		foreach ($context['stats_blocks'] as $stat => $result)
+			if (empty($result['call']))
+				unset($context['stats_blocks'][$stat]);
 	}
 
 	public function tabs()
@@ -559,6 +564,7 @@ class Trade
 		global $context, $scripturl, $sourcedir, $modSettings, $user_info;
 
 		// Set all the page stuff
+		loadlanguage('Shop/ShopAdmin');
 		require_once($sourcedir . '/Subs-List.php');
 		$context['page_title'] = Shop::getText('main_button') . ' - ' . Shop::getText('trade_log');
 		$context['page_welcome'] = Shop::getText('main_trade') . ' - ' . Shop::getText('trade_log');

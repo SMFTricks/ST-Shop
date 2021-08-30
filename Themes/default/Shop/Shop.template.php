@@ -543,47 +543,54 @@ function template_stats()
 		<div class="roundframe">';
 
 	// Store Stats
-	foreach ($context['stats_blocks'] as $stat => $block)
+	if (!empty($context['stats_blocks']))
 	{
-		// Check if user has enough privileges to show them this information
-		// Or if the block contains stuff
-		if (empty($block['enabled']) || empty($block['call']))
-			continue;
-
-		echo '
-			<div class="half_content">
-				<div class="title_bar">
-					<h4 class="titlebg">
-						<img class="centericon" src="', $settings['default_images_url'], '/icons/shop/', $stat, '.png" alt="" /> ', $txt['Shop_stats_' . $stat], '
-					</h4>
-				</div>
-					<dl class="stats" style="padding: 5px">';
-
-		foreach ($block['call'] as $item)
+		foreach ($context['stats_blocks'] as $stat => $block)
 		{
+			// Check if user has enough privileges to show them this information
+			// Or if the block contains stuff
+			if (empty($block['enabled']) || empty($block['call']))
+				continue;
+
 			echo '
-						<dt>
-							', (isset($item['num']) ? (!empty($item['image']) ? ($item['image'] . ' &nbsp;') : '') . (!empty($item['link']) ? 
-								$item['name'] : 
-								'<a href="' . $scripturl. '?action=profile;u=' . $item['id'] . '">' . $item['name'] . '</a>') : $item['image']), '
-						</dt>
-						<dd class="statsbar', isset($item['num']) ? ' generic_bar righttext' : '', '">';
+				<div class="half_content">
+					<div class="title_bar">
+						<h4 class="titlebg">
+							<img class="centericon" src="', $settings['default_images_url'], '/icons/shop/', $stat, '.png" alt="" /> ', $txt['Shop_stats_' . $stat], '
+						</h4>
+					</div>
+						<dl class="stats" style="padding: 5px">';
 
-				if (!empty($item['percent']))
-					echo '
-							<div class="bar" style="width: ', $item['percent'], '%;"></div>';
-				else
-					echo '
-							<div class="bar empty"></div>';
+			foreach ($block['call'] as $item)
+			{
 				echo '
-							<span>', isset($item['num']) ? $item['num'] : $item['name'], '</span>
-						</dd>';
-		}
+							<dt>
+								', (isset($item['num']) ? (!empty($item['image']) ? ($item['image'] . ' &nbsp;') : '') . (!empty($item['link']) ? 
+									$item['name'] : 
+									'<a href="' . $scripturl. '?action=profile;u=' . $item['id'] . '">' . $item['name'] . '</a>') : $item['image']), '
+							</dt>
+							<dd class="statsbar', isset($item['num']) ? ' generic_bar righttext' : '', '">';
 
-		echo '
-					</dl>
-			</div>';
+					if (!empty($item['percent']))
+						echo '
+								<div class="bar" style="width: ', $item['percent'], '%;"></div>';
+					else
+						echo '
+								<div class="bar empty"></div>';
+					echo '
+								<span>', isset($item['num']) ? $item['num'] : $item['name'], '</span>
+							</dd>';
+			}
+
+			echo '
+						</dl>
+				</div>';
+		}
 	}
+
+	// Show a nice message with information
+	else
+		echo $txt['Shop_stats_nostats'];
 
 	echo '
 		</div>';
