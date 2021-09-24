@@ -729,6 +729,7 @@ elseif (!defined('SMF'))
 				'name' => 'Shop_credits_count',
 				'type' => 'tinyint',
 				'default' => 1,
+				'not_null' => true,
 			]
 		);
 		$smcFunc['db_add_column'](
@@ -737,6 +738,7 @@ elseif (!defined('SMF'))
 				'name' => 'Shop_credits_topic',
 				'type' => 'int',
 				'default' => 0,
+				'not_null' => true,
 			]
 		);
 		$smcFunc['db_add_column'](
@@ -745,6 +747,7 @@ elseif (!defined('SMF'))
 				'name' => 'Shop_credits_post',
 				'type' => 'int',
 				'default' => 0,
+				'not_null' => true,
 			]
 		);
 		$smcFunc['db_add_column'](
@@ -753,6 +756,7 @@ elseif (!defined('SMF'))
 				'name' => 'Shop_credits_bonus',
 				'type' => 'tinyint',
 				'default' => 0,
+				'not_null' => true,
 			]
 		);
 
@@ -763,6 +767,7 @@ elseif (!defined('SMF'))
 				'name' => 'shopMoney',
 				'type' => 'mediumint',
 				'default' => 0,
+				'not_null' => true,
 			]
 		);
 		// Add a column for banked money
@@ -772,6 +777,7 @@ elseif (!defined('SMF'))
 				'name' => 'shopBank',
 				'type' => 'bigint',
 				'default' => 0,
+				'not_null' => true,
 			]
 		);
 		// Add a column for hide inventory
@@ -781,6 +787,7 @@ elseif (!defined('SMF'))
 				'name' => 'shopInventory_hide',
 				'type' => 'int',
 				'default' => 0,
+				'not_null' => true,
 			]
 		);
 		// Add a column for games pass
@@ -790,6 +797,8 @@ elseif (!defined('SMF'))
 				'name' => 'gamesPass',
 				'type' => 'int',
 				'default' => 0,
+				'unsigned' => true,
+				'not_null' => true,
 			]
 		);
 
