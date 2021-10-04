@@ -73,16 +73,18 @@ class Arcade implements Addons
 	{
 		// Add some hooks by action
 		if (isset($_REQUEST['action']))
+		{
 			switch ($_REQUEST['action'])
 			{
 				case 'admin': 
 					if (isset($_REQUEST['area']) && $_REQUEST['area'] == 'shopsettings')
 						add_integration_function('integrate_shop_addons_settings', __CLASS__ . '::settings', false);
-				break;
+					break;
 				case 'arcade':
 					add_integration_function('integrate_arcade_score', __CLASS__ . '::score', false);
-				break;
+					break;
 			}
+		}
 	}
 
 	/**
@@ -119,14 +121,11 @@ class Arcade implements Addons
 	 */
 	public static function settings(&$settings)
 	{
-		self::$_settings = [
-			['title', 'Shop_integration_arcade'],
-			['desc', 'Shop_integration_arcade_desc', 'label' => sprintf(Shop::getText('integration_settings_desc'), self::$_link, Shop::getText('integration_arcade'))],
-			['int', 'Shop_integration_arcade_score', 'subtext' => Shop::getText('integration_arcade_score_desc')],
-			['int', 'Shop_integration_arcade_personal_best', 'subtext' => Shop::getText('integration_arcade_personal_best_desc')],
-			['int', 'Shop_integration_arcade_new_champion', 'subtext' => Shop::getText('integration_arcade_new_champion_desc')],
-		];
-		$settings = array_merge(self::$_settings, $settings);
+		$settings[] = ['title', 'Shop_integration_arcade'];
+		$settings[] = ['desc', 'Shop_integration_arcade_desc', 'label' => sprintf(Shop::getText('integration_settings_desc'), self::$_link, Shop::getText('integration_arcade'))];
+		$settings[] = ['int', 'Shop_integration_arcade_score', 'subtext' => Shop::getText('integration_arcade_score_desc')];
+		$settings[] = ['int', 'Shop_integration_arcade_personal_best', 'subtext' => Shop::getText('integration_arcade_personal_best_desc')];
+		$settings[] = ['int', 'Shop_integration_arcade_new_champion', 'subtext' => Shop::getText('integration_arcade_new_champion_desc')];
 	}
 
 	/**

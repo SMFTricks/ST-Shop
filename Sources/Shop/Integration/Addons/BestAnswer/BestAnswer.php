@@ -98,16 +98,13 @@ class BestAnswer implements Addons
 	 */
 	public static function settings(&$settings)
 	{
-		self::$_settings = [
-			['title', 'Shop_integration_sycho_best_answer'],
-			['desc', 'Shop_integration_sycho_best_answer_desc', 'label' => sprintf(Shop::getText('integration_settings_desc'), self::$_link, Shop::getText('integration_sycho_best_answer'))],
-			['int', 'Shop_integration_sycho_best_answer_setting', 'subtext' => Shop::getText('integration_sycho_best_answer_setting_desc')],
-		];
-		$settings = array_merge(self::$_settings, $settings);
+		$settings[] = ['title', 'Shop_integration_sycho_best_answer'];
+		$settings[] = ['desc', 'Shop_integration_sycho_best_answer_desc', 'label' => sprintf(Shop::getText('integration_settings_desc'), self::$_link, Shop::getText('integration_sycho_best_answer'))];
+		$settings[] = ['int', 'Shop_integration_sycho_best_answer_setting', 'subtext' => Shop::getText('integration_sycho_best_answer_setting_desc')];
 	}
 
 	/**
-	 * Arcade::mark_best_answer()
+	 * BestAnswer::mark_best_answer()
 	 *
 	 * Gives credits to the best answer
 	 * 
