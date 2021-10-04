@@ -146,7 +146,7 @@ $txt['Shop_inventory_allow_hide_desc'] = 'User will be able to hide their invent
 $txt['Shop_inventory_show_same_once'] = 'Show the same item only once';
 
 // Notifications
-$txt['Shop_settings_notifications'] = 'Notificacions';
+$txt['Shop_settings_notifications'] = 'Notifications';
 $txt['Shop_settings_notifications_desc'] = 'In this area to you activate alerts for the users on certain actions.';
 $txt['Shop_noty_credits'] = 'Notify ' . (!empty($modSettings['Shop_credits_suffix']) ? $modSettings['Shop_credits_suffix'] : 'Credits') . ' received';
 $txt['Shop_noty_credits_desc'] = 'Send an alert when the user received credits or and item as a gift or admin action.';
