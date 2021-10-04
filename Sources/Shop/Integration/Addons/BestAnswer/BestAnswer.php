@@ -32,11 +32,6 @@ class BestAnswer implements Addons
 	private static $_language = false;
 
 	/**
-	 * @var array Store the settings for the arcade
-	 */
-	private static $_settings = [];
-
-	/**
 	 * @var array Log data to prevent duplicate content
 	 */
 	private static $_content;

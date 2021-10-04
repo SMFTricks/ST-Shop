@@ -32,11 +32,6 @@ class SimpleReferrals implements Addons
 	private static $_language = false;
 
 	/**
-	 * @var array Store the settings for the arcade
-	 */
-	private static $_settings = [];
-
-	/**
 	 * Addons::integration()
 	 *
 	 * Loads the essentials of the integration for this addon

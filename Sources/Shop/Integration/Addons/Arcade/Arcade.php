@@ -33,11 +33,6 @@ class Arcade implements Addons
 	private static $_language = false;
 
 	/**
-	 * @var array Store the settings for the arcade
-	 */
-	private static $_settings = [];
-
-	/**
 	 * @var int Store the total credits the user will get
 	 */
 	private static $_credits = 0;
