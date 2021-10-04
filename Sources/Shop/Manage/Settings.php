@@ -19,11 +19,6 @@ if (!defined('SMF'))
 class Settings extends Dashboard
 {
 	/**
-	 * @var array Settings that are shop related only.
-	 */
-	var $_shop_vars = [];
-
-	/**
 	 * Settings::__construct()
 	 *
 	 * Create the array of subactions and load necessary extra language files
@@ -76,16 +71,15 @@ class Settings extends Dashboard
 		
 		// Shop enabled? Show more options
 		if (!empty($modSettings['Shop_enable_shop']))
-			$this->_shop_vars = [
-				['check', 'Shop_enable_games'],
-				['check', 'Shop_enable_bank'],
-				['check', 'Shop_enable_gift'],
-				['check', 'Shop_enable_trade'],
-				['check', 'Shop_enable_stats'],
-				'',
-				['check', 'Shop_enable_maintenance', 'subtext' => Shop::getText('enable_maintenance_desc')]
-			];
-		$config_vars = array_merge($config_vars, $this->_shop_vars);
+		{
+			$config_vars[] = ['check', 'Shop_enable_games'];
+			$config_vars[] = ['check', 'Shop_enable_bank'];
+			$config_vars[] = ['check', 'Shop_enable_gift'];
+			$config_vars[] = ['check', 'Shop_enable_trade'];
+			$config_vars[] = ['check', 'Shop_enable_stats'];
+			$config_vars[] = '';
+			$config_vars[] = ['check', 'Shop_enable_maintenance', 'subtext' => Shop::getText('enable_maintenance_desc')];
+		}
 
 		Database::Save($config_vars, $return_config, 'general');
 	}
@@ -98,6 +92,8 @@ class Settings extends Dashboard
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = Shop::getText('tab_settings'). ' - ' . Shop::getText('settings_credits');
 		$context[$context['admin_menu_name']]['tab_data']['title'] = $context['page_title'];
+
+		// Credits settings
 		$config_vars = [
 			['text', 'Shop_credits_prefix', 'subtext' => Shop::getText('credits_prefix_desc')],
 			['text', 'Shop_credits_suffix', 'subtext' => Shop::getText('credits_suffix_desc')],
@@ -114,24 +110,22 @@ class Settings extends Dashboard
 
 		// Shop enabled? Show more options
 		if (!empty($modSettings['Shop_enable_shop']))
-			$this->_shop_vars = [
-				['title', 'Shop_bank_settings', 'disabled' => empty($modSettings['Shop_enable_bank'])],
-				['float', 'Shop_bank_interest', 'subtext' => Shop::getText('bank_interest_desc'), 'min' => '', 'disabled' => empty($modSettings['Shop_enable_bank'])],
-				['check', 'Shop_bank_interest_yesterday', 'subtext' => Shop::getText('bank_interest_yesterday_desc'), 'disabled' => empty($modSettings['Shop_enable_bank'])],
-				['int', 'Shop_bank_withdrawal_fee', 'disabled' => empty($modSettings['Shop_enable_bank'])],
-				['int', 'Shop_bank_deposit_fee', 'disabled' => empty($modSettings['Shop_enable_bank'])],
-				['int', 'Shop_bank_withdrawal_min', 'subtext' => Shop::getText('bank_max_min_desc'), 'disabled' => empty($modSettings['Shop_enable_bank'])],
-				['int', 'Shop_bank_withdrawal_max', 'subtext' => Shop::getText('bank_max_min_desc'), 'disabled' => empty($modSettings['Shop_enable_bank'])],
-				['int', 'Shop_bank_deposit_min', 'subtext' => Shop::getText('bank_max_min_desc'), 'disabled' => empty($modSettings['Shop_enable_bank'])],
-				['int', 'Shop_bank_deposit_max', 'subtext' => Shop::getText('bank_max_min_desc'), 'disabled' => empty($modSettings['Shop_enable_bank'])],
-				['title', 'Shop_credits_general_settings'],
-				['float', 'Shop_items_trade_fee', 'subtext' => Shop::getText('items_trade_fee_desc'), 'disabled' => empty($modSettings['Shop_enable_stats'])],
-				['text', 'Shop_images_width'],
-				['text', 'Shop_images_height'],
-				['int', 'Shop_items_perpage', 'subtext' => Shop::getText('items_perpage_desc')],
-				
-			];
-		$config_vars = array_merge($config_vars, $this->_shop_vars);
+		{
+			$config_vars[] = ['title', 'Shop_bank_settings', 'disabled' => empty($modSettings['Shop_enable_bank'])];
+			$config_vars[] = ['float', 'Shop_bank_interest', 'subtext' => Shop::getText('bank_interest_desc'), 'min' => '', 'disabled' => empty($modSettings['Shop_enable_bank'])];
+			$config_vars[] = ['check', 'Shop_bank_interest_yesterday', 'subtext' => Shop::getText('bank_interest_yesterday_desc'), 'disabled' => empty($modSettings['Shop_enable_bank'])];
+			$config_vars[] = ['int', 'Shop_bank_withdrawal_fee', 'disabled' => empty($modSettings['Shop_enable_bank'])];
+			$config_vars[] = ['int', 'Shop_bank_deposit_fee', 'disabled' => empty($modSettings['Shop_enable_bank'])];
+			$config_vars[] = ['int', 'Shop_bank_withdrawal_min', 'subtext' => Shop::getText('bank_max_min_desc'), 'disabled' => empty($modSettings['Shop_enable_bank'])];
+			$config_vars[] = ['int', 'Shop_bank_withdrawal_max', 'subtext' => Shop::getText('bank_max_min_desc'), 'disabled' => empty($modSettings['Shop_enable_bank'])];
+			$config_vars[] = ['int', 'Shop_bank_deposit_min', 'subtext' => Shop::getText('bank_max_min_desc'), 'disabled' => empty($modSettings['Shop_enable_bank'])];
+			$config_vars[] = ['int', 'Shop_bank_deposit_max', 'subtext' => Shop::getText('bank_max_min_desc'), 'disabled' => empty($modSettings['Shop_enable_bank'])];
+			$config_vars[] = ['title', 'Shop_credits_general_settings'];
+			$config_vars[] = ['float', 'Shop_items_trade_fee', 'subtext' => Shop::getText('items_trade_fee_desc'), 'disabled' => empty($modSettings['Shop_enable_stats'])];
+			$config_vars[] = ['text', 'Shop_images_width'];
+			$config_vars[] = ['text', 'Shop_images_height'];
+			$config_vars[] = ['int', 'Shop_items_perpage', 'subtext' => Shop::getText('items_perpage_desc')];
+		}
 
 		Database::Save($config_vars, $return_config, 'credits');
 	}
@@ -219,51 +213,50 @@ class Settings extends Dashboard
 
 		// Shop enabled? Show more options
 		if (!empty($modSettings['Shop_enable_shop']))
-			$this->_shop_vars = [
-				['select', 'Shop_display_bank',
-					[
-						Shop::getText('items_none_select'),
-						Shop::getText('display_post'),
-						Shop::getText('display_profile'),
-						Shop::getText('display_both')
-					],
+		{
+			$config_vars[] = ['select', 'Shop_display_bank',
+				[
+					Shop::getText('items_none_select'),
+					Shop::getText('display_post'),
+					Shop::getText('display_profile'),
+					Shop::getText('display_both')
 				],
-				['select', 'Shop_display_bank_placement',
-					[
-						Shop::getText('custom_profile_placement_standard', false),
-						Shop::getText('custom_profile_placement_icons', false),
-						Shop::getText('custom_profile_placement_above_signature', false),
-						Shop::getText('custom_profile_placement_below_signature', false),
-						Shop::getText('custom_profile_placement_below_avatar', false),
-						Shop::getText('custom_profile_placement_above_member', false),
-						Shop::getText('custom_profile_placement_bottom_poster', false),
-					],
-				],
-				'',
-				['select', 'Shop_inventory_enable',
-					[
-						Shop::getText('items_none_select'),
-						Shop::getText('display_post'),
-						Shop::getText('display_profile'),
-						Shop::getText('display_both')
-					],
-				],
-				['check', 'Shop_inventory_show_same_once'],
-				['int', 'Shop_inventory_items_num'],
-				['select', 'Shop_inventory_placement',
-					[
-						Shop::getText('custom_profile_placement_standard', false),
-						Shop::getText('custom_profile_placement_icons', false),
-						Shop::getText('custom_profile_placement_above_signature', false),
-						Shop::getText('custom_profile_placement_below_signature', false),
-						Shop::getText('custom_profile_placement_below_avatar', false),
-						Shop::getText('custom_profile_placement_above_member', false),
-						Shop::getText('custom_profile_placement_bottom_poster', false),
-					],
-				],
-				['check', 'Shop_inventory_allow_hide', 'subtext' => Shop::getText('inventory_allow_hide_desc')],
 			];
-		$config_vars = array_merge($config_vars, $this->_shop_vars);
+			$config_vars[] = ['select', 'Shop_display_bank_placement',
+				[
+					Shop::getText('custom_profile_placement_standard', false),
+					Shop::getText('custom_profile_placement_icons', false),
+					Shop::getText('custom_profile_placement_above_signature', false),
+					Shop::getText('custom_profile_placement_below_signature', false),
+					Shop::getText('custom_profile_placement_below_avatar', false),
+					Shop::getText('custom_profile_placement_above_member', false),
+					Shop::getText('custom_profile_placement_bottom_poster', false),
+				],
+			];
+			$config_vars[] = '';
+			$config_vars[] = ['select', 'Shop_inventory_enable',
+				[
+					Shop::getText('items_none_select'),
+					Shop::getText('display_post'),
+					Shop::getText('display_profile'),
+					Shop::getText('display_both')
+				],
+			];
+			$config_vars[] = ['check', 'Shop_inventory_show_same_once'];
+			$config_vars[] = ['int', 'Shop_inventory_items_num'];
+			$config_vars[] = ['select', 'Shop_inventory_placement',
+				[
+					Shop::getText('custom_profile_placement_standard', false),
+					Shop::getText('custom_profile_placement_icons', false),
+					Shop::getText('custom_profile_placement_above_signature', false),
+					Shop::getText('custom_profile_placement_below_signature', false),
+					Shop::getText('custom_profile_placement_below_avatar', false),
+					Shop::getText('custom_profile_placement_above_member', false),
+					Shop::getText('custom_profile_placement_bottom_poster', false),
+				],
+			];
+			$config_vars[] = ['check', 'Shop_inventory_allow_hide', 'subtext' => Shop::getText('inventory_allow_hide_desc')];
+		}
 
 		Database::Save($config_vars, $return_config, 'profile');
 	}
@@ -283,11 +276,10 @@ class Settings extends Dashboard
 		
 		// Shop enabled? Show more options
 		if (!empty($modSettings['Shop_enable_shop']))
-			$this->_shop_vars = [
-				['check', 'Shop_noty_items', 'subtext' => Shop::getText('noty_items_desc')],
-				['check', 'Shop_noty_trade', 'subtext' => Shop::getText('noty_trade_desc')],
-			];
-		$config_vars = array_merge($config_vars, $this->_shop_vars);
+		{
+			$config_vars[] = ['check', 'Shop_noty_items', 'subtext' => Shop::getText('noty_items_desc')];
+			$config_vars[] = ['check', 'Shop_noty_trade', 'subtext' => Shop::getText('noty_trade_desc')];
+		}
 
 		Database::Save($config_vars, $return_config, 'notifications');
 	}
