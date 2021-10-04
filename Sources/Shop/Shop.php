@@ -233,10 +233,15 @@ class Shop
 		// Class
 		$class = __NAMESPACE__ . '\Integration\Addons\\';
 
-		// load the hooks for these addons
+		// Sort
+		sort($addons);
+
+		// Load the hooks for these addons
 		foreach ($addons as $addon)
+		{
 			if (is_callable($class . $addon . '\\'. $addon, 'integration'))
 				add_integration_function('integrate_pre_load_theme', $class . $addon . '\\'. $addon .'::integration', false);
+		}
 	}
 
 	/**
