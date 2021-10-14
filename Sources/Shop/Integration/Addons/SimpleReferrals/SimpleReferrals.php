@@ -63,7 +63,7 @@ class SimpleReferrals implements Addons
 						add_integration_function('integrate_shop_addons_settings', __CLASS__ . '::settings', false);
 					break;
 				case 'signup2':
-					add_integration_function('integrate_mod_simplereferrals', __CLASS__ . '::referral', false);
+					add_integration_function('integrate_register_after', __CLASS__ . '::referral', false);
 					break;
 			}
 		}
@@ -105,15 +105,15 @@ class SimpleReferrals implements Addons
 	 * Gives credits to the referral for a new member referred to the forum
 	 * 
 	 */
-	public static function referral($id_user)
+	public static function referral($regOptions)
 	{
 		global $modSettings;
 
 		// Give credits for referring a new user to the forum
-		if (!empty($modSettings['Shop_integration_simple_referrals_setting']) && !empty($id_user))
+		if (!empty($modSettings['Shop_integration_simple_referrals_setting']) && !empty($regOptions['register_vars']['referral']))
 		{
 			// Update the credits
-			Database::Update('members', ['user' => $id_user, 'credits' => $modSettings['Shop_integration_simple_referrals_setting']], 'shopMoney = shopMoney + {int:credits}', 'WHERE id_member = {int:user}');
+			Database::Update('members', ['user' => $regOptions['register_vars']['referral'], 'credits' => $modSettings['Shop_integration_simple_referrals_setting']], 'shopMoney = shopMoney + {int:credits}', 'WHERE id_member = {int:user}');
 		}
 	}
 }
