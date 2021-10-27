@@ -67,16 +67,16 @@ function template_shop_inventory($inventory, $title = true)
 	if (empty($inventory))
 		return;
 
-	$disp = !empty($title) ? '<strong>' . $txt['Shop_posting_inventory'] . '</strong>:<br />' : '<br />';
+	$display_items = !empty($title) ? '<strong>' . $txt['Shop_posting_inventory'] . '</strong>:<br />' : '<br />';
 
 	// Format items
 	foreach($inventory as $item)
-		$disp .= Format::image($item['image'], $item['description']);
+		$display_items .= Format::image($item['image'], $item['description']);
 
 	// Show more
-	$disp .= '<br /><a href="'. $scripturl. '?action=shop;sa=invdisp;id='. $inventory[0]['userid']. '" onclick="return reqOverlayDiv(this.href, \''. $txt['Shop_posting_inventory']. '\', \'/icons/shop/top_inventories.png\');">'. $txt['Shop_posting_inventory_all']. '</a>';
+	$display_items .= '<br /><a href="'. $scripturl. '?action=shop;sa=invdisp;id='. $inventory[0]['userid']. '" onclick="return reqOverlayDiv(this.href, \''. $txt['Shop_posting_inventory']. '\', \'/icons/shop/top_inventories.png\');">'. $txt['Shop_posting_inventory_all']. '</a>';
 
-	return $disp;
+	return $display_items;
 }
 
 function template_shop_inventory_extended()
@@ -97,8 +97,11 @@ function template_shop_inventory_extended()
 			<div class="windowbg">';
 
 		// List the items...
-		foreach($context['inventory_list'] as $item)
-			echo Format::image($item['image'], $item['description']);
+		if (!empty($context['inventory_list']))
+			foreach($context['inventory_list'] as $item)
+				echo Format::image($item['image'], $item['description']);
+		else
+			echo $txt['Shop_inventory_other_no_items'];
 
 		echo '
 				<br class="clear">
