@@ -560,7 +560,7 @@ function template_stats()
 						<img class="centericon" src="', $settings['default_images_url'], '/icons/shop/', $stat, '.png" alt="" /> ', $txt['Shop_stats_' . $stat], '
 					</h4>
 				</div>
-					<dl class="stats" style="padding: 5px; display: flex;">';
+					<dl class="stats" style="padding: 5px; display: flex; flex-wrap: wrap;">';
 
 		foreach ($block['call'] as $item)
 		{
@@ -608,5 +608,11 @@ function template_shop_below()
 	if (!empty($modSettings['Shop_enable_shop']) && !empty($modSettings['Shop_enable_maintenance']) && allowedTo('shop_canAccess') && !allowedTo('shop_canManage'))
 		return false;
 
-	echo $context['shop']['copyright'];
+	echo '
+		<br />
+		<div style="text-align: center;">
+			<span class="smalltext">
+				', $context['shop']['copyright'], '
+			</span>
+		</div>';
 }

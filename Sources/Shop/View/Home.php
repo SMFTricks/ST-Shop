@@ -234,12 +234,6 @@ class Home
 	 */
 	public function copyright()
 	{
-		return '
-			<br />
-			<div style="text-align: center;">
-				<span class="smalltext">
-					Powered by <a href="https://smftricks.com" target="_blank" rel="noopener">ST Shop</a>
-				</span>
-			</div>';
+		return ' Powered by <a href="https://smftricks.com" target="_blank" rel="noopener">ST Shop</a>';
 	}
 }
