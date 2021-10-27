@@ -179,11 +179,11 @@ class User
 			];
 
 		// Inventory
-		if (empty($this->_profile['shopInventory_hide']) && !empty($modSettings['Shop_inventory_enable']) && !empty($modSettings['Shop_enable_shop']) && !empty($topic) && allowedTo('shop_viewInventory'))
+		if (empty($this->_profile['shopInventory_hide']) && !empty($modSettings['Shop_inventory_enable']) && !empty($modSettings['Shop_enable_shop']) && !empty($topic) && allowedTo('shop_viewInventory') && !empty($user_field_inventory = $this->_inventory->display($user)))
 			$data['custom_fields']['shop_inventory'] = [
 				'title' => Shop::getText('posting_inventory'),
 				'col_name' => 'Shop_inventory',
-				'value' => template_shop_inventory($this->_inventory->display($user), false),
+				'value' => template_shop_inventory($user_field_inventory, false),
 				'placement' => $modSettings['Shop_inventory_placement'],
 			];
 	}
