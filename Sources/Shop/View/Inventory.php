@@ -619,7 +619,7 @@ class Inventory
 
 	public function display($memID)
 	{
-		global $modSettings, $context;
+		global $modSettings;
 
 		// Allowed to see inventories?
 		if (!allowedTo('shop_viewInventory'))
