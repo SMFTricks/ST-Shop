@@ -243,7 +243,7 @@ class Dashboard
 		$context['Shop']['credits'] = $this->credits();
 
 		// Load the currrent version for this mod
-		loadJavaScriptFile('https://smftricks.com/assets/version/Shop/version.js', ['external' => true]);
+		loadJavaScriptFile('https://smftricks.com/assets/version/Shop/version.js', ['external' => true, 'defer' =>true]);
 
 		// Feed news
 		addInlineJavascript('
