@@ -370,6 +370,9 @@ class Shop
 			$temp_buttons[$k] = $v;
 		}
 		$buttons = $temp_buttons;
+
+		// Add the prefix permission to the admin button
+		$buttons['admin']['show'] = $buttons['admin']['show']  || allowedTo('shop_canManage');
 	}
 
 	/**
