@@ -282,10 +282,9 @@ class Profile
 	 * Add our specific alerts to the profile so user can enable/disable them
 	 * 
 	 * @param array $alert_types An array containing the types or groups each alert belongs to
-	 * @param array $group_options Additional options for group
 	 * @return void
 	 */
-	public function alert_types(&$alert_types, &$group_options)
+	public function alert_types(&$alert_types)
 	{
 		global $modSettings;
 
@@ -297,6 +296,6 @@ class Profile
 			$alert_types['shop']['shop_useritems'] = ['alert' => 'yes', 'email' => 'never'];
 		// Trades
 		if (!empty($modSettings['Shop_noty_trade']) && !empty($modSettings['Shop_enable_trade']) && !empty($modSettings['Shop_enable_shop']))
-			$alert_types['shop']{'shop_usertraded'} = ['alert' => 'yes', 'email' => 'never'];
+			$alert_types['shop']['shop_usertraded'] = ['alert' => 'yes', 'email' => 'never'];
 	}
 }
