@@ -57,7 +57,7 @@ class User
 	 *
 	 * Helper to load the inventory template
 	 */
-	public function template()
+	public static function template()
 	{
 		// Load template
 		loadTemplate('Shop/Inventory');

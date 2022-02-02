@@ -12,9 +12,7 @@ namespace Shop\Manage;
 
 use Shop\Shop;
 use Shop\Helper\Database;
-use Shop\Helper\Delete;
 use Shop\Helper\Format;
-use Shop\Helper\Images;
 
 if (!defined('SMF'))
 	die('No direct access...');
