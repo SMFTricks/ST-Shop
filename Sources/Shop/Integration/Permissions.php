@@ -81,7 +81,7 @@ class Permissions
 	 * Loads the admin language file for the help popups in the permissions page
 	 * 
 	 */
-	public function language()
+	public static function language()
 	{
 		loadLanguage('Shop/ShopAdmin');
 	}
