@@ -226,10 +226,8 @@ class Home
 	}
 
 	/**
-	 * Shop::copyright()
+	 * Home::copyright()
 	 *
-	 * Used in the credits action.
-	 * @param boolean $return decide between returning a string or append it to a known context var.
 	 * @return string A link for copyright notice
 	 */
 	public function copyright()
