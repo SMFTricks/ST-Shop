@@ -52,7 +52,7 @@ class Permissions
 		// Shop permissions
 		$permissionGroups['membergroup'][] = 'shop';
 		foreach ($this->shop_permissions as $p)
-			$permissionList['membergroup'][$p] = [false,'shop'];
+			$permissionList['membergroup'][$p] = [false, 'shop'];
 
 		// Shop disabled? No permissions then
 		if (empty($modSettings['Shop_enable_shop']))
