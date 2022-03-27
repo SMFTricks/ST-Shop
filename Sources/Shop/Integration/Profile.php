@@ -39,9 +39,6 @@ class Profile
 
 		// Load language just in case
 		loadLanguage('Shop/Shop');
-
-		// Load more hooks yea
-		$this->integrate();
 	}
 
 	 /**
@@ -117,6 +114,9 @@ class Profile
 			$temp_buttons[$k] = $v;
 		}
 		$profile_areas['profile_action']['areas'] = $temp_buttons;
+
+		// Load more hooks yea
+		$this->integrate();
 	}
 
 	 /**
@@ -128,9 +128,9 @@ class Profile
 	public function integrate()
 	{
 		// More profile stuff
-		add_integration_function('integrate_load_profile_fields', __CLASS__ . '::load_profile_fields#', false);
-		add_integration_function('integrate_setup_profile_context', __CLASS__ . '::setup_profile_context#', false);
-		add_integration_function('integrate_alert_types', __CLASS__ . '::alert_types#', false);
+		add_integration_function('integrate_load_profile_fields', __CLASS__ . '::load_profile_fields', false);
+		add_integration_function('integrate_setup_profile_context', __CLASS__ . '::setup_profile_context', false);
+		add_integration_function('integrate_alert_types', __CLASS__ . '::alert_types', false);
 		add_integration_function('integrate_load_custom_profile_fields', __CLASS__ . '::custom_profile_fields#', false);
 	}
 
@@ -142,7 +142,7 @@ class Profile
 	 * @param array $profile_fields An array containing the profile fields and inputs
 	 * @return void
 	 */
-	public function load_profile_fields(&$profile_fields)
+	public static function load_profile_fields(&$profile_fields)
 	{
 		global $modSettings;
 
@@ -200,7 +200,7 @@ class Profile
 	 * @param array $fields An array containing the profile fields that are actually loaded
 	 * @return void
 	 */
-	public function setup_profile_context(&$fields)
+	public static function setup_profile_context(&$fields)
 	{
 		global $modSettings;
 
@@ -284,7 +284,7 @@ class Profile
 	 * @param array $alert_types An array containing the types or groups each alert belongs to
 	 * @return void
 	 */
-	public function alert_types(&$alert_types)
+	public static function alert_types(&$alert_types)
 	{
 		global $modSettings;
 

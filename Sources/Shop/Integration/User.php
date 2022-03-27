@@ -124,7 +124,6 @@ class User
 	{
 		global $context, $user_info;
 
-		if (!empty($user_info))
 			if (!$context['user']['is_guest'])
 			{
 				$context['user']['shopMoney'] = $user_info['shopMoney'];

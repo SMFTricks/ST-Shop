@@ -204,7 +204,7 @@ class Categories extends Dashboard
 
 	public function set_cat()
 	{
-		global $context, $boardurl, $txt, $item_info, $scripturl;
+		global $context, $boardurl;
 
 		// Template...
 		loadTemplate('Shop/ShopAdmin');
