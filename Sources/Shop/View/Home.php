@@ -164,6 +164,7 @@ class Home
 			'url' => $scripturl . '?action=shop',
 			'name' => Shop::getText('main_button'),
 		];
+		$context['template_layers'][] = 'shop';
 
 		// What if the Shop is disabled? User shouldn't be able to access the Shop
 		if (empty($modSettings['Shop_enable_shop']))
