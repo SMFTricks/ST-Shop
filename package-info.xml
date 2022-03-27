@@ -18,11 +18,11 @@
 		</license>
 		<!-- Templates and Languages -->
 		<require-dir name="Themes" destination="$boarddir">Theme files</require-dir>
-		<!-- Item Modules and Images -->
+		<!-- Item Images -->
 		<require-dir name="shop_items" destination="$boarddir">Shop items and modules</require-dir>		
 		<!-- Shop Files -->
 		<require-dir name="Sources" destination="$boarddir">Source files</require-dir>
-		<!-- Database and Hooks -->
+		<!-- Database -->
 		<database>install.php</database>
 		<!-- Hooks -->
 		<hook hook="integrate_pre_load" function="Shop\Shop::initialize" file="$sourcedir/Shop/Shop.php" />
