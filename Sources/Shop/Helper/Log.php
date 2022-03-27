@@ -205,7 +205,7 @@ class Log
 		], $this->_buy);
 	}
 
-	public function bank($userid, $amount, $trans, $fee = 0, $type)
+	public function bank($userid, $amount, $trans, $fee = 0, $type = 'deposit')
 	{
 		// Move forward with the transaction
 		Database::Update('members', ['user' => $userid, 'amount' => $amount, 'fee' => $fee], 'shopMoney = shopMoney '. ($trans == 'deposit' ? '-' : '+') .' {int:amount}' .(!empty($fee) && empty($type) ? ' - {int:fee}' : '') . ', shopBank = shopBank '. ($trans == 'withdrawal' ? '-' : '+') .' {int:amount}' .(!empty($fee) && !empty($type) ? ' - {int:fee}' : '') . ',', 'WHERE id_member = {int:user}');
