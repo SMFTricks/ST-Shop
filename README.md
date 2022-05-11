@@ -37,10 +37,9 @@ ST Shop allows you to add a shop to your forum and gives you a wide variety of o
 
 ### Localization
 - ![English](https://www.simplemachines.org/site_images/lang/english.gif) English
-
-### More Modules
-* You can find some official modules in the [ST Shop Modules](https://github.com/SMFTricks/ST-Shop-Modules) repository.
 ---
 ### [Changelog](https://github.com/SMFTricks/ST-Shop/blob/master/CHANGELOG.md)
 ### [GitHub](https://github.com/SMFTricks/ST-Shop)
-### [Modules Discussion](https://smftricks.com/index.php?board=109.0)
+---
+### [ST Shop Modules](https://github.com/SMFTricks/ST-Shop-Modules)
+### [Modules and Addons Discussion](https://smftricks.com/index.php?board=109.0)
