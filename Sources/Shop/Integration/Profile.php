@@ -271,7 +271,7 @@ class Profile
 			$context['custom_fields']['shop_inventory'] = [
 				'name' => Shop::getText('posting_inventory'),
 				'colname' => 'Shop_inventory',
-				'output_html' => template_shop_inventory($this->_inventory->display($context['member']['id'])),
+				'output_html' => template_shop_inventory($this->_inventory->display($memID), $memID),
 				'placement' => 2,
 			];
 	}

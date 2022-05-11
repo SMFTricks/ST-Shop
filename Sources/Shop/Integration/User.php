@@ -182,7 +182,7 @@ class User
 			$data['custom_fields']['shop_inventory'] = [
 				'title' => Shop::getText('posting_inventory'),
 				'col_name' => 'Shop_inventory',
-				'value' => template_shop_inventory($user_field_inventory, false),
+				'value' => template_shop_inventory($user_field_inventory, $user, false),
 				'placement' => $modSettings['Shop_inventory_placement'],
 			];
 	}
