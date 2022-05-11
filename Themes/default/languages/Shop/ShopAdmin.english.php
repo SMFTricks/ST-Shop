@@ -159,6 +159,7 @@ $txt['Shop_noty_items_desc'] = 'Send an alert when another user robs credits fro
 // Admin Items
 $txt['Shop_tab_items'] = 'Shop Items';
 $txt['Shop_tab_items_desc'] = 'In this section you can browse all the items added to the shop, edit them and add new items.';
+$txt['Shop_items_list'] = 'Items list';
 $txt['Shop_items_add'] = 'Add item';
 $txt['Shop_items_add_desc'] = 'Here you can specify either use a premade item (module) or to use the default non-usable item.';
 $txt['Shop_items_add_desc2'] = 'You are adding the item \'%s\' to your shop.';
@@ -197,6 +198,7 @@ $txt['Shop_item_uncategorized'] = 'Uncategorized';
 // Modules
 $txt['Shop_tab_modules'] = 'Modules';
 $txt['Shop_tab_modules_desc'] = 'Here you can check all the shop modules (special items) available that were pre-included or uploaded.';
+$txt['Shop_modules_list'] = 'Modules list';
 $txt['Shop_modules_upload'] = 'Upload modules';
 $txt['Shop_modules_upload_desc'] = 'In this section you can easily upload new modules to your shop item modules folder.';
 $txt['Shop_modules_delete'] = 'Delete modules';
@@ -212,8 +214,9 @@ $txt['Shop_module_cant_instance'] = 'The file uploaded is not adecuate or it\'s 
 $txt['Shop_module_delete_also'] = 'Deleting these modules will convert every item using them to regular items. It will also delete the module from the database and the file from the server.';
 
 // Admin Categories
-$txt['Shop_tab_cats'] = 'Categories';
+$txt['Shop_tab_cats'] = 'Shop Categories';
 $txt['Shop_tab_cats_desc'] = 'In this section you can find all the created categories, and also edit them an add new categories.';
+$txt['Shop_cats_list'] = 'Categories list';
 $txt['Shop_no_cats'] = 'No categories added yet';
 $txt['Shop_cats_add'] = 'Add category';
 $txt['Shop_cats_add_desc'] = 'You are adding a new category. Here you can specify the name, image and description for the new category.';
