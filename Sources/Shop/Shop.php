@@ -49,7 +49,7 @@ class Shop
 	public static function initialize()
 	{
 		// Version and paths
-		self::$version = '4.1.10';
+		self::$version = '4.1.11';
 		self::$addonsdir = '/Shop/Integration/Addons/';
 		self::$itemsdir = '/shop_items/items/';
 		self::$modulesdir = '/Shop/Modules/';
@@ -216,6 +216,7 @@ class Shop
 		foreach ($hooks as $point => $callable)
 			add_integration_function('integrate_' . $point, __CLASS__ . '::' . $callable, false);
 	}
+
 	/**
 	 * Shop::addonHooks()
 	 * 
@@ -269,44 +270,47 @@ class Shop
 
 		// Feed
 		$actions['shopfeed'] = [false, __CLASS__ . '::getFeed'];
-		
+
+		// Need to be somewhere
+		if (!isset($_REQUEST['action']) || empty($_REQUEST['action']))
+			return;
+
 		// Add some hooks by action
-		if (isset($_REQUEST['action']))
-			switch ($_REQUEST['action'])
-			{
-				// I can simple load the language file, but...
-				// I'll load this hook just to flex on using yet another hook
-				case 'helpadmin':
-					add_integration_function('integrate_helpadmin', __NAMESPACE__ . '\Integration\Permissions::language', false);
-					break;
-				// Shop Admin
-				case 'admin':
-					add_integration_function('integrate_admin_areas', __NAMESPACE__ . '\Manage\Dashboard::hookAreas#', false);
-					break;
-				// Give points/credits on posting
-				case 'post':
-				case 'post2':
-					add_integration_function('integrate_after_create_post', __NAMESPACE__ . '\Integration\Posting::after_create_post#', false);
-					break;
-				// Who actions
-				case 'who':
-					add_integration_function('who_allowed', __NAMESPACE__ . '\Integration\Who::who_allowed#', false);
-					add_integration_function('whos_online_after', __NAMESPACE__ . '\Integration\Who::whos_online_after#', false);
-					break;
-				// Profile
-				case 'profile':
-					add_integration_function('integrate_pre_profile_areas', __NAMESPACE__ . '\Integration\Profile::hookAreas#', false);
-					break;
-				// Register
-				case 'signup':
-				case 'signup2':
-					add_integration_function('integrate_register', __NAMESPACE__ . '\Integration\Signup::register', false);
-					break;
-				// Likes
-				case 'likes':
-					add_integration_function('integrate_issue_like_before', __NAMESPACE__ . '\Integration\Likes::likePost#', false);
-					break;
-			}
+		switch ($_REQUEST['action'])
+		{
+			// I can simple load the language file, but...
+			// I'll load this hook just to flex on using yet another hook
+			case 'helpadmin':
+				add_integration_function('integrate_helpadmin', __NAMESPACE__ . '\Integration\Permissions::language', false);
+				break;
+			// Shop Admin
+			case 'admin':
+				add_integration_function('integrate_admin_areas', __NAMESPACE__ . '\Manage\Dashboard::hookAreas#', false);
+				break;
+			// Give points/credits on posting
+			case 'post':
+			case 'post2':
+				add_integration_function('integrate_after_create_post', __NAMESPACE__ . '\Integration\Posting::after_create_post#', false);
+				break;
+			// Who actions
+			case 'who':
+				add_integration_function('who_allowed', __NAMESPACE__ . '\Integration\Who::who_allowed#', false);
+				add_integration_function('whos_online_after', __NAMESPACE__ . '\Integration\Who::whos_online_after#', false);
+				break;
+			// Profile
+			case 'profile':
+				add_integration_function('integrate_pre_profile_areas', __NAMESPACE__ . '\Integration\Profile::hookAreas#', false);
+				break;
+			// Register
+			case 'signup':
+			case 'signup2':
+				add_integration_function('integrate_register', __NAMESPACE__ . '\Integration\Signup::register', false);
+				break;
+			// Likes
+			case 'likes':
+				add_integration_function('integrate_issue_like_before', __NAMESPACE__ . '\Integration\Likes::likePost#', false);
+				break;
+		}
 	}
 
 	/**
@@ -338,16 +342,10 @@ class Shop
 	 */
 	public static function hookButtons(&$buttons)
 	{
-		global $context, $scripturl, $modSettings, $settings;
+		global $scripturl, $modSettings;
 
-		// Too lazy for adding the menu on all the sub-templates
-		if (!empty($modSettings['Shop_enable_shop']))
-		{
-			self::ShopLayer();
-
-			// Languages
-			loadLanguage(__NAMESPACE__ . '/Shop');
-		}
+		// Languages
+		loadLanguage(__NAMESPACE__ . '/Shop');
 
 		$before = 'mlist';
 		$temp_buttons = [];
@@ -370,29 +368,9 @@ class Shop
 			$temp_buttons[$k] = $v;
 		}
 		$buttons = $temp_buttons;
-	}
 
-	/**
-	 * Shop::ShopLayer()
-	 *
-	 * Used for adding the shop tabs quickly
-	 * @return void
-	 */
-	public static function ShopLayer()
-	{
-		global $context;
-
-		if (isset($context['current_action']) && $context['current_action'] === 'shop' && (allowedTo('shop_canAccess') || allowedTo('shop_canManage'))) {
-			$position = array_search('body', $context['template_layers']);
-			if ($position === false)
-				$position = array_search('main', $context['template_layers']);
-
-			if ($position !== false) {
-				$before = array_slice($context['template_layers'], 0, $position + 1);
-				$after = array_slice($context['template_layers'], $position + 1);
-				$context['template_layers'] = array_merge($before, ['shop'], $after);
-			}
-		}
+		// Add the prefix permission to the admin button
+		$buttons['admin']['show'] = $buttons['admin']['show']  || allowedTo('shop_canManage');
 	}
 
 	/**

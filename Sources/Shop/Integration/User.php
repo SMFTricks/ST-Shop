@@ -57,7 +57,7 @@ class User
 	 *
 	 * Helper to load the inventory template
 	 */
-	public function template()
+	public static function template()
 	{
 		// Load template
 		loadTemplate('Shop/Inventory');
@@ -124,7 +124,6 @@ class User
 	{
 		global $context, $user_info;
 
-		if (!empty($user_info))
 			if (!$context['user']['is_guest'])
 			{
 				$context['user']['shopMoney'] = $user_info['shopMoney'];
@@ -183,7 +182,7 @@ class User
 			$data['custom_fields']['shop_inventory'] = [
 				'title' => Shop::getText('posting_inventory'),
 				'col_name' => 'Shop_inventory',
-				'value' => template_shop_inventory($user_field_inventory, false),
+				'value' => template_shop_inventory($user_field_inventory, $user, false),
 				'placement' => $modSettings['Shop_inventory_placement'],
 			];
 	}
@@ -208,7 +207,7 @@ class User
 				if (!empty($alert['extra']['language']))
 					loadLanguage('Shop/' . $alert['extra']['language']);
 
-				$alerts[$alert_id]['icon'] = '<img' .(empty($alert['extra']['use_item']) ? '' : ' style="width:16px; height:16px"') . ' class="alert_icon" src="' . (empty($alert['extra']['use_item']) ? $settings['images_url'] : $boardurl . Shop::$itemsdir) . (!empty($alert['extra']['item_icon']) ? ((empty($alert['extra']['use_item']) ? '/icons/shop/' : '') . $alert['extra']['item_icon']) : $alert['content_type']) . (empty($alert['extra']['use_item']) ? '.png' : '') . '">';
+				$alerts[$alert_id]['icon'] = '<img' .(empty($alert['extra']['use_item']) ? '' : ' style="width:16px; height:16px"') . ' class="alert_icon" src="' . (empty($alert['extra']['use_item']) ? $settings['default_images_url'] : $boardurl . Shop::$itemsdir) . (!empty($alert['extra']['item_icon']) ? ((empty($alert['extra']['use_item']) ? '/icons/shop/' : '') . $alert['extra']['item_icon']) : $alert['content_type']) . (empty($alert['extra']['use_item']) ? '.png' : '') . '">';
 				$alerts[$alert_id]['extra']['content_link'] = $alert['extra']['item_href'];
 			}
 	}

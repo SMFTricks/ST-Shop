@@ -59,7 +59,7 @@ function template_shop_inventory_search_below()
 	</script>';
 }
 
-function template_shop_inventory($inventory, $title = true)
+function template_shop_inventory($inventory, $memID, $title = true)
 {
 	global $scripturl, $txt;
 
@@ -74,7 +74,7 @@ function template_shop_inventory($inventory, $title = true)
 		$display_items .= Format::image($item['image'], $item['description']);
 
 	// Show more
-	$display_items .= '<br /><a href="'. $scripturl. '?action=shop;sa=invdisp;id='. $inventory[0]['userid']. '" onclick="return reqOverlayDiv(this.href, \''. $txt['Shop_posting_inventory']. '\', \'/icons/shop/top_inventories.png\');">'. $txt['Shop_posting_inventory_all']. '</a>';
+	$display_items .= '<br /><a href="'. $scripturl. '?action=shop;sa=invdisp;id='. $memID. '" onclick="return reqOverlayDiv(this.href, \''. $txt['Shop_posting_inventory']. '\', \'/icons/shop/top_inventories.png\');">'. $txt['Shop_posting_inventory_all']. '</a>';
 
 	return $display_items;
 }

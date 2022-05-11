@@ -52,7 +52,7 @@ class Permissions
 		// Shop permissions
 		$permissionGroups['membergroup'][] = 'shop';
 		foreach ($this->shop_permissions as $p)
-			$permissionList['membergroup'][$p] = [false,'shop'];
+			$permissionList['membergroup'][$p] = [false, 'shop'];
 
 		// Shop disabled? No permissions then
 		if (empty($modSettings['Shop_enable_shop']))
@@ -81,7 +81,7 @@ class Permissions
 	 * Loads the admin language file for the help popups in the permissions page
 	 * 
 	 */
-	public function language()
+	public static function language()
 	{
 		loadLanguage('Shop/ShopAdmin');
 	}

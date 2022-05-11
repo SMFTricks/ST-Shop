@@ -226,11 +226,12 @@ class Database
 		$request = $smcFunc['db_query']('','
 			SELECT ' . $column . '
 			FROM {db_prefix}{raw:table}'.(!empty($search) ? ('
-			WHERE ('. $column . (is_array($search) ? ' IN ({array_int:search})' : ('  = \''. $search . '\'')) . ') '.$additional_query) : '').'
+			WHERE ('. $column . (is_array($search) ? ' IN ({array_int:array_search})' : ('  = {int:search}')) . ') '.$additional_query) : '').'
 			LIMIT 1',
 			[
 				'table' => $table,
-				'search' => $search
+				'array_search' => $search,
+				'search' => $search,
 			]
 		);
 		$result = $smcFunc['db_num_rows']($request);
@@ -245,9 +246,10 @@ class Database
 
 		$smcFunc['db_query']('', '
 			DELETE FROM {db_prefix}{raw:table}
-			WHERE '. $column . (is_array($search) ? ' IN ({array_int:search})' : (' = ' . $search)) . $additional_query,
+			WHERE '. $column . (is_array($search) ? ' IN ({array_int:array_search})' : '  = {int:search}') . $additional_query,
 			[
 				'table' => $table,
+				'array_search' => $search,
 				'search' => $search,
 			]
 		);
@@ -282,7 +284,7 @@ class Database
 		global $smcFunc;
 
 		$smcFunc['db_query']('','
-			UPDATE IGNORE {db_prefix}'.$table .  '
+			UPDATE {db_prefix}'.$table .  '
 			SET
 			'.rtrim($types, ', ') . '
 			'.$query,

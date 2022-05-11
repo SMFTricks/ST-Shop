@@ -204,7 +204,7 @@ class Categories extends Dashboard
 
 	public function set_cat()
 	{
-		global $context, $boardurl, $txt, $item_info, $scripturl;
+		global $context, $boardurl;
 
 		// Template...
 		loadTemplate('Shop/ShopAdmin');
@@ -223,10 +223,10 @@ class Categories extends Dashboard
 		$context['shop_images_list'] = Images::list();
 
 		// Edit, or Add?
-		if ($_REQUEST['sa'] == 'edit')
+		if ($_REQUEST['sa'] == 'edit' && isset($_REQUEST['id']))
 		{
 			// Try to find this item
-			if (empty(Database::Find('stshop_categories AS sc', 'sc.catid', (int) $_REQUEST['id'])))
+			if (empty($_REQUEST['id']) || empty(Database::Find('stshop_categories AS sc', 'sc.catid', (int) $_REQUEST['id'])))
 				fatal_error(Shop::getText('cat_notfound'), false);
 
 			// Get category

@@ -107,7 +107,7 @@ class Dashboard
 					'permission' => ['shop_canManage'],
 					'enabled' => !empty($modSettings['Shop_enable_shop']),
 					'subsections' => [
-						'index' => [Shop::getText('tab_items')],
+						'index' => [Shop::getText('items_list')],
 						'add' => [Shop::getText('items_add')],
 						'upload' => [Shop::getText('items_upload')],
 					],
@@ -119,7 +119,7 @@ class Dashboard
 					'permission' => ['admin_forum'],
 					'enabled' => !empty($modSettings['Shop_enable_shop']),
 					'subsections' => [
-						'index' => [Shop::getText('tab_modules')],
+						'index' => [Shop::getText('modules_list')],
 						'upload' => [Shop::getText('modules_upload')],
 					],
 				],
@@ -130,7 +130,7 @@ class Dashboard
 					'permission' => ['shop_canManage'],
 					'enabled' => !empty($modSettings['Shop_enable_shop']),
 					'subsections' => [
-						'index' => [Shop::getText('tab_cats')],
+						'index' => [Shop::getText('cats_list')],
 						'add' => [Shop::getText('cats_add')],
 					],
 				],
@@ -243,7 +243,7 @@ class Dashboard
 		$context['Shop']['credits'] = $this->credits();
 
 		// Load the currrent version for this mod
-		loadJavaScriptFile('https://smftricks.com/assets/version/Shop/version.js', ['external' => true]);
+		loadJavaScriptFile('https://smftricks.com/assets/version/Shop/version.js', ['external' => true, 'defer' =>true]);
 
 		// Feed news
 		addInlineJavascript('

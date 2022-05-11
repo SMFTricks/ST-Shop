@@ -84,7 +84,7 @@ class Boards
 		$boardOptions['Shop_credits_count'] = 1;
 	}
 
-	public function modify_board($id, $boardOptions, &$boardUpdates, &$boardUpdateParameters)
+	public static function modify_board($id, $boardOptions, &$boardUpdates, &$boardUpdateParameters)
 	{
 		$boardOptions['Shop_credits_count'] = isset($_POST['Shop_credits_count']);
 		$boardOptions['Shop_credits_topic'] = !empty($_POST['Shop_credits_topic']) ? (int) $_POST['Shop_credits_topic'] : 0;

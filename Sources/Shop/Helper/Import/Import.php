@@ -277,7 +277,7 @@ abstract class Import
 				$this->_types[$column] = str_replace('integer', 'int', gettype($type));
 
 			// Insert the items into the database
-			Database::Insert('stshop_inventory', $this->_shop_inventory, $this->_types, ['id'], 'replace');
+			Database::Insert('stshop_inventory', $this->_shop_inventory, $this->_types, ['id']);
 
 			// Get our total of items imported
 			$this->_total_imported = $smcFunc['db_affected_rows']();

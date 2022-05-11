@@ -1,19 +1,16 @@
- <p align="center">
-    <img src="https://smftricks.com/logos/logo.png">
- </p>
- 
- <img src="https://img.shields.io/badge/License-MPL%202.0-a05a3f?style=flat-square">  <img src="https://img.shields.io/badge/SMF-2.1-3f73a0?style=flat-square">
+![SMF Tricks - Free & Premium Mods and Themes for SMF](https://smftricks.com/logos/logo.png)
 
- 
-## ST Shop for SMF
-- Developed by [Diego Andrés](https://github.com/DiegoAndresCortes)
-- Original developer: [Sleepy Arcade™](https://github.com/SAMods)
-- Original idea: [Daniel15](https://github.com/Daniel15)
+# ST Shop for SMF
+![License](https://img.shields.io/badge/License-MPL%202.0-248049) ![Hooks Only](https://img.shields.io/badge/Hooks%20Only-Yes-6041a3) ![SMF 2.1](https://img.shields.io/badge/SMF-2.1-3f73a0)
+
+* Developed by [Diego Andrés](https://github.com/DiegoAndresCortes)
+* Original Developer: [Sleepy Arcade™](https://github.com/SAMods)
+* Original Idea: [Daniel15](https://github.com/Daniel15)
 
 ## Introduction
-* ST Shop allows you to add a shop to your forum and gives you a wide variety of options to customize your shop for your users experience.
+ST Shop allows you to add a shop to your forum and gives you a wide variety of options to customize your shop for your users experience.
 
-## Features
+### Features
 - Enable shop
   - You can use the shop features as a standalone points system
 - Custom credits/currency
@@ -38,15 +35,11 @@
   - Select your favorite items to display
 - Shop stats
 
-## Requirements
-* SMF 2.1
-
-## How to install
-* You can install ST Shop through the package manager of your forum administration.
-
-## More Modules
-* You can find some more "official" modules in the [ST Shop Modules](https://github.com/SMFTricks/ST-Shop-Modules) repository.
-
-## Changelog
-You can find the changelog for ST Shop on SMF Tricks: [Changelog](https://smftricks.com/index.php?board=51.0)
-
+### Localization
+- ![English](https://www.simplemachines.org/site_images/lang/english.gif) English
+---
+### [Changelog](https://github.com/SMFTricks/ST-Shop/blob/master/CHANGELOG.md)
+### [GitHub](https://github.com/SMFTricks/ST-Shop)
+---
+### [ST Shop Modules](https://github.com/SMFTricks/ST-Shop-Modules)
+### [Modules and Addons Discussion](https://smftricks.com/index.php?board=109.0)

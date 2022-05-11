@@ -119,3 +119,16 @@ $txt['Shop_pmg_nogroups'] = 'You don\'t have any special groups to select';
 $txt['Shop_pmg_setting1'] = 'Membergroup';
 $txt['Shop_pmg_setting1_desc'] = 'Select the membergroup the user will get when usin the item.';
 $txt['Shop_pmg_success'] = 'You have successfully joined the group!';
+// Steal Item
+$txt['Shop_si_name'] = 'Steal Item';
+$txt['Shop_si_desc'] = 'Steal an item from another member';
+$txt['Shop_si_setting1'] = 'Probability of successful steal:';
+$txt['Shop_si_setting1_desc'] = 'For steal, user does NOT need to, and should NOT know the probability! It\'s more fun this way :-)';
+$txt['Shop_si_setting2'] = 'Send personal message:';
+$txt['Shop_si_setting2_desc'] = 'When a user gets robbed shop will send a pm with information about who robbed them and what item they stole from them';
+$txt['Shop_si_setting3'] = 'Send alert:';
+$txt['Shop_si_setting3_desc'] = 'When a user gets robbed shop will send an alert with information about who robbed them and what item they stole from them';
+$txt['Shop_si_success1'] = 'You successfully stole from %2$s, you robbed the item "%1$s"'; 
+$txt['Shop_si_error'] = 'That user does not exist or is not carrying any items!';
+$txt['Shop_si_notification_pm'] = 'We are sorry to inform you that you just have been robbed!' . "\n" . '[url=%1$s]%2$s[/url] has stripped you of the item [i]%3$s[/i] from your inventory.' . "\n\n" . 'This is an automatic notification, have a good day.' . "\n" .'- Forum Shop';
+$txt['alert_shop_module_steal_item'] = '{member_link} just robbed you the item "{item}" from your inventory!';

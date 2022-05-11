@@ -313,7 +313,7 @@ class Items extends Dashboard
 		$context['shop_categories_list'] = Database::Get(0, 1000, 'sc.name', 'stshop_categories AS sc', Database::$categories);
 
 		// Edit, or Add?
-		if ($_REQUEST['sa'] == 'edit')
+		if ($_REQUEST['sa'] == 'edit' && isset($_REQUEST['id']))
 		{
 			// Get item
 			$context['shop_item'] = Database::Get('', '', '', 'stshop_items AS s', array_merge(Database::$items, ['sm.file']), 'WHERE s.itemid = {int:itemid}', true, 'LEFT JOIN {db_prefix}stshop_modules AS sm ON (sm.id = s.module)', ['itemid' => (int) (isset($_REQUEST['id']) ? $_REQUEST['id'] : 0)]);
@@ -396,7 +396,7 @@ class Items extends Dashboard
 		// Data
 		$this->_fields_data = [
 			'itemid' => (int) isset($_REQUEST['id']) && !empty($_REQUEST['id']) ? $_REQUEST['id'] : 0,
-			'name' => (string) isset($_REQUEST['itemname']) ? Database::sanitize($_REQUEST['itemname']) : '',
+			'name' => (string) isset($_REQUEST['itemname']) ? un_htmlspecialchars(Database::sanitize($_REQUEST['itemname'])) : '',
 			'image' => (string) isset($_REQUEST['icon']) ? Database::sanitize($_REQUEST['icon']) : '',
 			'description' => (string) isset($_REQUEST['itemdesc']) ? Database::sanitize($_REQUEST['itemdesc']) : '',
 			'price' => (int) isset($_REQUEST['itemprice']) && !empty($_REQUEST['itemprice']) ? $_REQUEST['itemprice'] : 0,

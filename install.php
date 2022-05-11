@@ -103,7 +103,6 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'itemid',
 					'type' => 'int',
-					'size' => 10,
 					'auto' => true,
 					'not_null' => true,
 					'unsigned' => true,
@@ -142,30 +141,32 @@ elseif (!defined('SMF'))
 					'name' => 'module',
 					'type' => 'int',
 					'not_null' => true,
-					'size' => 10,
 					'default' => 0,
 					'unsigned' => true,
 				],
 				[
 					'name' => 'info1',
 					'type' => 'int',
+					'default' => 0,
 				],
 				[
 					'name' => 'info2',
 					'type' => 'int',
+					'default' => 0,
 				],
 				[
 					'name' => 'info3',
 					'type' => 'int',
+					'default' => 0,
 				],
 				[
 					'name' => 'info4',
 					'type' => 'int',
+					'default' => 0,
 				],
 				[
 					'name' => 'input_needed',
 					'type' => 'tinyint',
-					'size' => 1,
 					'default' => 0,
 					'not_null' => true,
 					'unsigned' => true,
@@ -173,7 +174,6 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'can_use_item',
 					'type' => 'tinyint',
-					'size' => 1,
 					'default' => 0,
 					'not_null' => true,
 					'unsigned' => true,
@@ -181,7 +181,6 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'delete_after_use',
 					'type' => 'tinyint',
-					'size' => 1,
 					'default' => 0,
 					'not_null' => true,
 					'unsigned' => true,
@@ -213,6 +212,10 @@ elseif (!defined('SMF'))
 					'type' => 'primary',
 					'columns' => ['itemid'],
 				],
+				[
+					'type' => 'index',
+					'columns' => ['status', 'can_use_item', 'module', 'input_needed', 'stock'],
+				],
 			],
 			'if_exists' => 'ignore',
 			'error' => 'fatal',
@@ -225,7 +228,6 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'id',
 					'type' => 'int',
-					'size' => 10,
 					'auto' => true,
 					'not_null' => true,
 					'unsigned' => true,
@@ -299,6 +301,10 @@ elseif (!defined('SMF'))
 					'type' => 'primary',
 					'columns' => ['id'],
 				],
+				[
+					'type' => 'index',
+					'columns' => ['can_use_item', 'require_input'],
+				]
 			],
 			'if_exists' => 'ignore',
 			'error' => 'fatal',
@@ -311,7 +317,6 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'id',
 					'type' => 'mediumint',
-					'size' => 10,
 					'auto' => true,
 					'not_null' => true,
 					'unsigned' => true,
@@ -319,20 +324,17 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'userid',
 					'type' => 'mediumint',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],	
 				[
 					'name' => 'itemid',
 					'type' => 'int',
-					'size' => 10,
 					'unsigned' => true,
 				],
 				[
 					'name' => 'trading',
 					'type' => 'tinyint',
-					'size' => 1,
 					'default' => 0,
 					'not_null' => true,
 					'unsigned' => true,
@@ -370,8 +372,12 @@ elseif (!defined('SMF'))
 			'indexes' => [
 				[
 					'type' => 'primary',
-					'columns' => ['id'],
+					'columns' => ['id', 'userid', 'trading'],
 				],
+				[
+					'type' => 'index',
+					'columns' => ['date', 'fav', 'tradedate'],
+				]
 			],
 			'if_exists' => 'ignore',
 			'error' => 'fatal',
@@ -384,7 +390,6 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'catid',
 					'type' => 'int',
-					'size' => 5,
 					'auto' => true,
 					'not_null' => true,
 					'unsigned' => true,
@@ -424,7 +429,6 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'id',
 					'type' => 'int',
-					'size' => 10,
 					'auto' => true,
 					'not_null' => true,
 					'unsigned' => true,
@@ -432,28 +436,24 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'itemid',
 					'type' => 'int',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
 				[
 					'name' => 'invid',
 					'type' => 'mediumint',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
 				[
 					'name' => 'userid',
 					'type' => 'mediumint',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
 				[
 					'name' => 'sellerid',
 					'type' => 'mediumint',
-					'size' => 10,
 					'default' => 0,
 					'not_null' => true,
 					'unsigned' => true,
@@ -461,14 +461,12 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'amount',
 					'type' => 'int',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
 				[
 					'name' => 'fee',
 					'type' => 'int',
-					'size' => 10,
 					'default' => 0,
 					'not_null' => true,
 					'unsigned' => true,
@@ -477,15 +475,18 @@ elseif (!defined('SMF'))
 					'name' => 'date',
 					'type' => 'int',
 					'not_null' => true,
-					'size' => 11,
 					'unsigned' => true,
 				],
 			],
 			'indexes' => [
 				[
 					'type' => 'primary',
-					'columns' => ['id'],
+					'columns' => ['id', 'userid', 'itemid'],
 				],
+				[
+					'type' => 'index',
+					'columns' => ['date', 'sellerid', 'invid'],
+				]
 			],
 			'if_exists' => 'ignore',
 			'error' => 'fatal',
@@ -497,7 +498,6 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'id',
 					'type' => 'int',
-					'size' => 10,
 					'auto' => true,
 					'not_null' => true,
 					'unsigned' => true,
@@ -505,35 +505,30 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'userid',
 					'type' => 'mediumint',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
 				[
 					'name' => 'receiver',
 					'type' => 'mediumint',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
 				[
 					'name' => 'amount',
 					'type' => 'int',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
 				[
 					'name' => 'itemid',
 					'type' => 'mediumint',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
 				[
 					'name' => 'invid',
 					'type' => 'mediumint',
-					'size' => 10,
 					'default' => 0,
 					'not_null' => true,
 					'unsigned' => true,
@@ -555,15 +550,18 @@ elseif (!defined('SMF'))
 					'name' => 'date',
 					'type' => 'int',
 					'not_null' => true,
-					'size' => 11,
 					'unsigned' => true,
 				],
 			],
 			'indexes' => [
 				[
 					'type' => 'primary',
-					'columns' => ['id'],
+					'columns' => ['id', 'userid', 'receiver'],
 				],
+				[
+					'type' => 'index',
+					'columns' => ['date', 'itemid', 'is_admin'],
+				]
 			],
 			'if_exists' => 'ignore',
 			'error' => 'fatal',
@@ -575,7 +573,6 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'id',
 					'type' => 'int',
-					'size' => 10,
 					'auto' => true,
 					'not_null' => true,
 					'unsigned' => true,
@@ -583,21 +580,18 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'userid',
 					'type' => 'mediumint',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
 				[
 					'name' => 'amount',
 					'type' => 'int',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
 				[
 					'name' => 'fee',
 					'type' => 'mediumint',
-					'size' => 10,
 					'default' => 0,
 					'not_null' => true,
 					'unsigned' => true,
@@ -610,7 +604,6 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'type',
 					'type' => 'smallint',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
@@ -618,14 +611,13 @@ elseif (!defined('SMF'))
 					'name' => 'date',
 					'type' => 'int',
 					'not_null' => true,
-					'size' => 11,
 					'unsigned' => true,
 				],
 			],
 			'indexes' => [
 				[
 					'type' => 'primary',
-					'columns' => ['id'],
+					'columns' => ['id', 'userid', 'type'],
 				],
 			],
 			'if_exists' => 'ignore',
@@ -638,7 +630,6 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'id',
 					'type' => 'int',
-					'size' => 10,
 					'auto' => true,
 					'not_null' => true,
 					'unsigned' => true,
@@ -646,14 +637,12 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'userid',
 					'type' => 'mediumint',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
 				[
 					'name' => 'amount',
 					'type' => 'int',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
@@ -666,15 +655,18 @@ elseif (!defined('SMF'))
 					'name' => 'date',
 					'type' => 'int',
 					'not_null' => true,
-					'size' => 11,
 					'unsigned' => true,
 				],
 			],
 			'indexes' => [
 				[
 					'type' => 'primary',
-					'columns' => ['id'],
+					'columns' => ['id', 'userid'],
 				],
+				[
+					'type' => 'index',
+					'columns' => ['date'],
+				]
 			],
 			'if_exists' => 'ignore',
 			'error' => 'fatal',
@@ -688,14 +680,12 @@ elseif (!defined('SMF'))
 				[
 					'name' => 'id_msg',
 					'type' => 'int',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
 				[
 					'name' => 'id_member',
 					'type' => 'mediumint',
-					'size' => 10,
 					'not_null' => true,
 					'unsigned' => true,
 				],
@@ -729,6 +719,7 @@ elseif (!defined('SMF'))
 				'name' => 'Shop_credits_count',
 				'type' => 'tinyint',
 				'default' => 1,
+				'unsigned' => true,
 				'not_null' => true,
 			]
 		);
@@ -738,6 +729,7 @@ elseif (!defined('SMF'))
 				'name' => 'Shop_credits_topic',
 				'type' => 'int',
 				'default' => 0,
+				'unsigned' => true,
 				'not_null' => true,
 			]
 		);
@@ -747,6 +739,7 @@ elseif (!defined('SMF'))
 				'name' => 'Shop_credits_post',
 				'type' => 'int',
 				'default' => 0,
+				'unsigned' => true,
 				'not_null' => true,
 			]
 		);
@@ -756,6 +749,7 @@ elseif (!defined('SMF'))
 				'name' => 'Shop_credits_bonus',
 				'type' => 'tinyint',
 				'default' => 0,
+				'unsigned' => true,
 				'not_null' => true,
 			]
 		);
@@ -787,6 +781,7 @@ elseif (!defined('SMF'))
 				'name' => 'shopInventory_hide',
 				'type' => 'int',
 				'default' => 0,
+				'unsigned' => true,
 				'not_null' => true,
 			]
 		);
