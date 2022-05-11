@@ -3,9 +3,9 @@
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
 	<id>smftricks:shop</id>
 	<name>ST Shop</name>
-	<version>4.1.10</version>
+	<version>4.1.11</version>
 	<type>modification</type>
-	<install for="2.1 - 2.1.99, 2.1 RC4">
+	<install for="2.1 - 2.1.99">
 		<!-- Mod Readme -->
 		<readme lang="english" parsebbc="true" type="file">readme/readme.english.txt</readme>
 		<!-- Credits -->
@@ -30,7 +30,7 @@
 		<redirect url="?action=admin;area=shopinfo">redirect.txt</redirect>
 	</install>
 
-	<uninstall for="2.1 - 2.1.99, 2.1 RC4">
+	<uninstall for="2.1 - 2.1.99">
 		<!-- Hooks Remove -->
 		<hook hook="integrate_pre_load" function="Shop\Shop::initialize" file="$sourcedir/Shop/Shop.php" reverse="true" />
 		<!-- Source Files -->
