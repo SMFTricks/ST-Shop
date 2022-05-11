@@ -41,7 +41,6 @@ ST Shop allows you to add a shop to your forum and gives you a wide variety of o
 ### More Modules
 * You can find some official modules in the [ST Shop Modules](https://github.com/SMFTricks/ST-Shop-Modules) repository.
 ---
-### [Modules Discussion](https://smftricks.com/index.php?board=109.0)
 ### [Changelog](https://github.com/SMFTricks/ST-Shop/blob/master/CHANGELOG.md)
 ### [GitHub](https://github.com/SMFTricks/ST-Shop)
-
+### [Modules Discussion](https://smftricks.com/index.php?board=109.0)
