@@ -309,7 +309,7 @@ class Inventory extends Dashboard
 
 	public function view_inventory()
 	{
-		global $context, $modSettings, $user_info, $memberContext, $sourcedir;
+		global $context, $user_info, $memberContext, $sourcedir;
 
 		// Keep the tab active
 		$context[$context['admin_menu_name']]['current_subsection'] = 'search';
