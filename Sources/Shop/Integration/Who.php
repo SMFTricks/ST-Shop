@@ -69,13 +69,18 @@ class Who
 	 */
 	public function whos_online_after(&$urls, &$data)
 	{
-		global $modSettings;
+		global $modSettings, $user_info;
 
 		// We do nothing if shop is disabled or user can't see it
 		if (empty($modSettings['Shop_enable_shop']) || !allowedTo('shop_canAccess'))
 			return;
 
-		foreach ($urls as $k => $url)
+		// Fix the anomaly where $urls is a string when coming from the profile section.
+		if (!is_array($urls))
+			$url_list = array(array($urls, $user_info['id']));
+		else
+			$url_list = $urls;
+		foreach ($url_list as $k => $url)
 		{
 			// Get the request parameters..
 			$actions = Database::json_decode($url[0], true);
