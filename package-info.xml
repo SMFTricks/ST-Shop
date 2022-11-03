@@ -3,7 +3,7 @@
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
 	<id>smftricks:shop</id>
 	<name>ST Shop</name>
-	<version>4.1.12</version>
+	<version>4.2</version>
 	<type>modification</type>
 	<install for="2.1 - 2.1.99">
 		<!-- Mod Readme -->
@@ -25,14 +25,14 @@
 		<!-- Database -->
 		<database>install.php</database>
 		<!-- Hooks -->
-		<hook hook="integrate_pre_load" function="Shop\Shop::initialize" file="$sourcedir/Shop/Shop.php" />
+		<hook hook="integrate_pre_load" function="Shop\Shop::initialize#" file="$sourcedir/Shop/Shop.php" />
 		<!-- Redirect -->
 		<redirect url="?action=admin;area=shopinfo">redirect.txt</redirect>
 	</install>
 
 	<uninstall for="2.1 - 2.1.99">
 		<!-- Hooks Remove -->
-		<hook hook="integrate_pre_load" function="Shop\Shop::initialize" file="$sourcedir/Shop/Shop.php" reverse="true" />
+		<hook hook="integrate_pre_load" function="Shop\Shop::initialize#" file="$sourcedir/Shop/Shop.php" reverse="true" />
 		<!-- Source Files -->
 		<remove-dir name="$sourcedir/Shop">Source files</remove-dir>
 		<!-- Languages -->
