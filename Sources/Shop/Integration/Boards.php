@@ -13,9 +13,6 @@ namespace Shop\Integration;
 use Shop\Shop;
 use Shop\Helper\Format;
 
-if (!defined('SMF'))
-	die('No direct access...');
-
 class Boards
 {
 	/**
@@ -34,13 +31,36 @@ class Boards
 		$this->_columns = ['Shop_credits_count', 'Shop_credits_topic', 'Shop_credits_post', 'Shop_credits_bonus'];
 	}
 
-	public function pre_boardtree(&$boardColumns, &$boardParameters, &$boardJoins, &$boardWhere, &$boardOrder)
+	/**
+	 * Boards::load_board()
+	 * 
+	 * Add the board columns to the select query
+	 * 
+	 * @param array $custom_column_selects The additional custom board columns
+	 */
+	public function load_board(&$custom_column_selects) : void
 	{
+		// Add the columns
 		foreach ($this->_columns as $column)
-			$boardColumns[] = 'b.' . $column;
+			$custom_column_selects[] = 'b.' . $column;
 	}
 
-	public function boardtree_board($row)
+	/**
+	 * Boards::board_info()
+	 * 
+	 * Add the board columns to the board info array
+	 * 
+	 * @param array $board_info The board information
+	 * @param array $row The board row
+	 */
+	public function board_info(&$board_info, $row) : void
+	{
+		// Add the columns
+		foreach ($this->_columns as $column)
+			$board_info[$column] = $row[$column];
+	}
+
+	public function boardtree_board($row) : void
 	{
 		global $boards;
 
@@ -49,7 +69,7 @@ class Boards
 				$boards[$row['id_board']][$setting] = $row[$setting];
 	}
 
-	public function edit_board()
+	public function edit_board() : void
 	{
 		global $context, $modSettings;
 
@@ -77,14 +97,14 @@ class Boards
 		];
 	}
 
-	public function create_board(&$boardOptions, &$board_columns, &$board_parameters)
+	public function create_board(&$boardOptions, &$board_columns, &$board_parameters) : void
 	{
 		foreach ($this->_columns as $setting)
 			$boardOptions[$setting] = 0;
 		$boardOptions['Shop_credits_count'] = 1;
 	}
 
-	public static function modify_board($id, $boardOptions, &$boardUpdates, &$boardUpdateParameters)
+	public static function modify_board($id, $boardOptions, &$boardUpdates, &$boardUpdateParameters) : void
 	{
 		$boardOptions['Shop_credits_count'] = isset($_POST['Shop_credits_count']);
 		$boardOptions['Shop_credits_topic'] = !empty($_POST['Shop_credits_topic']) ? (int) $_POST['Shop_credits_topic'] : 0;
