@@ -12,93 +12,67 @@ namespace Shop\Integration;
 
 use Shop\Helper\Database;
 
-if (!defined('SMF'))
-	die('No direct access...');
-
 class Posting
 {
 	/**
 	 * @var array Will set default values for credits, bonuses and the user id.
 	 */
-	private $_post_shop = [];
-
-	/**
-	 * @var array It will save the board information with the provided details.
-	 */
-	private $_shop_info;
-
-	/**
-	 * @var object Need to create a new instance of Boards.
-	 */
-	private $_boards;
-
-	/**
-	 * Posting::__construct()
-	 *
-	 * Add default values for the posting values, and create a new instance of Boards
-	 */
-	function __construct()
-	{
-		// Some defaults for fallback
-		$this->_post_shop = [
-			'credits' => 0,
-			'bonus' => 0,
-			'user' => 0
-		];
-		// Create instance of boards..
-		$this->_boards = new Boards;
-	}
+	private $_post_shop = [
+		'credits' => 0,
+		'bonus' => 0,
+		'user' => 0
+	];
 
 	/**
 	 * Posting::after_create_post()
 	 *
 	 * Used for giving money/credits/points to the users when posting.
 	 * This will run even if the shop is disabled, it allows stand-alone integration.
-	 * @param array $msgOptions An array of information/options for the post
 	 * @param array $topicOptions An array of information/options for the topic
 	 * @param array $posterOptions An array of information/options for the poster
-	 * @param array $message_columns An array containing the columns of topics table
-	 * @param array $message_parameters An array containing the values for every column
-	 * @return void
 	 */
-	public function after_create_post($msgOptions, $topicOptions, $posterOptions, $message_columns, $message_parameters)
+	public function after_create_post($msgOptions, array $topicOptions, array $posterOptions) : void
 	{
-		global $modSettings;
-
-		// Get the board info
-		$this->_shop_info = Database::Get('', '', '', 'boards', $this->_boards->_columns, 'WHERE id_board = {int:board}', true, '', ['board' => $topicOptions['board']]);
+		global $modSettings, $board_info;
 
 		// Is it even enabled?
-		if (!empty($this->_shop_info['Shop_credits_count']) && !empty($posterOptions['id']))
-		{
-			// Set the user
-			$this->_post_shop['user'] = $posterOptions['id'];
+		if (empty($board_info['Shop_credits_count']) || empty($posterOptions['id']))
+			return;
 
-			// Figure out the correct initial amount
-			$this->_post_shop['credits'] = (empty($topicOptions['id']) ? (!empty($this->_shop_info['Shop_credits_topic']) ? $this->_shop_info['Shop_credits_topic'] : $modSettings['Shop_credits_topic']) : (!empty($this->_shop_info['Shop_credits_post']) ? $this->_shop_info['Shop_credits_post'] : $modSettings['Shop_credits_post']));
+		// Set the user
+		$this->_post_shop['user'] = $posterOptions['id'];
+
+		// Figure out the correct initial amount
+		$this->_post_shop['credits'] = (empty($topicOptions['id']) ? (!empty($board_info['Shop_credits_topic']) ? $board_info['Shop_credits_topic'] : $modSettings['Shop_credits_topic']) : (!empty($board_info['Shop_credits_post']) ? $board_info['Shop_credits_post'] : $modSettings['Shop_credits_post']));
 			
-			// Bonus
-			if (!empty($this->_shop_info['Shop_credits_bonus']) && (($modSettings['Shop_credits_word'] > 0) || ($modSettings['Shop_credits_character'] > 0)))
-			{
-				// no, BBCCode won't count
-				$plaintext = preg_replace('[\[(.*?)\]]', ' ', $_POST['message']);
-				// convert newlines to spaces
-				$plaintext = str_replace(['<br />', "\r", "\n"], ' ', $plaintext);
-				// convert multiple spaces into one
-				$plaintext = preg_replace('/\s+/', ' ', $plaintext);
-				// bonus for each word
-				$this->_post_shop['bonus'] += ($modSettings['Shop_credits_word'] * str_word_count($plaintext));
-				// and for each letter
-				$this->_post_shop['bonus'] += ($modSettings['Shop_credits_character'] * strlen($plaintext));
+		// Bonus
+		if (!empty($board_info['Shop_credits_bonus']) && (($modSettings['Shop_credits_word'] > 0) || ($modSettings['Shop_credits_character'] > 0)))
+		{
+			// no, BBCCode won't count
+			$plaintext = preg_replace('[\[(.*?)\]]', ' ', $_POST['message']);
+			// convert newlines to spaces
+			$plaintext = str_replace(['<br />', "\r", "\n"], ' ', $plaintext);
+			// convert multiple spaces into one
+			$plaintext = preg_replace('/\s+/', ' ', $plaintext);
+			// bonus for each word
+			$this->_post_shop['bonus'] += ($modSettings['Shop_credits_word'] * str_word_count($plaintext));
+			// Remove the spaces
+			$plaintext = str_replace(' ', '', $plaintext);
+			// And now count the characters
+			$this->_post_shop['bonus'] += ($modSettings['Shop_credits_character'] * strlen($plaintext));
 
-				// Limit?
-				if (isset($modSettings['Shop_credits_limit']) && $modSettings['Shop_credits_limit'] != 0 && $this->_post_shop['bonus'] > $modSettings['Shop_credits_limit'])
-					$this->_post_shop['bonus'] = $modSettings['Shop_credits_limit'];
-			}
-
-			// and finally, give credits
-			Database::Update('members', $this->_post_shop, 'shopMoney = shopMoney + {int:credits} + {int:bonus}', 'WHERE id_member = {int:user}');
+			// Limit?
+			if (isset($modSettings['Shop_credits_limit']) && $modSettings['Shop_credits_limit'] != 0 && $this->_post_shop['bonus'] > $modSettings['Shop_credits_limit'])
+				$this->_post_shop['bonus'] = $modSettings['Shop_credits_limit'];
 		}
+
+		// and finally, give credits
+		Database::Update(
+			'members',
+			$this->_post_shop,
+			'shopMoney = shopMoney + {int:credits} + {int:bonus}',
+			'WHERE id_member = {int:user}'
+		);
 	}
 
 	/**
@@ -170,14 +144,14 @@ class Posting
 				// Credits + Bonus
 				$point = ($bonus + $credits);
 				// and finally, deduct credits
-				$result = $smcFunc['db_query']('','
+				$smcFunc['db_query']('','
 					UPDATE {db_prefix}members
 					SET shopMoney = shopMoney - {int:point}
 					WHERE id_member = {int:id_member}',
-					array(
+					[
 						'point' => $point,
 						'id_member' => $row['id_member'],
-					)
+					]
 				);
 			}
 		}
