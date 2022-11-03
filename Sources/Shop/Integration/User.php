@@ -14,9 +14,6 @@ use Shop\Shop;
 use Shop\Helper\Format;
 use Shop\View\Inventory;
 
-if (!defined('SMF'))
-	die('No direct access...');
-
 class User
 {
 	/**
