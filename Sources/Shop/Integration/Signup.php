@@ -10,9 +10,6 @@
 
 namespace Shop\Integration;
 
-if (!defined('SMF'))
-	die('No direct access...');
-
 class Signup
 {
 	/**
@@ -23,7 +20,7 @@ class Signup
 	 * @param array $regOptions An array of registration options
 	 * @return void
 	 */
-	public static function register(&$regOptions, &$theme_vars, &$knownInts, &$knownFloats)
+	public function register(array &$regOptions) : void
 	{
 		global $modSettings;
 
