@@ -46,10 +46,10 @@ class Shop
 	public static $supportSite;
 
 
-	public static function initialize()
+	public function initialize()
 	{
 		// Version and paths
-		self::$version = '4.1.12';
+		self::$version = '4.2';
 		self::$addonsdir = '/Shop/Integration/Addons/';
 		self::$itemsdir = '/shop_items/items/';
 		self::$modulesdir = '/Shop/Modules/';
@@ -57,21 +57,20 @@ class Shop
 		self::$supportSite = 'https://smftricks.com/index.php?action=.xml;sa=news;board=51;limit=10;type=rss2';
 
 		// Default Values
-		self::setDefaults();
+		$this->setDefaults();
 
 		// Hooks
-		self::defineHooks();
-		self::userHooks();
-		self::addonHooks();
+		$this->mainHooks();
+		// self::userHooks();
+		$this->addonHooks();
 	}
 
 	/**
 	 * Shop::setDefaults()
 	 *
 	 * Sets almost every setting to a default value
-	 * @return void
 	 */
-	public static function setDefaults()
+	public function setDefaults() : void
 	{
 		global $modSettings;
 
@@ -201,20 +200,31 @@ class Shop
 	}
 
 	/**
-	 * Shop::defineHooks()
+	 * Shop::mainHooks()
 	 *
-	 * Load hooks quietly
-	 * @return void
+	 * Load the main hooks for the mod
 	 */
-	public static function defineHooks()
+	public function mainHooks() : void
 	{
+		// The main hooks
 		$hooks = [
-			'autoload' => 'autoload',
-			'menu_buttons' => 'hookButtons',
-			'actions' => 'hookActions',
+			'autoload' => false,
+			'actions' => false,
+			'load_board' => 'Boards',
+			'board_info' => 'Boards',
+			'menu_buttons' => 'Buttons',
+			'load_member_data' => 'User',
+			'user_info' => 'User',
+			'simple_actions' => 'User',
+			'member_context' => 'User',
+			'fetch_alerts' => 'User',
 		];
+
+		// Load the hooks
 		foreach ($hooks as $point => $callable)
-			add_integration_function('integrate_' . $point, __CLASS__ . '::' . $callable, false);
+		{
+			add_integration_function('integrate_' . $point, (!empty($callable) ? (__NAMESPACE__ . '\\Integration\\' . $callable) : __CLASS__)  . '::' . $point . '#', false);
+		}
 	}
 
 	/**
@@ -222,9 +232,8 @@ class Shop
 	 * 
 	 * Load hooks from addons/mods
 	 * 
-	 * @return void
 	 */
-	public static function addonHooks()
+	public function addonHooks() : void
 	{
 		global $sourcedir;
 
@@ -241,7 +250,7 @@ class Shop
 		foreach ($addons as $addon)
 		{
 			if (is_callable($class . $addon . '\\'. $addon, 'integration'))
-				add_integration_function('integrate_pre_load_theme', $class . $addon . '\\'. $addon .'::integration', false);
+				add_integration_function('integrate_pre_load_theme', $class . $addon . '\\'. $addon .'::integration#', false);
 		}
 	}
 
@@ -249,9 +258,8 @@ class Shop
 	 * Shop::autoload()
 	 *
 	 * @param array $classMap
-	 * @return void
 	 */
-	public static function autoload(&$classMap)
+	public function autoload(&$classMap) : void
 	{
 		$classMap['Shop\\'] = 'Shop/';
 	}
@@ -261,9 +269,8 @@ class Shop
 	 *
 	 * Insert the actions needed by this mod
 	 * @param array $actions An array containing all possible SMF actions. This includes loading different hooks for certain areas.
-	 * @return void
 	 */
-	public static function hookActions(&$actions)
+	public function actions(&$actions) : void
 	{
 		// The main action
 		$actions['shop'] = ['Shop/View/Home.php', __NAMESPACE__  . '\View\Home::main#'];
@@ -271,6 +278,18 @@ class Shop
 		// Feed
 		$actions['shopfeed'] = [false, __CLASS__ . '::getFeed'];
 
+		// Load hooks based in the action
+		$this->actionHooks($actions);
+	}
+
+	/**
+	 * Shop::actionHooks()
+	 * 
+	 * Load hooks based on the action
+	 * 
+	 */
+	private function actionHooks() : void
+	{
 		// Need to be somewhere
 		if (!isset($_REQUEST['action']) || empty($_REQUEST['action']))
 			return;
@@ -314,71 +333,11 @@ class Shop
 	}
 
 	/**
-	 * Shop::userHooks()
-	 *
-	 * Load member and custom fields hooks
-	 * @return void
-	 */
-	public static function userHooks()
-	{
-		// Load user and alerts hooks
-		$hooks = [
-			'load_member_data',
-			'user_info',
-			'simple_actions',
-			'member_context',
-			'fetch_alerts',
-		];
-		foreach ($hooks as $hook)
-			add_integration_function('integrate_' . $hook, __NAMESPACE__ . '\Integration\User::' . $hook.'#', false);
-	}
-
-	/**
-	 * Shop::hookButtons()
-	 *
-	 * Insert a Shop button on the menu buttons array
-	 * @param array $buttons An array containing all possible tabs for the main menu.
-	 * @return void
-	 */
-	public static function hookButtons(&$buttons)
-	{
-		global $scripturl, $modSettings;
-
-		// Languages
-		loadLanguage(__NAMESPACE__ . '/Shop');
-
-		$before = 'mlist';
-		$temp_buttons = [];
-		foreach ($buttons as $k => $v) {
-			if ($k == $before) {
-				$temp_buttons['shop'] = [
-					'title' => self::getText('main_button'),
-					'href' => $scripturl . '?action=shop',
-					'icon' => 'icons/shop.png',
-					'show' => (allowedTo('shop_canAccess') || allowedTo('shop_canManage')) && !empty($modSettings['Shop_enable_shop']),
-					'sub_buttons' => [
-						'shopadmin' => [
-							'title' => self::getText('admin_button'),
-							'href' => $scripturl . '?action=admin;area=shopinfo',
-							'show' => allowedTo('shop_canManage'),
-						],
-					],
-				];
-			}
-			$temp_buttons[$k] = $v;
-		}
-		$buttons = $temp_buttons;
-
-		// Add the prefix permission to the admin button
-		$buttons['admin']['show'] = $buttons['admin']['show']  || allowedTo('shop_canManage');
-	}
-
-	/**
 	 * Shop::getText()
 	 *
 	 * Gets a string key, and returns the associated text string.
 	 */
-	public static function getText($text, $pattern = true)
+	public static function getText($text, $pattern = true) : string
 	{
 		global $txt;
 
@@ -389,10 +348,8 @@ class Shop
 	 * Shop::getFeed()
 	 *
 	 * Proxy function to avoid Cross-origin errors.
-	 * @return string
-	 * @author Jessica González <suki@missallsunday.com>
 	 */
-	public static function getFeed()
+	public static function getFeed() : void
 	{
 		global $sourcedir;
 
