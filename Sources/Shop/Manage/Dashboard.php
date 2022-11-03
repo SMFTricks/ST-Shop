@@ -311,7 +311,7 @@ class Dashboard
 	 */
 	public function manageboards()
 	{
-		add_integration_function('integrate_pre_boardtree', 'Shop\Integration\Boards::pre_boardtree#', false);
+		add_integration_function('integrate_pre_boardtree', 'Shop\Integration\Boards::load_board#', false);
 		add_integration_function('integrate_boardtree_board', 'Shop\Integration\Boards::boardtree_board#', false);
 		add_integration_function('integrate_edit_board', 'Shop\Integration\Boards::edit_board#', false);
 		add_integration_function('integrate_create_board', 'Shop\Integration\Boards::create_board#', false);
