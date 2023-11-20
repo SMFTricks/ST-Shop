@@ -1,5 +1,8 @@
 # Changelog
 
+#### 4.1.12 - 20 November 2023
+- ![Bug Fix](https://smftricks.com/assets/changelog/bug--minus.png) Various fixes.
+
 #### 4.1.11 - 10 May 2022
 - ![Improvement](https://smftricks.com/assets/changelog/tag--pencil.png) Use default theme path for images.
 - ![Improvement](https://smftricks.com/assets/changelog/tag--pencil.png) Improvements for some search queries.

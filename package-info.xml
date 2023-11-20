@@ -3,7 +3,7 @@
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
 	<id>smftricks:shop</id>
 	<name>ST Shop</name>
-	<version>4.1.11</version>
+	<version>4.1.12</version>
 	<type>modification</type>
 	<install for="2.1 - 2.1.99">
 		<!-- Mod Readme -->
